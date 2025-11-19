@@ -1,0 +1,16 @@
+﻿columns
+Date
+Code
+Open
+High
+Low
+Close
+Volume
+SMA_20
+RSI_14
+MACD
+MACD_Sig
+ATR_14
+Close_shift_5
+Return_5d
+Label_5d

@@ -1,0 +1,1895 @@
+호슬프로그램(주식추천 및 자동매매) 파이프라인
+
+1. 추천 프로그램 (AI 분석 파이프라인)
+***실행파일 python daily_recommender.py***
+'오늘의 Top 10' 추천 종목 리스트(recommendation_...csv)를 생성하는 **'오프라인 연구소'**입니다.
+
+1-1. 핵심 실행 파일 (.py)
+create_ticker_map.py: [종목명 사전 생성] FinanceDataReader를 이용해 ticker_map.parquet 파일을 생성합니다.
+build_database_V25.py: [V25 DB 구축] 'V21 DB'(all_features_cumulative_V21_Hoj.parquet)와 '종목명 사전'(ticker_map.parquet)을 병합하여 'V25 최종 DB'(V25_Hoj_DB.parquet)를 생성합니다.
+train_real_engine_V25.py: [V25 엔진 학습] 'V25 최종 DB'를 10년치 전체로 학습시켜 'Hoj AI 뇌'(REAL_CHAMPION_MODEL_V25.pkl)를 생성합니다.
+daily_recommender.py: [Hoj 실전 추천기] 'AI 뇌'와 'V25 DB'를 로드하여 '오늘의 Top 10'을 .csv 파일과 화면으로 출력합니다.
+
+1-2. 데이터 및 AI 모델 파일 (.parquet, .pkl)
+REAL_CHAMPION_MODEL_V25.pkl: 🥇 Hoj 엔진 AI '뇌' (최종 결과물).
+V25_Hoj_DB.parquet: 💾 Hoj 엔진 '최종 DB' (1단계 결과물).
+ticker_map.parquet: 💾 '종목명 사전' (create_ticker_map.py의 결과물).
+all_features_cumulative_V21_Hoj.parquet: (숨겨진 재료) 12개 피처가 계산된 'V21 Hoj DB' (build_database_V25.py의 입력 재료).
+all_stocks_cumulative.parquet: 💾 (원본 재료) 10년치 순수 시세 (V21 DB의 원재료로 추정).
+kospi_index_10y.parquet: 💾 (원본 재료) 10년치 KOSPI (V21 DB의 원재료로 추정).
+
+1-3. (참고) Sle 엔진 및 연구/검증용 파일
+SLE_CHAMPION_MODEL_V32.pkl: 🥇 Sle 엔진 AI '뇌'.
+V11_Merged_SLE_Base.parquet: 💾 Sle 엔진 'DB'.
+train_sle_engine_V32.py: 🔬 Sle '뇌'를 학습시키는 파일.
+run_hoj_grid_search_V20.py: 🔬 Hoj 엔진 '가설 검증' 스크립트.
+run_tuning_V22.py: 🔬 Hoj 엔진 '튜닝 검증' 스크립트.
+run_hybrid_test_V33.py: 🔬 Hoj/Sle '하이브리드 전략 검증' 스크립트.
+run_strategy_grid_search_V9.py: 🔬 '매도 전략 검증' 스크립트.
+
+2. 매매 프로그램 (주문 및 알림 봇)
+***실행파일 python main_trading.py***
+'추천 프로그램'의 결과를 받아 실제 주문과 알림을 실행하는 **'온라인 실전 부대'**입니다.
+
+2-1. 핵심 실행 파일 (.py)
+main_trading.py: '실전 매매'의 지휘자. (매매 대상 수동 설정, 매수 타이밍 계산, API/카톡 호출)
+kiwoom_api.py: 키움증권 API(주문, 차트 조회) 실제 통신 담당.
+token_manager.py: 키움 API 토큰 발급/관리 담당.
+kakao_notifier.py: 카카오톡 알림 발송 및 토큰 관리 담당.
+
+2-2. 설정 및 인증 파일 (.ini, .json)
+config.ini: 모든 API 키(키움, 카카오), 계좌번호, 모드(실전/모의)를 저장하는 필수 핵심 설정 파일.
+token.json: token_manager.py가 생성/관리하는 키움 인증 토큰 저장 파일.
+kakao_token.json: kakao_notifier.py가 생성/관리하는 카카오 인증 토큰(Access/Refresh) 저장 파일.
+
+키움 rest api 문서
+# kiwoom_api.py
+
+import json
+import requests
+from typing import Optional, Dict, Any, List
+
+# 전송 완료 시 import 해야 하는 모듈
+# 실제 프로젝트 구조에 맞게 경로를 수정해야 할 수 있습니다.
+try:
+    from .token_manager import TokenManager
+except ImportError:
+    # 예시: 같은 디렉토리에 있다고 가정
+    from token_manager import TokenManager 
+
+class KiwoomRestApi:
+    """
+    키움증권 REST API를 위한 마스터 클래스입니다.
+    V34 프로젝트의 국내 주식(ka*, kt*) API를 호출하는 메서드를 포함합니다.
+    """
+    
+    def __init__(self, app_key: str, secret_key: str, mock_mode: bool = False):
+        """
+        API 클라이언트를 초기화합니다.
+        
+        :param app_key: 앱 키
+        :param secret_key: 시크릿 키
+        :param mock_mode: 모의 투자 모드 여부 (True면 모의 투자 도메인 사용)
+        """
+        self.app_key = app_key
+        self.secret_key = secret_key
+        self.mock_mode = mock_mode
+        self.base_url = "https://api.kiwoom.com"
+        if self.mock_mode:
+            # KRX만 지원되지만, 일단 기본 도메인으로 설정 (문서 참조)
+            self.base_url = "https://mockapi.kiwoom.com" 
+
+        # TokenManager 클래스를 import하여 사용합니다.
+        self.token_manager = TokenManager(app_key, secret_key, mock_mode)
+
+    def _get_headers(self, api_id: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, str]:
+        """기본 요청 헤더를 생성합니다."""
+        access_token = self.token_manager.get_token()
+        headers = {
+            "Content-Type": "application/json;charset=UTF-8",
+            "api-id": api_id,
+            "authorization": f"Bearer {access_token}"
+        }
+        if cont_yn:
+            headers["cont-yn"] = cont_yn
+        if next_key:
+            headers["next-key"] = next_key
+        return headers
+
+    def _call_api(self, api_id: str, url_path: str, method: str = "POST", 
+                  body: Optional[Dict[str, Any]] = None, 
+                  cont_yn: Optional[str] = None, 
+                  next_key: Optional[str] = None) -> Dict[str, Any]:
+        """
+        실제 API 호출을 실행하고 응답을 처리하는 내부 메서드입니다.
+        """
+        full_url = self.base_url + url_path
+        headers = self._get_headers(api_id, cont_yn, next_key)
+
+        print(f"[{api_id}] Calling API: {full_url}")
+        
+        # --- [실제 API 요청 로직 구현 필요] ---
+        
+        try:
+            # 실제 HTTP 요청을 보내는 부분
+            response = requests.request(
+                method, 
+                full_url, 
+                headers=headers, 
+                data=json.dumps(body) if body else None
+            )
+            response.raise_for_status()  # 200 이외의 응답 코드는 예외 발생
+            return response.json()
+            
+        except requests.exceptions.RequestException as e:
+            print(f"API Request Failed for {api_id}: {e}")
+            # 에러 응답 구조에 맞게 반환 값 조정 필요
+            return {"return_code": -999, "return_msg": f"API Request Failed: {e}"}
+        
+        # --- [실제 API 요청 로직 구현 필요] ---
+        
+
+    # ==========================================================
+    # I. OAuth 인증 API (TokenManager를 통해 처리되지만, 명세서에 있으므로 남겨둠)
+    # ==========================================================
+    
+    def issue_access_token(self, grant_type: str = "client_credentials") -> Dict[str, Any]:
+        """
+        [au10001] 접근토큰 발급: TokenManager를 통해 처리됨.
+        """
+        api_id = "au10001"
+        url_path = "/oauth2/token"
+        body = {
+            "grant_type": grant_type,
+            "appkey": self.app_key,
+            "secretkey": self.secret_key
+        }
+        # 토큰 발급 API는 인증이 필요 없습니다.
+        try:
+            response = requests.post(self.base_url + url_path, json=body, 
+                                     headers={"Content-Type": "application/json;charset=UTF-8"})
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            return {"return_code": -999, "return_msg": f"Token Issue Failed: {e}"}
+
+    def revoke_access_token(self, token: str) -> Dict[str, Any]:
+        """
+        [au10002] 접근토큰 폐기: TokenManager를 통해 처리될 수 있지만, 명시적으로 호출 가능하도록 구현.
+        """
+        api_id = "au10002"
+        url_path = "/oauth2/revoke"
+        body = {
+            "appkey": self.app_key,
+            "secretkey": self.secret_key,
+            "token": token
+        }
+        # 토큰 폐기 API는 인증이 필요 없습니다.
+        try:
+            response = requests.post(self.base_url + url_path, json=body, 
+                                     headers={"Content-Type": "application/json;charset=UTF-8"})
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            return {"return_code": -999, "return_msg": f"Token Revoke Failed: {e}"}
+
+
+    # ==========================================================
+    # II. 국내주식 API (ka...): 시세/조회
+    # ==========================================================
+
+    def get_realtime_item_inquiry_rank(self, qry_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka00198] 실시간종목조회순위"""
+        api_id = "ka00198"
+        url_path = "/api/dostk/stkinfo"
+        body = {"qry_tp": qry_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_balance_yield(self, qry_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka01690] 일별잔고수익률 (모의투자 미지원)"""
+        api_id = "ka01690"
+        url_path = "/api/dostk/acnt"
+        body = {"qry_dt": qry_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_basic_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10001] 주식기본정보요청"""
+        api_id = "ka10001"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_trader_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10002] 주식거래원요청"""
+        api_id = "ka10002"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_conclusion_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10003] 체결정보요청"""
+        api_id = "ka10003"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_hoga(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10004] 주식호가요청"""
+        api_id = "ka10004"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_day_week_month(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10005] 주식일주월시분요청 (종목/날짜 관련 시세 종합)"""
+        api_id = "ka10005"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_minute_candle(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10006] 주식시분요청 (시/분별 데이터)"""
+        api_id = "ka10006"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_quotation_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10007] 시세표성정보요청 (종목 상세 시세/호가)"""
+        api_id = "ka10007"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_investor_trade_trend(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10008] 주식외국인종목별매매동향"""
+        api_id = "ka10008"
+        url_path = "/api/dostk/frgnistt"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_institution_trade_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10009] 주식기관요청"""
+        api_id = "ka10009"
+        url_path = "/api/dostk/frgnistt"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_program_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10010] 업종프로그램요청"""
+        api_id = "ka10010"
+        url_path = "/api/dostk/sect"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_warrant_all_market_price(self, newstk_recvrht_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10011] 신주인수권전체시세요청"""
+        api_id = "ka10011"
+        url_path = "/api/dostk/mrkcond"
+        body = {"newstk_recvrht_tp": newstk_recvrht_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_credit_trade_trend(self, stk_cd: str, dt: str, qry_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10013] 신용매매동향요청"""
+        api_id = "ka10013"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "dt": dt, "qry_tp": qry_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_short_selling_trend(self, stk_cd: str, tm_tp: str, strt_dt: str, end_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10014] 공매도추이요청"""
+        api_id = "ka10014"
+        url_path = "/api/dostk/shsa"
+        body = {"stk_cd": stk_cd, "tm_tp": tm_tp, "strt_dt": strt_dt, "end_dt": end_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_trade_details(self, stk_cd: str, strt_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10015] 일별거래상세요청"""
+        api_id = "ka10015"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_new_high_low_price(self, mrkt_tp: str, ntl_tp: str, high_low_close_tp: str, stk_cnd: str, trde_qty_tp: str, crd_cnd: str, updown_incls: str, dt: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10016] 신고저가요청"""
+        api_id = "ka10016"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "ntl_tp": ntl_tp, "high_low_close_tp": high_low_close_tp, "stk_cnd": stk_cnd, "trde_qty_tp": trde_qty_tp, "crd_cnd": crd_cnd, "updown_incls": updown_incls, "dt": dt, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_limit_up_down_price(self, mrkt_tp: str, updown_tp: str, sort_tp: str, stk_cnd: str, trde_qty_tp: str, crd_cnd: str, trde_gold_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10017] 상하한가요청"""
+        api_id = "ka10017"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "updown_tp": updown_tp, "sort_tp": sort_tp, "stk_cnd": stk_cnd, "trde_qty_tp": trde_qty_tp, "crd_cnd": crd_cnd, "trde_gold_tp": trde_gold_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_high_low_price_proximity(self, high_low_tp: str, alacc_rt: str, mrkt_tp: str, trde_qty_tp: str, stk_cnd: str, crd_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10018] 고저가근접요청"""
+        api_id = "ka10018"
+        url_path = "/api/dostk/stkinfo"
+        body = {"high_low_tp": high_low_tp, "alacc_rt": alacc_rt, "mrkt_tp": mrkt_tp, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_price_jump_fluctuation(self, mrkt_tp: str, flu_tp: str, tm_tp: str, tm: str, trde_qty_tp: str, stk_cnd: str, crd_cnd: str, pric_cnd: str, updown_incls: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10019] 가격급등락요청"""
+        api_id = "ka10019"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "flu_tp": flu_tp, "tm_tp": tm_tp, "tm": tm, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "pric_cnd": pric_cnd, "updown_incls": updown_incls, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_hoga_balance_rank(self, mrkt_tp: str, sort_tp: str, trde_qty_tp: str, stk_cnd: str, crd_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10020] 호가잔량상위요청"""
+        api_id = "ka10020"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_tp": sort_tp, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_hoga_balance_surge(self, mrkt_tp: str, trde_tp: str, sort_tp: str, tm_tp: str, trde_qty_tp: str, stk_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10021] 호가잔량급증요청"""
+        api_id = "ka10021"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "trde_tp": trde_tp, "sort_tp": sort_tp, "tm_tp": tm_tp, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_balance_rate_surge(self, mrkt_tp: str, rt_tp: str, tm_tp: str, trde_qty_tp: str, stk_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10022] 잔량율급증요청"""
+        api_id = "ka10022"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "rt_tp": rt_tp, "tm_tp": tm_tp, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trade_volume_surge(self, mrkt_tp: str, sort_tp: str, tm_tp: str, trde_qty_tp: str, tm: Optional[str], stk_cnd: str, pric_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10023] 거래량급증요청"""
+        api_id = "ka10023"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_tp": sort_tp, "tm_tp": tm_tp, "trde_qty_tp": trde_qty_tp, "tm": tm, "stk_cnd": stk_cnd, "pric_tp": pric_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trade_volume_renewal(self, mrkt_tp: str, cycle_tp: str, trde_qty_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10024] 거래량갱신요청"""
+        api_id = "ka10024"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "cycle_tp": cycle_tp, "trde_qty_tp": trde_qty_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_price_zone_concentration(self, mrkt_tp: str, prps_cnctr_rt: str, cur_prc_entry: str, prpscnt: str, cycle_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10025] 매물대집중요청"""
+        api_id = "ka10025"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "prps_cnctr_rt": prps_cnctr_rt, "cur_prc_entry": cur_prc_entry, "prpscnt": prpscnt, "cycle_tp": cycle_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_high_low_per(self, pertp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10026] 고저PER요청"""
+        api_id = "ka10026"
+        url_path = "/api/dostk/stkinfo"
+        body = {"pertp": pertp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_prev_day_fluctuation_rate_rank(self, mrkt_tp: str, sort_tp: str, trde_qty_cnd: str, stk_cnd: str, crd_cnd: str, updown_incls: str, pric_cnd: str, trde_prica_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10027] 전일대비등락률상위요청"""
+        api_id = "ka10027"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_tp": sort_tp, "trde_qty_cnd": trde_qty_cnd, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "updown_incls": updown_incls, "pric_cnd": pric_cnd, "trde_prica_cnd": trde_prica_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_open_price_fluctuation_rate(self, sort_tp: str, trde_qty_cnd: str, mrkt_tp: str, updown_incls: str, stk_cnd: str, crd_cnd: str, trde_prica_cnd: str, flu_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10028] 시가대비등락률요청"""
+        api_id = "ka10028"
+        url_path = "/api/dostk/stkinfo"
+        body = {"sort_tp": sort_tp, "trde_qty_cnd": trde_qty_cnd, "mrkt_tp": mrkt_tp, "updown_incls": updown_incls, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "trde_prica_cnd": trde_prica_cnd, "flu_cnd": flu_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_expected_conclusion_fluctuation_rate_rank(self, mrkt_tp: str, sort_tp: str, trde_qty_cnd: str, stk_cnd: str, crd_cnd: str, pric_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10029] 예상체결등락률상위요청"""
+        api_id = "ka10029"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_tp": sort_tp, "trde_qty_cnd": trde_qty_cnd, "stk_cnd": stk_cnd, "crd_cnd": crd_cnd, "pric_cnd": pric_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_trade_volume_rank(self, mrkt_tp: str, sort_tp: str, mang_stk_incls: str, crd_tp: str, trde_qty_tp: str, pric_tp: str, trde_prica_tp: str, mrkt_open_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10030] 당일거래량상위요청"""
+        api_id = "ka10030"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_tp": sort_tp, "mang_stk_incls": mang_stk_incls, "crd_tp": crd_tp, "trde_qty_tp": trde_qty_tp, "pric_tp": pric_tp, "trde_prica_tp": trde_prica_tp, "mrkt_open_tp": mrkt_open_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_prev_day_trade_volume_rank(self, mrkt_tp: str, qry_tp: str, rank_strt: str, rank_end: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10031] 전일거래량상위요청"""
+        api_id = "ka10031"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "qry_tp": qry_tp, "rank_strt": rank_strt, "rank_end": rank_end, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trade_amount_rank(self, mrkt_tp: str, mang_stk_incls: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10032] 거래대금상위요청"""
+        api_id = "ka10032"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "mang_stk_incls": mang_stk_incls, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_credit_ratio_rank(self, mrkt_tp: str, trde_qty_tp: str, stk_cnd: str, updown_incls: str, crd_cnd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10033] 신용비율상위요청"""
+        api_id = "ka10033"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "trde_qty_tp": trde_qty_tp, "stk_cnd": stk_cnd, "updown_incls": updown_incls, "crd_cnd": crd_cnd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_investor_period_trade_rank(self, mrkt_tp: str, trde_tp: str, dt: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10034] 외인기간별매매상위요청"""
+        api_id = "ka10034"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "trde_tp": trde_tp, "dt": dt, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_investor_consecutive_net_trade_rank(self, mrkt_tp: str, trde_tp: str, base_dt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10035] 외인연속순매매상위요청"""
+        api_id = "ka10035"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "trde_tp": trde_tp, "base_dt_tp": base_dt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_investor_limit_exhaustion_rate_increase_rank(self, mrkt_tp: str, dt: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10036] 외인한도소진율증가상위"""
+        api_id = "ka10036"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "dt": dt, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_window_trade_rank(self, mrkt_tp: str, dt: str, trde_tp: str, sort_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10037] 외국계창구매매상위요청"""
+        api_id = "ka10037"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "dt": dt, "trde_tp": trde_tp, "sort_tp": sort_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_broker_rank_by_item(self, stk_cd: str, strt_dt: str, end_dt: str, qry_tp: str, dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10038] 종목별증권사순위요청"""
+        api_id = "ka10038"
+        url_path = "/api/dostk/rkinfo"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt, "qry_tp": qry_tp, "dt": dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_broker_trade_rank(self, mmcm_cd: str, trde_qty_tp: str, trde_tp: str, dt: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10039] 증권사별매매상위요청"""
+        api_id = "ka10039"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mmcm_cd": mmcm_cd, "trde_qty_tp": trde_qty_tp, "trde_tp": trde_tp, "dt": dt, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_main_traders(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10040] 당일주요거래원요청"""
+        api_id = "ka10040"
+        url_path = "/api/dostk/rkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_net_buy_trader_rank(self, stk_cd: str, strt_dt: Optional[str], end_dt: Optional[str], qry_dt_tp: str, pot_tp: str, dt: Optional[str], sort_base: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10042] 순매수거래원순위요청"""
+        api_id = "ka10042"
+        url_path = "/api/dostk/rkinfo"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt, "qry_dt_tp": qry_dt_tp, "pot_tp": pot_tp, "dt": dt, "sort_base": sort_base}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trader_price_zone_analysis(self, stk_cd: str, strt_dt: str, end_dt: str, qry_dt_tp: str, pot_tp: str, dt: str, sort_base: str, mmcm_cd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10043] 거래원매물대분석요청"""
+        api_id = "ka10043"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt, "qry_dt_tp": qry_dt_tp, "pot_tp": pot_tp, "dt": dt, "sort_base": sort_base, "mmcm_cd": mmcm_cd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_institution_trade_item(self, strt_dt: str, end_dt: str, trde_tp: str, mrkt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10044] 일별기관매매종목요청"""
+        api_id = "ka10044"
+        url_path = "/api/dostk/mrkcond"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "trde_tp": trde_tp, "mrkt_tp": mrkt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_institution_trade_trend(self, stk_cd: str, strt_dt: str, end_dt: str, orgn_prsm_unp_tp: str, for_prsm_unp_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10045] 종목별기관매매추이요청"""
+        api_id = "ka10045"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt, "orgn_prsm_unp_tp": orgn_prsm_unp_tp, "for_prsm_unp_tp": for_prsm_unp_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_conclusion_strength_trend_hourly(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10046] 체결강도추이시간별요청"""
+        api_id = "ka10046"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_conclusion_strength_trend_daily(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10047] 체결강도추이일별요청"""
+        api_id = "ka10047"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_daily_sensitivity_index(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10048] ELW일별민감도지표요청"""
+        api_id = "ka10048"
+        url_path = "/api/dostk/elw"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_sensitivity_index(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10050] ELW민감도지표요청"""
+        api_id = "ka10050"
+        url_path = "/api/dostk/elw"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_investor_net_buy(self, mrkt_tp: str, amt_qty_tp: str, base_dt: Optional[str], stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10051] 업종별투자자순매수요청"""
+        api_id = "ka10051"
+        url_path = "/api/dostk/sect"
+        body = {"mrkt_tp": mrkt_tp, "amt_qty_tp": amt_qty_tp, "base_dt": base_dt, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trader_instant_trade_volume(self, mmcm_cd: str, stk_cd: Optional[str], mrkt_tp: str, qty_tp: str, pric_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10052] 거래원순간거래량요청"""
+        api_id = "ka10052"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mmcm_cd": mmcm_cd, "stk_cd": stk_cd, "mrkt_tp": mrkt_tp, "qty_tp": qty_tp, "pric_tp": pric_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_top_exit_trader(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10053] 당일상위이탈원요청"""
+        api_id = "ka10053"
+        url_path = "/api/dostk/rkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_volatility_mitigation_mechanism_items(self, mrkt_tp: str, bf_mkrt_tp: str, stk_cd: Optional[str], motn_tp: str, skip_stk: str, trde_qty_tp: str, min_trde_qty: str, max_trde_qty: str, trde_prica_tp: str, min_trde_prica: str, max_trde_prica: str, motn_drc: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10054] 변동성완화장치발동종목요청"""
+        api_id = "ka10054"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp, "bf_mkrt_tp": bf_mkrt_tp, "stk_cd": stk_cd, "motn_tp": motn_tp, "skip_stk": skip_stk, "trde_qty_tp": trde_qty_tp, "min_trde_qty": min_trde_qty, "max_trde_qty": max_trde_qty, "trde_prica_tp": trde_prica_tp, "min_trde_prica": min_trde_prica, "max_trde_prica": max_trde_prica, "motn_drc": motn_drc, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_prev_day_conclusion_volume(self, stk_cd: str, tdy_pred: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10055] 당일전일체결량요청"""
+        api_id = "ka10055"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "tdy_pred": tdy_pred}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_investor_daily_trade_items(self, strt_dt: str, end_dt: str, trde_tp: str, mrkt_tp: str, invsr_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10058] 투자자별일별매매종목요청"""
+        api_id = "ka10058"
+        url_path = "/api/dostk/stkinfo"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "trde_tp": trde_tp, "mrkt_tp": mrkt_tp, "invsr_tp": invsr_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_investor_institution_info(self, dt: str, stk_cd: str, amt_qty_tp: str, trde_tp: str, unit_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10059] 종목별투자자기관별요청"""
+        api_id = "ka10059"
+        url_path = "/api/dostk/stkinfo"
+        body = {"dt": dt, "stk_cd": stk_cd, "amt_qty_tp": amt_qty_tp, "trde_tp": trde_tp, "unit_tp": unit_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_investor_institution_chart(self, dt: str, stk_cd: str, amt_qty_tp: str, trde_tp: str, unit_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10060] 종목별투자자기관별차트요청"""
+        api_id = "ka10060"
+        url_path = "/api/dostk/chart"
+        body = {"dt": dt, "stk_cd": stk_cd, "amt_qty_tp": amt_qty_tp, "trde_tp": trde_tp, "unit_tp": unit_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_investor_institution_total(self, stk_cd: str, strt_dt: str, end_dt: str, amt_qty_tp: str, trde_tp: str, unit_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10061] 종목별투자자기관별합계요청"""
+        api_id = "ka10061"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt, "amt_qty_tp": amt_qty_tp, "trde_tp": trde_tp, "unit_tp": unit_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_same_net_trade_rank(self, strt_dt: str, end_dt: Optional[str], mrkt_tp: str, trde_tp: str, sort_cnd: str, unit_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10062] 동일순매매순위요청"""
+        api_id = "ka10062"
+        url_path = "/api/dostk/rkinfo"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "mrkt_tp": mrkt_tp, "trde_tp": trde_tp, "sort_cnd": sort_cnd, "unit_tp": unit_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_intraday_investor_trade(self, mrkt_tp: str, amt_qty_tp: str, invsr: str, frgn_all: str, smtm_netprps_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10063] 장중투자자별매매요청"""
+        api_id = "ka10063"
+        url_path = "/api/dostk/mrkcond"
+        body = {"mrkt_tp": mrkt_tp, "amt_qty_tp": amt_qty_tp, "invsr": invsr, "frgn_all": frgn_all, "smtm_netprps_tp": smtm_netprps_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_intraday_investor_trade_chart(self, mrkt_tp: str, amt_qty_tp: str, trde_tp: str, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10064] 장중투자자별매매차트요청"""
+        api_id = "ka10064"
+        url_path = "/api/dostk/chart"
+        body = {"mrkt_tp": mrkt_tp, "amt_qty_tp": amt_qty_tp, "trde_tp": trde_tp, "stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_intraday_investor_trade_rank(self, trde_tp: str, mrkt_tp: str, orgn_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10065] 장중투자자별매매상위요청"""
+        api_id = "ka10065"
+        url_path = "/api/dostk/rkinfo"
+        body = {"trde_tp": trde_tp, "mrkt_tp": mrkt_tp, "orgn_tp": orgn_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_after_hours_investor_trade(self, mrkt_tp: str, amt_qty_tp: str, trde_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10066] 장마감후투자자별매매요청"""
+        api_id = "ka10066"
+        url_path = "/api/dostk/mrkcond"
+        body = {"mrkt_tp": mrkt_tp, "amt_qty_tp": amt_qty_tp, "trde_tp": trde_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_loan_trade_trend(self, strt_dt: Optional[str], end_dt: Optional[str], all_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10068] 대차거래추이요청 (전체)"""
+        api_id = "ka10068"
+        url_path = "/api/dostk/slb"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "all_tp": all_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_top_10_stock_loan_trade(self, strt_dt: str, end_dt: Optional[str], mrkt_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10069] 대차거래상위10종목요청"""
+        api_id = "ka10069"
+        url_path = "/api/dostk/slb"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "mrkt_tp": mrkt_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_realized_profit_loss_by_item_daily(self, stk_cd: Optional[str], strt_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10072] 일자별종목별실현손익요청_일자"""
+        api_id = "ka10072"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_realized_profit_loss_by_item_period(self, stk_cd: Optional[str], strt_dt: str, end_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10073] 일자별종목별실현손익요청_기간"""
+        api_id = "ka10073"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_realized_profit_loss(self, strt_dt: str, end_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10074] 일자별실현손익요청"""
+        api_id = "ka10074"
+        url_path = "/api/dostk/acnt"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_unconcluded_orders(self, all_stk_tp: str, trde_tp: str, stk_cd: Optional[str], stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10075] 미체결요청"""
+        api_id = "ka10075"
+        url_path = "/api/dostk/acnt"
+        body = {"all_stk_tp": all_stk_tp, "trde_tp": trde_tp, "stk_cd": stk_cd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_concluded_orders(self, stk_cd: Optional[str], qry_tp: str, sell_tp: str, ord_no: Optional[str], stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10076] 체결요청"""
+        api_id = "ka10076"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd, "qry_tp": qry_tp, "sell_tp": sell_tp, "ord_no": ord_no, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_realized_profit_loss_details(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10077] 당일실현손익상세요청"""
+        api_id = "ka10077"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_broker_item_trade_trend(self, mmcm_cd: str, stk_cd: str, strt_dt: str, end_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10078] 증권사별종목매매동향요청"""
+        api_id = "ka10078"
+        url_path = "/api/dostk/mrkcond"
+        body = {"mmcm_cd": mmcm_cd, "stk_cd": stk_cd, "strt_dt": strt_dt, "end_dt": end_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_tick_chart(self, stk_cd: str, tic_scope: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10079] 주식틱차트조회요청"""
+        api_id = "ka10079"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_minute_chart(self, stk_cd: str, tic_scope: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10080] 주식분봉차트조회요청"""
+        api_id = "ka10080"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_daily_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10081] 주식일봉차트조회요청"""
+        api_id = "ka10081"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_weekly_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10082] 주식주봉차트조회요청"""
+        api_id = "ka10082"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_monthly_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10083] 주식월봉차트조회요청"""
+        api_id = "ka10083"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_prev_day_conclusion(self, stk_cd: str, tdy_pred: str, tic_min: str, tm: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10084] 당일전일체결요청"""
+        api_id = "ka10084"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd, "tdy_pred": tdy_pred, "tic_min": tic_min, "tm": tm}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_yield(self, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10085] 계좌수익률요청"""
+        api_id = "ka10085"
+        url_path = "/api/dostk/acnt"
+        body = {"stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_stock_price(self, stk_cd: str, qry_dt: str, indc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10086] 일별주가요청"""
+        api_id = "ka10086"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd, "qry_dt": qry_dt, "indc_tp": indc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_after_hours_single_price(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10087] 시간외단일가요청"""
+        api_id = "ka10087"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_unconcluded_split_order_details(self, ord_no: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10088] 미체결 분할주문 상세"""
+        api_id = "ka10088"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_no": ord_no}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_yearly_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10094] 주식년봉차트조회요청"""
+        api_id = "ka10094"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_watchlist_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10095] 관심종목정보요청 (다중 종목 가능)"""
+        api_id = "ka10095"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_after_hours_single_fluctuation_rank(self, mrkt_tp: str, sort_base: str, stk_cnd: str, trde_qty_cnd: str, crd_cnd: str, trde_prica: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10098] 시간외단일가등락율순위요청"""
+        api_id = "ka10098"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "sort_base": sort_base, "stk_cnd": stk_cnd, "trde_qty_cnd": trde_qty_cnd, "crd_cnd": crd_cnd, "trde_prica": trde_prica}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_list(self, mrkt_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10099] 종목정보 리스트"""
+        api_id = "ka10099"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10100] 종목정보 조회"""
+        api_id = "ka10100"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_code_list(self, mrkt_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10101] 업종코드 리스트"""
+        api_id = "ka10101"
+        url_path = "/api/dostk/stkinfo"
+        body = {"mrkt_tp": mrkt_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_broker_list(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10102] 회원사 리스트"""
+        api_id = "ka10102"
+        url_path = "/api/dostk/stkinfo"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_institution_foreign_consecutive_trade_status(self, dt: str, strt_dt: Optional[str], end_dt: Optional[str], mrkt_tp: str, netslmt_tp: str, stk_inds_tp: str, amt_qty_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10131] 기관외국인연속매매현황요청"""
+        api_id = "ka10131"
+        url_path = "/api/dostk/frgnistt"
+        body = {"dt": dt, "strt_dt": strt_dt, "end_dt": end_dt, "mrkt_tp": mrkt_tp, "netslmt_tp": netslmt_tp, "stk_inds_tp": stk_inds_tp, "amt_qty_tp": amt_qty_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_trade_journal(self, base_dt: Optional[str], ottks_tp: str, ch_crd_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka10170] 당일매매일지요청"""
+        api_id = "ka10170"
+        url_path = "/api/dostk/acnt"
+        body = {"base_dt": base_dt, "ottks_tp": ottks_tp, "ch_crd_tp": ch_crd_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # Note: ka10171, ka10172, ka10173, ka10174는 WebSocket API이므로, HTTP/REST API 호출 로직(_call_api)과 다르게 구현되어야 합니다.
+    # 여기서는 REST API 호출 함수 형식으로 틀만 유지하고, 실제 통신은 별도의 WebSocket 클라이언트에서 처리해야 함을 주석으로 명시합니다.
+
+    def get_condition_search_list(self, trnm: str = "CNSRLST") -> Dict[str, Any]:
+        """[ka10171] 조건검색 목록조회 (WebSocket)"""
+        api_id = "ka10171"
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm}
+        # WebSocket API는 _call_api를 사용하지 않습니다. 별도 WebSocket 로직 구현 필요.
+        print(f"[{api_id}] WebSocket API - Retrieve Condition Search List. Requires separate WebSocket client.")
+        return body
+
+    def request_condition_search_general(self, seq: str, search_type: str = "0", stex_tp: str = "K", cont_yn: str = "N", next_key: str = "", trnm: str = "CNSRREQ") -> Dict[str, Any]:
+        """[ka10172] 조건검색 요청 일반 (WebSocket)"""
+        api_id = "ka10172"
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm, "seq": seq, "search_type": search_type, "stex_tp": stex_tp, "cont_yn": cont_yn, "next_key": next_key}
+        # WebSocket API는 _call_api를 사용하지 않습니다. 별도 WebSocket 로직 구현 필요.
+        print(f"[{api_id}] WebSocket API - General Condition Search Request. Requires separate WebSocket client.")
+        return body
+
+    def request_condition_search_realtime(self, seq: str, search_type: str = "1", stex_tp: str = "K", trnm: str = "CNSRREQ") -> Dict[str, Any]:
+        """[ka10173] 조건검색 요청 실시간 (WebSocket)"""
+        api_id = "ka10173"
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm, "seq": seq, "search_type": search_type, "stex_tp": stex_tp}
+        # WebSocket API는 _call_api를 사용하지 않습니다. 별도 WebSocket 로직 구현 필요.
+        print(f"[{api_id}] WebSocket API - Realtime Condition Search Request. Requires separate WebSocket client.")
+        return body
+
+    def cancel_condition_search_realtime(self, seq: str, trnm: str = "CNSRCLR") -> Dict[str, Any]:
+        """[ka10174] 조건검색 실시간 해제 (WebSocket)"""
+        api_id = "ka10174"
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm, "seq": seq}
+        # WebSocket API는 _call_api를 사용하지 않습니다. 별도 WebSocket 로직 구현 필요.
+        print(f"[{api_id}] WebSocket API - Cancel Realtime Condition Search. Requires separate WebSocket client.")
+        return body
+
+    def get_sector_current_price(self, mrkt_tp: str, inds_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20001] 업종현재가요청"""
+        api_id = "ka20001"
+        url_path = "/api/dostk/sect"
+        body = {"mrkt_tp": mrkt_tp, "inds_cd": inds_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_stock_price(self, mrkt_tp: str, inds_cd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20002] 업종별주가요청"""
+        api_id = "ka20002"
+        url_path = "/api/dostk/sect"
+        body = {"mrkt_tp": mrkt_tp, "inds_cd": inds_cd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_all_sector_index(self, inds_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20003] 전업종지수요청"""
+        api_id = "ka20003"
+        url_path = "/api/dostk/sect"
+        body = {"inds_cd": inds_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_tick_chart(self, inds_cd: str, tic_scope: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20004] 업종틱차트조회요청"""
+        api_id = "ka20004"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "tic_scope": tic_scope}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_minute_chart(self, inds_cd: str, tic_scope: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20005] 업종분봉조회요청"""
+        api_id = "ka20005"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "tic_scope": tic_scope}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_daily_chart(self, inds_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20006] 업종일봉조회요청"""
+        api_id = "ka20006"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_weekly_chart(self, inds_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20007] 업종주봉조회요청"""
+        api_id = "ka20007"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_monthly_chart(self, inds_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20008] 업종월봉조회요청"""
+        api_id = "ka20008"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_current_price_daily(self, mrkt_tp: str, inds_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20009] 업종현재가일별요청"""
+        api_id = "ka20009"
+        url_path = "/api/dostk/sect"
+        body = {"mrkt_tp": mrkt_tp, "inds_cd": inds_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_sector_yearly_chart(self, inds_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20019] 업종년봉조회요청"""
+        api_id = "ka20019"
+        url_path = "/api/dostk/chart"
+        body = {"inds_cd": inds_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_stock_loan_trade_trend(self, strt_dt: Optional[str], end_dt: Optional[str], all_tp: Optional[str], stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka20068] 대차거래추이요청(종목별)"""
+        api_id = "ka20068"
+        url_path = "/api/dostk/slb"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "all_tp": all_tp, "stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+ # ELW API
+    def get_elw_price_jump_fluctuation(self, flu_tp: str, tm_tp: str, tm: str, trde_qty_tp: str, isscomp_cd: str, bsis_aset_cd: str, rght_tp: str, lpcd: str, trde_end_elwskip: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30001] ELW가격급등락요청"""
+        api_id = "ka30001"
+        url_path = "/api/dostk/elw"
+        body = {"flu_tp": flu_tp, "tm_tp": tm_tp, "tm": tm, "trde_qty_tp": trde_qty_tp, "isscomp_cd": isscomp_cd, "bsis_aset_cd": bsis_aset_cd, "rght_tp": rght_tp, "lpcd": lpcd, "trde_end_elwskip": trde_end_elwskip}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_trader_elw_net_trade_rank(self, isscomp_cd: str, trde_qty_tp: str, trde_tp: str, dt: str, trde_end_elwskip: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30002] 거래원별ELW순매매상위요청"""
+        api_id = "ka30002"
+        url_path = "/api/dostk/elw"
+        body = {"isscomp_cd": isscomp_cd, "trde_qty_tp": trde_qty_tp, "trde_tp": trde_tp, "dt": dt, "trde_end_elwskip": trde_end_elwskip}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_lp_holding_daily_trend(self, bsis_aset_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30003] ELWLP보유일별추이요청"""
+        api_id = "ka30003"
+        url_path = "/api/dostk/elw"
+        body = {"bsis_aset_cd": bsis_aset_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_disparity_rate(self, isscomp_cd: str, bsis_aset_cd: str, rght_tp: str, lpcd: str, trde_end_elwskip: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30004] ELW괴리율요청"""
+        api_id = "ka30004"
+        url_path = "/api/dostk/elw"
+        body = {"isscomp_cd": isscomp_cd, "bsis_aset_cd": bsis_aset_cd, "rght_tp": rght_tp, "lpcd": lpcd, "trde_end_elwskip": trde_end_elwskip}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def request_elw_condition_search(self, isscomp_cd: str, bsis_aset_cd: str, rght_tp: str, lpcd: str, sort_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30005] ELW조건검색요청"""
+        api_id = "ka30005"
+        url_path = "/api/dostk/elw"
+        body = {"isscomp_cd": isscomp_cd, "bsis_aset_cd": bsis_aset_cd, "rght_tp": rght_tp, "lpcd": lpcd, "sort_tp": sort_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_fluctuation_rate_rank(self, sort_tp: str, rght_tp: str, trde_end_skip: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30009] ELW등락율순위요청"""
+        api_id = "ka30009"
+        url_path = "/api/dostk/elw"
+        body = {"sort_tp": sort_tp, "rght_tp": rght_tp, "trde_end_skip": trde_end_skip}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_balance_rank(self, sort_tp: str, rght_tp: str, trde_end_skip: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30010] ELW잔량순위요청"""
+        api_id = "ka30010"
+        url_path = "/api/dostk/elw"
+        body = {"sort_tp": sort_tp, "rght_tp": rght_tp, "trde_end_skip": trde_end_skip}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_proximity_rate(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30011] ELW근접율요청"""
+        api_id = "ka30011"
+        url_path = "/api/dostk/elw"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_elw_item_details(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka30012] ELW종목상세정보요청"""
+        api_id = "ka30012"
+        url_path = "/api/dostk/elw"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # ETF API
+    def get_etf_yield(self, stk_cd: str, etfobjt_idex_cd: str, dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40001] ETF수익율요청"""
+        api_id = "ka40001"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd, "etfobjt_idex_cd": etfobjt_idex_cd, "dt": dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_item_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40002] ETF종목정보요청"""
+        api_id = "ka40002"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_daily_trend(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40003] ETF일별추이요청"""
+        api_id = "ka40003"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_all_market_price(self, txon_type: str, navpre: str, mngmcomp: str, txon_yn: str, trace_idex: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40004] ETF전체시세요청"""
+        api_id = "ka40004"
+        url_path = "/api/dostk/etf"
+        body = {"txon_type": txon_type, "navpre": navpre, "mngmcomp": mngmcomp, "txon_yn": txon_yn, "trace_idex": trace_idex, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_hourly_trend(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40006] ETF시간대별추이요청"""
+        api_id = "ka40006"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_hourly_conclusion(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40007] ETF시간대별체결요청"""
+        api_id = "ka40007"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_daily_conclusion(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40008] ETF일자별체결요청"""
+        api_id = "ka40008"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_hourly_conclusion_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40009] ETF시간대별체결요청 (중복 ID이지만, 요청/응답 필드에 차이가 있어 분리)"""
+        api_id = "ka40009"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_etf_hourly_trend_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka40010] ETF시간대별추이요청 (중복 ID이지만, 요청/응답 필드에 차이가 있어 분리)"""
+        api_id = "ka40010"
+        url_path = "/api/dostk/etf"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 금현물 API (시세)
+    def get_gold_spot_conclusion_trend(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50010] 금현물체결추이"""
+        api_id = "ka50010"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_daily_trend(self, stk_cd: str, base_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50012] 금현물일별추이"""
+        api_id = "ka50012"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_tick_chart(self, stk_cd: str, tic_scope: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50079] 금현물틱차트조회요청"""
+        api_id = "ka50079"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_minute_chart(self, stk_cd: str, tic_scope: str, upd_stkpc_tp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50080] 금현물분봉차트조회요청"""
+        api_id = "ka50080"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_daily_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50081] 금현물일봉차트조회요청"""
+        api_id = "ka50081"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_weekly_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50082] 금현물주봉차트조회요청"""
+        api_id = "ka50082"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_monthly_chart(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50083] 금현물월봉차트조회요청"""
+        api_id = "ka50083"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "base_dt": base_dt, "upd_stkpc_tp": upd_stkpc_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_expected_conclusion(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50087] 금현물예상체결"""
+        api_id = "ka50087"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_daily_tick_chart(self, stk_cd: str, tic_scope: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50091] 금현물당일틱차트조회요청"""
+        api_id = "ka50091"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_daily_minute_chart(self, stk_cd: str, tic_scope: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50092] 금현물당일분봉차트조회요청"""
+        api_id = "ka50092"
+        url_path = "/api/dostk/chart"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_market_price_info(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50100] 금현물 시세정보"""
+        api_id = "ka50100"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_hoga(self, stk_cd: str, tic_scope: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka50101] 금현물 호가"""
+        api_id = "ka50101"
+        url_path = "/api/dostk/mrkcond"
+        body = {"stk_cd": stk_cd, "tic_scope": tic_scope}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_spot_investor_status(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka52301] 금현물투자자현황"""
+        api_id = "ka52301"
+        url_path = "/api/dostk/frgnistt"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 테마/프로그램 API
+    def get_theme_group_list(self, qry_tp: str, stk_cd: Optional[str], date_tp: str, thema_nm: Optional[str], flu_pl_amt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90001] 테마그룹별요청"""
+        api_id = "ka90001"
+        url_path = "/api/dostk/thme"
+        body = {"qry_tp": qry_tp, "stk_cd": stk_cd, "date_tp": date_tp, "thema_nm": thema_nm, "flu_pl_amt_tp": flu_pl_amt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_theme_constituent_items(self, date_tp: Optional[str], thema_grp_cd: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90002] 테마구성종목요청"""
+        api_id = "ka90002"
+        url_path = "/api/dostk/thme"
+        body = {"date_tp": date_tp, "thema_grp_cd": thema_grp_cd, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_program_net_buy_top_50(self, trde_upper_tp: str, amt_qty_tp: str, mrkt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90003] 프로그램순매수상위50요청"""
+        api_id = "ka90003"
+        url_path = "/api/dostk/stkinfo"
+        body = {"trde_upper_tp": trde_upper_tp, "amt_qty_tp": amt_qty_tp, "mrkt_tp": mrkt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_program_trade_status(self, dt: str, mrkt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90004] 종목별프로그램매매현황요청"""
+        api_id = "ka90004"
+        url_path = "/api/dostk/stkinfo"
+        body = {"dt": dt, "mrkt_tp": mrkt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_program_trade_trend_hourly(self, date: str, amt_qty_tp: str, mrkt_tp: str, min_tic_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90005] 프로그램매매추이요청 시간대별"""
+        api_id = "ka90005"
+        url_path = "/api/dostk/mrkcond"
+        body = {"date": date, "amt_qty_tp": amt_qty_tp, "mrkt_tp": mrkt_tp, "min_tic_tp": min_tic_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_program_trade_arbitrage_balance_trend(self, date: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90006] 프로그램매매차익잔고추이요청"""
+        api_id = "ka90006"
+        url_path = "/api/dostk/mrkcond"
+        body = {"date": date, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_program_trade_cumulative_trend(self, date: str, amt_qty_tp: str, mrkt_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90007] 프로그램매매누적추이요청"""
+        api_id = "ka90007"
+        url_path = "/api/dostk/mrkcond"
+        body = {"date": date, "amt_qty_tp": amt_qty_tp, "mrkt_tp": mrkt_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_hourly_program_trade_trend(self, amt_qty_tp: str, stk_cd: str, date: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90008] 종목시간별프로그램매매추이요청"""
+        api_id = "ka90008"
+        url_path = "/api/dostk/mrkcond"
+        body = {"amt_qty_tp": amt_qty_tp, "stk_cd": stk_cd, "date": date}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_foreign_institution_trade_rank(self, mrkt_tp: str, amt_qty_tp: str, qry_dt_tp: str, date: Optional[str], stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90009] 외국인기관매매상위요청"""
+        api_id = "ka90009"
+        url_path = "/api/dostk/rkinfo"
+        body = {"mrkt_tp": mrkt_tp, "amt_qty_tp": amt_qty_tp, "qry_dt_tp": qry_dt_tp, "date": date, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_program_trade_trend_daily(self, date: str, amt_qty_tp: str, mrkt_tp: str, min_tic_tp: str, stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90010] 프로그램매매추이요청 일자별"""
+        api_id = "ka90010"
+        url_path = "/api/dostk/mrkcond"
+        body = {"date": date, "amt_qty_tp": amt_qty_tp, "mrkt_tp": mrkt_tp, "min_tic_tp": min_tic_tp, "stex_tp": stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_stock_loan_trade_details(self, dt: str, mrkt_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90012] 대차거래내역요청"""
+        api_id = "ka90012"
+        url_path = "/api/dostk/slb"
+        body = {"dt": dt, "mrkt_tp": mrkt_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_item_daily_program_trade_trend(self, amt_qty_tp: Optional[str], stk_cd: str, date: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[ka90013] 종목일별프로그램매매추이요청"""
+        api_id = "ka90013"
+        url_path = "/api/dostk/mrkcond"
+        body = {"amt_qty_tp": amt_qty_tp, "stk_cd": stk_cd, "date": date}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+
+    # ==========================================================
+    # III. 국내주식 API (kt...): 계좌 및 주문
+    # ==========================================================
+    
+    def get_deposit_details(self, qry_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00001] 예수금상세현황요청"""
+        api_id = "kt00001"
+        url_path = "/api/dostk/acnt"
+        body = {"qry_tp": qry_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_estimated_deposit_asset_status(self, start_dt: str, end_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00002] 일별추정예탁자산현황요청"""
+        api_id = "kt00002"
+        url_path = "/api/dostk/acnt"
+        body = {"start_dt": start_dt, "end_dt": end_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_estimated_asset_inquiry(self, qry_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00003] 추정자산조회요청"""
+        api_id = "kt00003"
+        url_path = "/api/dostk/acnt"
+        body = {"qry_tp": qry_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_evaluation_status(self, qry_tp: str, dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00004] 계좌평가현황요청"""
+        api_id = "kt00004"
+        url_path = "/api/dostk/acnt"
+        body = {"qry_tp": qry_tp, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_conclusion_balance(self, dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00005] 체결잔고요청"""
+        api_id = "kt00005"
+        url_path = "/api/dostk/acnt"
+        body = {"dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_order_conclusion_details(self, ord_dt: Optional[str], qry_tp: str, stk_bond_tp: str, sell_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00007] 계좌별주문체결내역상세요청"""
+        api_id = "kt00007"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "stk_bond_tp": stk_bond_tp, "sell_tp": sell_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_next_day_settlement_details(self, strt_dcd_seq: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00008] 계좌별익일결제예정내역요청"""
+        api_id = "kt00008"
+        url_path = "/api/dostk/acnt"
+        body = {"strt_dcd_seq": strt_dcd_seq}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_order_conclusion_status(self, ord_dt: Optional[str], stk_bond_tp: str, mrkt_tp: str, sell_tp: str, qry_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00009] 계좌별주문체결현황요청"""
+        api_id = "kt00009"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_dt": ord_dt, "stk_bond_tp": stk_bond_tp, "mrkt_tp": mrkt_tp, "sell_tp": sell_tp, "qry_tp": qry_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def request_order_withdrawal_possible_amount(self, io_amt: Optional[str], stk_cd: str, trde_tp: str, trde_qty: Optional[str], uv: str, exp_buy_unp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00010] 주문인출가능금액요청"""
+        api_id = "kt00010"
+        url_path = "/api/dostk/acnt"
+        body = {"io_amt": io_amt, "stk_cd": stk_cd, "trde_tp": trde_tp, "trde_qty": trde_qty, "uv": uv, "exp_buy_unp": exp_buy_unp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_order_possible_quantity_by_margin_rate(self, stk_cd: str, uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00011] 증거금율별주문가능수량조회요청"""
+        api_id = "kt00011"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd, "uv": uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_order_possible_quantity_by_credit_guarantee_rate(self, stk_cd: str, uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00012] 신용보증금율별주문가능수량조회요청"""
+        api_id = "kt00012"
+        url_path = "/api/dostk/acnt"
+        body = {"stk_cd": stk_cd, "uv": uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_margin_details_inquiry(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00013] 증거금세부내역조회요청"""
+        api_id = "kt00013"
+        url_path = "/api/dostk/acnt"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_consignment_comprehensive_trade_details(self, strt_dt: str, end_dt: str, tp: str, stk_cd: Optional[str], crnc_cd: Optional[str], gds_tp: str, frgn_stex_code: Optional[str], dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00015] 위탁종합거래내역요청"""
+        api_id = "kt00015"
+        url_path = "/api/dostk/acnt"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "tp": tp, "stk_cd": stk_cd, "crnc_cd": crnc_cd, "gds_tp": gds_tp, "frgn_stex_code": frgn_stex_code, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_daily_account_yield_details(self, fr_dt: str, to_dt: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00016] 일별계좌수익률상세현황요청"""
+        api_id = "kt00016"
+        url_path = "/api/dostk/acnt"
+        body = {"fr_dt": fr_dt, "to_dt": to_dt}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_daily_status(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00017] 계좌별당일현황요청"""
+        api_id = "kt00017"
+        url_path = "/api/dostk/acnt"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_account_evaluation_balance_details(self, qry_tp: str, dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt00018] 계좌평가잔고내역요청"""
+        api_id = "kt00018"
+        url_path = "/api/dostk/acnt"
+        body = {"qry_tp": qry_tp, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 주식 주문 API
+    def buy_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10000] 주식 매수주문"""
+        api_id = "kt10000"
+        url_path = "/api/dostk/ordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "cond_uv": cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def sell_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10001] 주식 매도주문"""
+        api_id = "kt10001"
+        url_path = "/api/dostk/ordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "cond_uv": cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def correct_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, mdfy_qty: str, mdfy_uv: str, mdfy_cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10002] 주식 정정주문"""
+        api_id = "kt10002"
+        url_path = "/api/dostk/ordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "mdfy_qty": mdfy_qty, "mdfy_uv": mdfy_uv, "mdfy_cond_uv": mdfy_cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def cancel_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, cncl_qty: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10003] 주식 취소주문"""
+        api_id = "kt10003"
+        url_path = "/api/dostk/ordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 신용 주문 API
+    def credit_buy_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10006] 신용 매수주문"""
+        api_id = "kt10006"
+        url_path = "/api/dostk/crdordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "cond_uv": cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def credit_sell_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, crd_deal_tp: str, crd_loan_dt: Optional[str], cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10007] 신용 매도주문"""
+        api_id = "kt10007"
+        url_path = "/api/dostk/crdordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "crd_deal_tp": crd_deal_tp, "crd_loan_dt": crd_loan_dt, "cond_uv": cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def credit_correct_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, mdfy_qty: str, mdfy_uv: str, mdfy_cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10008] 신용 정정주문"""
+        api_id = "kt10008"
+        url_path = "/api/dostk/crdordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "mdfy_qty": mdfy_qty, "mdfy_uv": mdfy_uv, "mdfy_cond_uv": mdfy_cond_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def credit_cancel_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, cncl_qty: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt10009] 신용 취소주문"""
+        api_id = "kt10009"
+        url_path = "/api/dostk/crdordr"
+        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 신용융자/대주 가능 종목 조회 API
+    def get_credit_loan_possible_items(self, crd_stk_grde_tp: Optional[str], mrkt_deal_tp: str, stk_cd: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt20016] 신용융자 가능종목요청"""
+        api_id = "kt20016"
+        url_path = "/api/dostk/stkinfo"
+        body = {"crd_stk_grde_tp": crd_stk_grde_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_credit_loan_possible_inquiry(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt20017] 신용융자 가능문의"""
+        api_id = "kt20017"
+        url_path = "/api/dostk/stkinfo"
+        body = {"stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # 금현물 주문/계좌 API
+    def gold_buy_order(self, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50000] 금현물 매수주문"""
+        api_id = "kt50000"
+        url_path = "/api/dostk/ordr"
+        body = {"stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def gold_sell_order(self, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50001] 금현물 매도주문"""
+        api_id = "kt50001"
+        url_path = "/api/dostk/ordr"
+        body = {"stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def gold_correct_order(self, stk_cd: str, orig_ord_no: str, mdfy_qty: str, mdfy_uv: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50002] 금현물 정정주문"""
+        api_id = "kt50002"
+        url_path = "/api/dostk/ordr"
+        body = {"stk_cd": stk_cd, "orig_ord_no": orig_ord_no, "mdfy_qty": mdfy_qty, "mdfy_uv": mdfy_uv}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def gold_cancel_order(self, orig_ord_no: str, stk_cd: str, cncl_qty: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50003] 금현물 취소주문"""
+        api_id = "kt50003"
+        url_path = "/api/dostk/ordr"
+        body = {"orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_balance(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50020] 금현물 잔고확인"""
+        api_id = "kt50020"
+        url_path = "/api/dostk/acnt"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_deposit(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50021] 금현물 예수금"""
+        api_id = "kt50021"
+        url_path = "/api/dostk/acnt"
+        body = {}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_order_conclusion_all(self, ord_dt: str, qry_tp: Optional[str], mrkt_deal_tp: str, stk_bond_tp: str, slby_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50030] 금현물 주문체결전체조회"""
+        api_id = "kt50030"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_bond_tp": stk_bond_tp, "slby_tp": slby_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_order_conclusion(self, ord_dt: str, qry_tp: str, stk_bond_tp: str, sell_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50031] 금현물 주문체결조회"""
+        api_id = "kt50031"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "stk_bond_tp": stk_bond_tp, "sell_tp": sell_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_trade_details(self, strt_dt: Optional[str], end_dt: Optional[str], tp: Optional[str], stk_cd: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50032] 금현물 거래내역조회"""
+        api_id = "kt50032"
+        url_path = "/api/dostk/acnt"
+        body = {"strt_dt": strt_dt, "end_dt": end_dt, "tp": tp, "stk_cd": stk_cd}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    def get_gold_unconcluded_orders(self, ord_dt: str, qry_tp: Optional[str], mrkt_deal_tp: str, stk_bond_tp: str, sell_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
+        """[kt50075] 금현물 미체결조회"""
+        api_id = "kt50075"
+        url_path = "/api/dostk/acnt"
+        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_bond_tp": stk_bond_tp, "sell_tp": sell_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
+        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
+
+    # ==========================================================
+    # IV. 실시간 API (00, 04, ...): WebSocket API
+    # ==========================================================
+    # Note: 이 함수들은 WebSocket 연결을 통해 실시간 데이터를 등록/해지하는 용도이며, 
+    # 실제 WebSocket 통신 로직은 이 클래스 외부 또는 별도 WebSocket 클라이언트에서 처리해야 합니다. 
+    # 여기서는 호출에 필요한 Request Body 구조만 반환합니다.
+
+    def subscribe_realtime(self, grp_no: str, refresh: str, data: List[Dict[str, Any]], trnm: str = "REG") -> Dict[str, Any]:
+        """실시간 데이터 구독 요청 (일반적인 등록 함수)"""
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm, "grp_no": grp_no, "refresh": refresh, "data": data}
+        print(f"[WebSocket] Subscribe Request: {body}")
+        # 실제로는 WebSocket 클라이언트를 통해 전송되어야 합니다.
+        return body
+
+    def unsubscribe_realtime(self, grp_no: str, data: List[Dict[str, Any]], trnm: str = "REMOVE") -> Dict[str, Any]:
+        """실시간 데이터 구독 해지 요청 (일반적인 해지 함수)"""
+        url_path = "/api/dostk/websocket"
+        body = {"trnm": trnm, "grp_no": grp_no, "data": data}
+        print(f"[WebSocket] Unsubscribe Request: {body}")
+        # 실제로는 WebSocket 클라이언트를 통해 전송되어야 합니다.
+        return body
+
+    def subscribe_order_conclusion(self, grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[00] 주문체결 실시간 등록"""
+        api_id = "00"
+        data = [{"item": [""], "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_balance(self, grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[04] 잔고 실시간 등록"""
+        api_id = "04"
+        data = [{"item": [""], "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_stock_momentum(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0A] 주식기세 실시간 등록"""
+        api_id = "0A"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+    
+    def subscribe_stock_conclusion(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0B] 주식체결 실시간 등록"""
+        api_id = "0B"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_stock_priority_hoga(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0C] 주식우선호가 실시간 등록"""
+        api_id = "0C"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+        
+    def subscribe_stock_hoga_balance(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0D] 주식호가잔량 실시간 등록"""
+        api_id = "0D"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_stock_after_hours_hoga(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0E] 주식시간외호가 실시간 등록"""
+        api_id = "0E"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_stock_daily_traders(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0F] 주식당일거래원 실시간 등록"""
+        api_id = "0F"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+        
+    def subscribe_etf_nav(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0G] ETF NAV 실시간 등록"""
+        api_id = "0G"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_stock_expected_conclusion(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0H] 주식예상체결 실시간 등록"""
+        api_id = "0H"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_international_gold_converted_price(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0I] 국제금환산가격 실시간 등록"""
+        api_id = "0I"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_sector_index(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0J] 업종지수 실시간 등록"""
+        api_id = "0J"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+        
+    def subscribe_sector_fluctuation(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0U] 업종등락 실시간 등록"""
+        api_id = "0U"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+        
+    def subscribe_stock_item_info(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0g] 주식종목정보 실시간 등록"""
+        api_id = "0g"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_elw_theory_price(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0m] ELW 이론가 실시간 등록"""
+        api_id = "0m"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_market_start_time(self, grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0s] 장시작시간 실시간 등록"""
+        api_id = "0s"
+        data = [{"item": [""], "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_elw_index(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0u] ELW 지표 실시간 등록"""
+        api_id = "0u"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+    def subscribe_item_program_trade(self, items: List[str], grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[0w] 종목프로그램매매 실시간 등록"""
+        api_id = "0w"
+        data = [{"item": items, "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+        
+    def subscribe_vi_trigger_release(self, grp_no: str = "1", refresh: str = "1") -> Dict[str, Any]:
+        """[1h] VI발동/해제 실시간 등록"""
+        api_id = "1h"
+        data = [{"item": [""], "type": [api_id]}]
+        return self.subscribe_realtime(grp_no, refresh, data)
+
+
+# ---
+# # [사용 예시]
+# # (이 부분은 파일에 포함시키지 않거나, 테스트 목적으로만 사용하십시오.)
+# if __name__ == '__main__':
+#     # TokenManager는 별도로 구현해야 합니다.
+#     # Mock TokenManager 예시 (실제 사용 시 대체 필요)
+#     class MockTokenManager:
+#         def __init__(self, *args, **kwargs):
+#             pass
+#         def get_token(self):
+#             # 유효한 테스트 토큰을 반환해야 합니다.
+#             return "YourActualValidAccessTokenHere"
+    
+#     # KiwoomRestApi 클래스의 __init__에서 실제 TokenManager를 import한다고 가정
+#     # self.token_manager = TokenManager(app_key, secret_key, mock_mode)
+#     
+#     # 테스트를 위해 임시로 MockTokenManager를 사용
+#     KiwoomRestApi.token_manager = MockTokenManager("dummy_key", "dummy_secret")
+
+#     api = KiwoomRestApi("YOUR_APP_KEY", "YOUR_SECRET_KEY", mock_mode=True)
+
+#     # 1. 주식 기본 정보 요청 예시 (ka10001)
+#     # response = api.get_stock_basic_info(stk_cd="005930")
+#     # print("\n[ka10001 Response Example]")
+#     # print(json.dumps(response, indent=4, ensure_ascii=False))
+
+#     # 2. 주식 매수 주문 요청 예시 (kt10000)
+#     # response = api.buy_order(
+#     #     dmst_stex_tp="KRX", 
+#     #     stk_cd="005930", 
+#     #     ord_qty="1", 
+#     #     ord_uv="70000", 
+#     #     trde_tp="0"
+#     # )
+#     # print("\n[kt10000 Response Example]")
+#     # print(json.dumps(response, indent=4, ensure_ascii=False))
+#     
+#     # 3. 미체결 주문 조회 예시 (ka10075)
+#     # response = api.get_unconcluded_orders(
+#     #     all_stk_tp="0",
+#     #     trde_tp="0",
+#     #     stk_cd="",
+#     #     stex_tp="0"
+#     # )
+#     # print("\n[ka10075 Response Example]")
+#     # print(json.dumps(response, indent=4, ensure_ascii=False))
+
+#     # 4. WebSocket 등록 요청 (0B) (실제 요청은 별도 WebSocket 클라이언트에서 처리)
+#     # request_body = api.subscribe_stock_conclusion(items=["005930", "035720"])
+#     # print("\n[0B Realtime Request Body]")
+#     # print(json.dumps(request_body, indent=4, ensure_ascii=False))
+# ---
+
+영웅문4 - 키움rest api tr매칭
+영웅문4 화면번호	영웅문4 화면명	키움 REST API
+0361	실시간계좌관리(T)-예수금	kt00001 예수금상세현황요청
+0362	예수금상세현황	kt00001 예수금상세현황요청
+0120	미니주식체결	ka10003 체결정보요청
+0122	당일전일체결	"ka10055 당일전일체결량요청
+ka10084 당일전일체결요청"
+0124	일별주가	ka10086 일별주가요청
+0125	시간대별 전일비거래비중	-
+0126	미니거래원변동	ka10040 당일주요거래원요청
+0129	미니거래원	-
+0254	당일주요거래원	ka10040 당일주요거래원요청
+0141	종목별 신용매매동향	ka10013 신용매매동향요청
+0142	종목별 공매도추이	ka10014 공매도추이요청
+0143	일별거래상세	ka10015 일별거래상세요청
+0161	신고가_신저가	ka10016 신고저가요청
+0162	상한가하한가	ka10017 상하한가요청
+0163	고가_저가근접	ka10018 고저가근접요청
+0164	가격급등_급락	ka10019 가격급등락요청
+0165	호가잔량상위	ka10020 호가잔량상위요청
+0166	호가잔량급증	ka10020 호가잔량상위요청
+0167	잔량급증율	ka10022 잔량율급증요청
+0168	거래량급증	ka10023 거래량급증요청
+0169	거래량갱신	ka10024 거래량갱신요청
+0170	매물대집중	ka10025 매물대집중요청
+0171	고PER_저PER	ka10026 고저PER요청
+0181	전일대비등락률상위	ka10027 전일대비등락률상위요청
+0182	시가대비등락률상위	ka10028 시가대비등락률요청
+0183	예상체결등락률상위	ka10029 예상체결등락률상위요청
+0184	당일거래량상위	ka10030 당일거래량상위요청
+0185	전일거래량상위	ka10031 전일거래량상위요청
+0186	거래대금상위	ka10032 거래대금상위요청
+0188	신용비율상위	ka10033 신용비율상위요청
+0198	실시간 종목 조회 순위	ka00198 실시간종목조회순위
+0213	업종별주가	"ka20001 업종현재가요청
+ka20002 업종별주가요청"
+0211	업종현재가	"ka20001 업종현재가요청
+ka20002 업종별주가요청"
+0214	업종시세 - 전업종지수	ka20003 전업종지수요청
+0240	외국인정보 - 종목별매매동향	ka10008 주식외국인종목별매매동향
+0213	업종별 주가	ka20002 업종별주가요청
+0242	기간별매매상위	ka10034 외인기간별매매상위요청
+0243	연속순매매상위	ka10035 외인연속순매매상위요청
+0244	한도소진율증가상위	ka10036 외인한도소진율증가상위
+0246	매매상위	ka10037 외국계창구매매상위요청
+0248	미니외국계창구매매상위	ka10037 외국계창구매매상위요청
+0250	증권사별 매매동향 - 종목매매동향	ka10078 증권사별종목매매동향요청
+0251	증권사별 매매동향 - 종목별증권사순위	ka10038 종목별증권사순위요청
+0252	증권사별 매매동향(증권사별매매상위)	ka10039 증권사별매매상위요청
+0254	증권사별 매매동향(당일주요거래원)	"ka10040 당일주요거래원요청
+ka10053 당일상위이탈원요청"
+0256	증권사별 매매동향(거래원매물대분석)	"ka10042 순매수거래원순위요청
+ka10043 거래원매물대분석요청"
+0257	일별_기관매매종목	ka10044 일별기관매매종목요청
+0258	종목별_기관매매추이	ka10045 종목별기관매매추이요청
+0272	ELW가격급등-급락	ka30001 ELW가격급등락요청
+0273	거래원별ELW순매매상위	ka30002 거래원별ELW순매매상위요청
+0275	ETF현재가	"ka40001 ETF수익율요청
+ka40007 ETF시간대별체결요청
+ka40009 ETF시간대별체결요청"
+0277	ETF일별추이	"ka40002 ETF종목정보요청
+ka40003 ETF일별추이요청"
+0278	ETF전체시세	ka40004 ETF전체시세요청
+0279	ETF시간대별추이	ka40003 ETF일별추이요청
+0285	ELW LP보유일별추이	ka30003 ELWLP보유일별추이요청
+0286	ELW일별민감도지표	"ka10001 주식기본정보요청
+ka10048 ELW일별민감도지표요청"
+0287	ELW괴리율	ka30004 ELW괴리율요청
+0289	ELW조건검색	ka30005 ELW조건검색요청
+0290	ELW현재가	"ka10081 주식일봉차트조회요청
+ka30012 ELW종목상세정보요청
+ka30011 ELW근접율요청"
+0291	ELW종목상세정보	"ka10001 주식기본정보요청
+ka30012 ELW종목상세정보요청"
+0292	ELW투자지표	ka10001 주식기본정보요청
+0293	ELW등락률순위	ka30009 ELW등락율순위요청
+0294	ELW잔량순위	ka30010 ELW잔량순위요청
+0295	ELW거래량순위	"ka10001 주식기본정보요청
+ka10050 ELW민감도지표요청"
+0296	ELW시세현황	ka30012 ELW종목상세정보요청
+0299	ELW민감도지표	ka10050 ELW민감도지표요청
+0328	일자별 종목별 실현손익	"ka10072 일자별종목별실현손익요청_일자
+ka10073 일자별종목별실현손익요청_기간"
+0329	일자별실현손익	ka10074 일자별실현손익요청
+0341	실시간계좌관리 - 실시간 미체결	ka10075 미체결요청
+0350	체결확인(당일)	ka10076 체결요청
+0355	실현손익 - 당일실현손익상세	ka10077 당일실현손익상세요청
+0612	미니TICK차트	ka10079 주식틱차트조회요청
+6600	통합키움차트	"ka10081 주식일봉차트조회요청
+ka10082 주식주봉차트조회요청
+ka10083 주식월봉차트조회요청"
+0613	주식일주월차트	"ka10081 주식일봉차트조회요청
+ka10082 주식주봉차트조회요청
+ka10083 주식월봉차트조회요청"
+0615	키움미니차트	"ka10079 주식틱차트조회요청
+ka10080 주식분봉차트조회요청
+ka10081 주식일봉차트조회요청
+ka10082 주식주봉차트조회요청
+ka10083 주식월봉차트조회요청"
+0617	미니모아차트	"ka10079 주식틱차트조회요청
+ka10080 주식분봉차트조회요청
+ka10081 주식일봉차트조회요청"
+0650	테마종목(테마그룹별)	ka90001 테마그룹별요청
+0651	테마종목_테마구성종목	ka90002 테마구성종목요청
+0766	프로그램매매 - 프로그램순매수상위50	ka90003 프로그램순매수상위50요청
+0767	프로그램매매 - 종목별프로그램매매현황	ka90004 종목별프로그램매매현황요청
+0768	프로그램매매 - 프로그램매매추이	ka90005 프로그램매매추이요청 시간대별
+0773	차익잔고추이	ka90006 프로그램매매차익잔고추이요청
+0774	차익잔고현황	-
+0777	프로그램매매누적추이	ka90007 프로그램매매누적추이요청
+0778	종목일별 프로그램매매추이	-
+0785	외국인기관매매상위	ka90009 외국인기관매매상위요청
+0795	투자자별일별매매종목	ka10058 투자자별일별매매종목요청
+0796	종목별투자자	"ka10059 종목별투자자기관별요청
+ka10060 종목별투자자기관별차트요청
+ka10061 종목별투자자기관별합계요청"
+0797	업종별투자자별순매수	ka10051 업종별투자자순매수요청
+0798	기관_외국인 동일순매매순위	ka10062 동일순매매순위요청
+0799	종목별 투자자2	ka10059 종목별투자자기관별요청
+1052	장중투자자별매매종합(잠정)	"ka10063 장중투자자별매매요청
+ka10064 장중투자자별매매차트요청"
+1053	장중투자자별매매상위(잠정)	ka10065 장중투자자별매매상위요청
+1054	장마감후투자자별매매	ka10066 장마감후투자자별매매요청
+1060	대차거래내역	ka90012 대차거래내역요청
+1061	대차거래추이	"ka10068 대차거래추이요청
+ka20068 대차거래추이요청(종목별)"
+1062	대차거래상위10종목	ka10069 대차거래상위10종목요청
+0349	일별 추정예탁자산 현황	kt00002 일별추정예탁자산현황요청
+0341	실시간미체결	ka10075 미체결요청
+0345	실시간잔고	"kt00003 추정자산조회요청
+ka10085 계좌수익률요청"
+0346	실시간계좌관리(T) - 잔고확인	kt00004 계좌평가현황요청
+0391	계좌평가 잔고내역(합산)	kt00018 계좌평가잔고내역요청
+0309	실시간잔고-미체결	"ka10075 미체결요청
+kt00003 추정자산조회요청
+ka10085 계좌수익률요청"
+0351	주문체결내역 - 주문체결내역 - 금일주문체결내역	kt00007 계좌별주문체결내역상세요청
+0352	주문체결내역 - 주문체결내역 - 전일체결내역	kt00008 계좌별익일결제예정내역요청
+0347	주문인출 가능금 추정	kt00010 주문인출가능금액요청
+0399	주문가능수량(종목별_증거금률별)	"kt00011 증거금율별주문가능수량조회요청
+kt00012 신용보증금율별주문가능수량조회요청"
+0397	주식증거금상세	kt00013 증거금세부내역조회요청
+0353	실시간계좌관리(T)-당일매매일지	ka10170 당일매매일지요청
+0354	당일매매정리	-
+0391	계좌평가잔고내역	kt00004 계좌평가현황요청
+0366	계좌잔고 상세내역 조회	kt00004 계좌평가현황요청
+0351	금일주문체결내역	kt00009 계좌별주문체결현황요청
+0348	결제예정내역상세	kt00008 계좌별익일결제예정내역요청
+0489	위탁종합계좌거래내역	kt00015 위탁종합거래내역요청
+0391	계좌평가잔고내역	kt00004 계좌평가현황요청
+0366	계좌잔고 상세내역 조회	kt00004 계좌평가현황요청
+0392	일별계좌수익률현황	kt00016 일별계좌수익률상세현황요청
+0392	주식수익률현황 - 일별주식수익률현황	kt00017 계좌별당일현황요청
+0393	주식수익률현황 - 월별주식수익률현황	kt00017 계좌별당일현황요청
+0769	프로그램매매 - 프로그램매매추이차트	-
+0489	위탁종합계좌 거래내역	kt00015 위탁종합거래내역요청
+0879	신용융자가능종목	kt20016 신용융자 가능종목요청
+0366	계좌잔고 상세내역 조회	kt00005 체결잔고요청
+0127	거래원순간거래량	ka10052 거래원순간거래량요청
+0178	체결강도추이	ka10046 체결강도추이시간별요청
+0298	신주인수권전체시세	ka10011 신주인수권전체시세요청
+0193	변동성완화장치(VI) 발동종목현황	ka10054 변동성완화장치발동종목요청
+0763	기관/외국인연속매매현황 - 기관/외국인연속매매현황	ka10131 기관외국인연속매매현황요청
+1304	시간외단일가등락률순위	ka10098 시간외단일가등락율순위요청
+1690	자동일지(T) - 일별 잔고 수익률	ka01690 일별잔고수익률
+0620	미니업종차트	"ka20004 업종틱차트조회요청
+ka20005 업종분봉조회요청
+ka20006 업종일봉조회요청
+ka20007 업종주봉조회요청
+ka20008 업종월봉조회요청
+ka20019 업종년봉조회요청"
+0619	금현물차트	"ka50079 금현물틱차트조회요청
+ka50080 금현물분봉차트조회요청
+ka50081 금현물일봉차트조회요청
+ka50082 금현물주봉차트조회요청
+ka50083 금현물월봉차트조회요청"
+0202	금현물주문종합	"kt50000 금현물매수주문
+kt50001 금현물매도주문
+kt50002 금현물정정주문
+kt50003 금현물취소주문
+ka50100 금현물 시세정보
+ka50101 금현물 호가
+5w 국제금환산가격(원/g)
+5d 국제금환산가격($/온스)
+ka52301 금현물투자자현황
+ka50087 금현물예상체결
+kt50000 금현물 매수주문
+kt50001 금현물 매도주문
+kt50002 금현물 정정주문
+kt50003 금현물 취소주문
+kt50075 금현물 미체결조회
+kt50020 금현물 잔고확인
+kt50021 금현물 예수금
+kt50030 금현물 주문체결전체조회
+kt50031 금현물 주문체결조회"
+0619	금현물차트	"ka50079 금현물틱차트조회요청
+ka50080 금현물분봉차트조회요청
+ka50081 금현물일봉차트조회요청
+ka50082 금현물주봉차트조회요청
+ka50083 금현물월봉차트조회요청
+ka50091 금현물당일틱차트조회요청
+ka50092 금현물당일분봉차트조회요청"
+0209	금현물일별추이	ka50012 금현물일별추이
+0208	금현물체결추이	ka50010 금현물체결추이
+1365	금현물거래내역	kt50032 금현물 거래내역조회

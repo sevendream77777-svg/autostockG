@@ -1,0 +1,27 @@
+=== 검사: F:\autostockG\MODELENGINE\RAW\all_stocks_cumulative.parquet ===
+컬럼: ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Change', 'Code', 'Name', 'Market']
+Date 타입: datetime64[ns]
+Date 샘플: [Timestamp('2015-01-02 00:00:00'), Timestamp('2015-01-05 00:00:00'), Timestamp('2015-01-06 00:00:00')]
+Code 타입: object
+Code 샘플: ['005930', '005930', '005930']
+
+=== 검사: F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet ===
+컬럼: ['Date', 'Code', 'Open', 'High', 'Low', 'Close', 'Volume', 'SMA_20', 'SMA_40', 'SMA_60', 'SMA_90', 'RSI_14', 'VOL_SMA_20', 'MACD', 'MACD_Sig', 'BBP_20', 'ATR_14', 'STOCH_K', 'STOCH_D', 'CCI_20']
+Date 타입: datetime64[ns]
+Date 샘플: [Timestamp('2015-05-14 00:00:00'), Timestamp('2015-05-15 00:00:00'), Timestamp('2015-05-18 00:00:00')]
+Code 타입: object
+Code 샘플: ['000020', '000020', '000020']
+
+=== 검사: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet ===
+컬럼: ['Date', 'Code', 'Open', 'High', 'Low', 'Close', 'Volume', 'SMA_20', 'SMA_40', 'SMA_60', 'SMA_90', 'RSI_14', 'VOL_SMA_20', 'MACD', 'MACD_Sig', 'BBP_20', 'ATR_14', 'STOCH_K', 'STOCH_D', 'CCI_20']
+Date 타입: datetime64[ns]
+Date 샘플: [Timestamp('2015-05-14 00:00:00'), Timestamp('2015-05-15 00:00:00'), Timestamp('2015-05-18 00:00:00')]
+Code 타입: object
+Code 샘플: ['000020', '000020', '000020']
+
+=== 검사: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet ===
+컬럼: ['Date', 'Code', 'Open', 'High', 'Low', 'Close', 'Volume', 'SMA_20', 'SMA_40', 'SMA_60', 'SMA_90', 'RSI_14', 'VOL_SMA_20', 'MACD', 'MACD_Sig', 'BBP_20', 'ATR_14', 'STOCH_K', 'STOCH_D', 'CCI_20']
+Date 타입: datetime64[ns]
+Date 샘플: [Timestamp('2015-05-14 00:00:00'), Timestamp('2015-05-15 00:00:00'), Timestamp('2015-05-18 00:00:00')]
+Code 타입: object
+Code 샘플: ['000020', '000020', '000020']

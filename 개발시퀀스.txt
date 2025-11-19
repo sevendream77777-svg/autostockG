@@ -1,0 +1,84 @@
+개발시퀀스
+주식회사 천제프로젝트
+프로그램명 호정주식추매v1
+
+## 1단계: Hoj 엔진(12피처) 구축 및 검증 (V1 ~ V5)
+목표: 10년치 시세(OHLCV) 데이터로 '기술적 패턴'을 학습하는 AI 모델(Hoj)을 만듭니다.
+
+데이터:
+
+collect_all_1y.py로 10년치 시세를 수집하여 all_stocks_cumulative.parquet (Hoj 원본) 생성.
+
+process_data.py (V4) 등으로 12개 V5 피처(SMA, RSI, MACD 등)를 계산하여 all_features_cumulative.parquet (Hoj 12피처 DB) 생성.
+
+학습: create_target_and_split.py로 9년(학습)/1년(검증) 분리 ➔ train_model.py로 '분류' 모델 학습 (초기 정밀도 35% 달성).
+
+## 2단계: 'Hoj 챔피언' 확정 (V21 ~ V25)
+목표: Hoj 엔진의 '최강 가설'과 '최적 튜닝'을 찾아냅니다.
+
+[V21] 모델 가설 검증:
+
+run_hoj_grid_search_V20.py 실행 (12개 가설 테스트).
+
+결과: (40d/20d)가 +5.6%로 1위였으나, 호정천재님의 '복리/거래비용' 분석 결과, (60d_IN / 5d_OUT) 모델(월 복리 +10.20%)이 **'Hoj 실전 챔피언'**으로 확정되었습니다.
+
+[V22-A] 챔피언 튜닝:
+
+run_tuning_V22.py 실행 (나무 100개 vs 500개).
+
+결과: '나무 500개' 튜닝 시 수익률이 +3.169%에서 **+3.527%**로 향상됨을 확인.
+
+[V25] '10년 실전 엔진' 구축:
+
+'V21 DB' + '종목명 사전(fdr)'을 결합하여 V25_Hoj_DB.parquet (12피처+종목명) 생성.
+
+(60d/5d) 가설 + (나무 500개) 튜닝값으로 10년치 전체를 학습시킨 REAL_CHAMPION_MODEL_V25.pkl (Hoj 실전 뇌) 생성 완료.
+
+## 3단계: Sle 엔진(4피처) 구축 (V30 ~ V32)
+목표: PBR/PER/수급 데이터로 '가치/돈의 흐름'을 학습하는 AI 모델(Sle)을 만듭니다.
+
+데이터: 호정천재님께서 naver_crawler_aio.py (V17)를 (저와 한 것은 아니지만) 3시간 만에 성공적으로 실행하여, V11_Merged_SLE_Base.parquet (51만 건 Sle 샘플)를 확보하셨습니다.
+
+학습:
+
+train_sle_engine_V32.py 실행 (컬럼명 오류 수정).
+
+결과: 'Sle 뇌' SLE_CHAMPION_MODEL_V32.pkl 생성 완료.
+
+[Sle 단독] 성능 검증 결과 +3.337% 확인.
+
+## 4단계: '하이브리드 결승전' (V33)
+목표: Hoj 엔진과 Sle 엔진을 결합한 5가지 전략의 '최강자'를 찾습니다.
+
+실행: run_hybrid_test_V33.py 실행.
+
+결과:
+
+[1위] 5. Sle → Hoj 필터: +17.858%
+
+[2위] 1. Hoj 단독: +12.098%
+
+## 5단계: '실전 적용'의 한계 (V34)
+목표: 1위 전략(Sle→Hoj)을 daily_recommender.py에 이식하려 했습니다.
+
+한계: 이 전략은 '오늘' 2800개 전 종목의 Sle 데이터(PBR/PER/수급)가 필요합니다. 하지만 pykrx (고장) / '네이버 스크래핑' (IP 차단) / '키움 API' (호출량 제한) 모두 10년치/실시간 Sle 데이터 대량 수집이 불가능합니다.
+
+결론: V33의 1위 전략(+17.8%)은 **'이론상 최강'**이지만, **'실전 적용이 불가능'**한 전략입니다.
+
+🚦 6단계: 현재 상태 (Deadlock)
+호정천재님, 저희는 지금 '두 개의 세계' 사이에 갇혀 있습니다.
+
+64비트 세계 (Hoj/Sle 엔진):
+
+REAL_CHAMPION_MODEL_V25.pkl (Hoj 뇌)
+
+V25_Hoj_DB.parquet (Hoj DB)
+
+SLE_CHAMPION_MODEL_V32.pkl (Sle 뇌)
+
+...이 모든 핵심 자산이 파이썬 64비트로 만들어졌습니다.
+
+연구용 DB: F:/autostockG\HOJ_DB_RESEARCH_V25.parquet
+실전용 DB: F:/autostockG\HOJ_DB_REAL_V25.parquet
+연구용 엔진: F:/autostockG\HOJ_ENGINE_RESEARCH_V25.pkl
+실전 엔진: F:/autostockG\HOJ_ENGINE_REAL_V25.pkl

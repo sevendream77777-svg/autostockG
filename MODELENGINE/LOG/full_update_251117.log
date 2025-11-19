@@ -1,0 +1,299 @@
+==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[ERROR] 연구용 DB 생성 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 87, in main
+    build_HOJ_DB_RESEARCH.build_research_db()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'build_HOJ_DB_RESEARCH' has no attribute 'build_research_db'. Did you mean: 'build_hoj_research_db'?
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[ERROR] 실전용 DB 생성 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 96, in main
+    build_HOJ_DB_REAL.build_real_db()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'build_HOJ_DB_REAL' has no attribute 'build_real_db'. Did you mean: 'build_hoj_real_db'?
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[ERROR] 연구용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 105, in main
+    train_HOJ_ENGINE_RESEARCH.train_research_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_RESEARCH' has no attribute 'train_research_engine'
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[ERROR] 실전용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 114, in main
+    train_HOJ_ENGINE_REAL.train_real_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_REAL' has no attribute 'train_real_engine'
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+
+여기부턴 파워쉘내용 추가
+
+PS F:\autostockG\MODELENGINE\util> python full_update_pipeline.py
+=== [RESEARCH] HOJ 엔진 학습 시작 ===
+  📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+  - DB 로드 완료: (5479016, 24)
+  📅 학습 기간: 2015-05-14 ~ 2024-11-04
+  📅 검증 기간: 2024-11-05 ~ 2025-11-07
+
+[1] 회귀 모델 학습 (Return_5d)
+Training until validation scores don't improve for 100 rounds
+[50]    valid_0's rmse: 0.215445
+[100]   valid_0's rmse: 0.265269
+Early stopping, best iteration is:
+[1]     valid_0's rmse: 0.127555
+   ✅ 회귀 RMSE (valid): 0.127555
+
+[2] 분류 모델 학습 (Label_5d)
+Training until validation scores don't improve for 100 rounds
+[50]    valid_0's binary_logloss: 0.68937
+[100]   valid_0's binary_logloss: 0.690651
+Early stopping, best iteration is:
+[22]    valid_0's binary_logloss: 0.688668
+   ✅ 분류 Logloss (valid): 0.688668
+   📊 분류 정확도 (valid): 0.5380
+💾 연구용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+=== [RESEARCH] HOJ 엔진 학습 종료 ===
+=== [REAL] HOJ 엔진 학습 시작 ===
+  📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+  - DB 로드 완료: (5479016, 24)
+  📅 학습 구간(REAL): 2015-05-14 ~ 2025-11-07
+
+[1] 회귀 모델 학습 (FULL DATA)
+   ℹ 학습 RMSE (train, 참고): 1.373144
+
+[2] 분류 모델 학습 (FULL DATA)
+   ℹ 학습 정확도 (train, 참고): 0.5556
+💾 실전용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+=== [REAL] HOJ 엔진 학습 종료 ===
+==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[FEATURE V31/15] 피처 생성 시작
+  RAW 파일:   F:\autostockG\MODELENGINE\RAW\all_stocks_cumulative.parquet
+  KOSPI 파일: F:\autostockG\MODELENGINE\RAW\kospi_index_10y.parquet
+  출력 파일:  F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet
+  - 결측 제거: 5,843,227 → 5,492,653 행
+  - 최종 피처 개수: 15개
+[FEATURE V31/15] 저장 완료: F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet
+[FEATURE V31/15] 버전 저장: F:\autostockG\MODELENGINE\FEATURE\features_V31_251117.parquet
+[FEATURE V31/15] 작업 완료
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[ERROR] 연구용 DB 생성 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 87, in main
+    build_HOJ_DB_RESEARCH.build_research_db()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'build_HOJ_DB_RESEARCH' has no attribute 'build_research_db'. Did you mean: 'build_hoj_research_db'?
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[ERROR] 실전용 DB 생성 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 96, in main
+    build_HOJ_DB_REAL.build_real_db()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'build_HOJ_DB_REAL' has no attribute 'build_real_db'. Did you mean: 'build_hoj_real_db'?
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[ERROR] 연구용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 105, in main
+    train_HOJ_ENGINE_RESEARCH.train_research_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_RESEARCH' has no attribute 'train_research_engine'
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[ERROR] 실전용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 114, in main
+    train_HOJ_ENGINE_REAL.train_real_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_REAL' has no attribute 'train_real_engine'
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+
+📄 전체 로그 파일: F:\autostockG\MODELENGINE\LOG\full_update_251117.log
+PS F:\autostockG\MODELENGINE\util>==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[STEP 2] 연구용 HOJ DB 생성 완료
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[STEP 3] 실전용 HOJ DB 생성 완료
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[ERROR] 연구용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 105, in main
+    train_HOJ_ENGINE_RESEARCH.train_hoj_research_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_RESEARCH' has no attribute 'train_hoj_research_engine'
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[ERROR] 실전용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 114, in main
+    train_HOJ_ENGINE_REAL.train_hoj_real_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_REAL' has no attribute 'train_hoj_real_engine'
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[STEP 2] 연구용 HOJ DB 생성 완료
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[STEP 3] 실전용 HOJ DB 생성 완료
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[ERROR] 연구용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 105, in main
+    train_HOJ_ENGINE_RESEARCH.train_hoj_research_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_RESEARCH' has no attribute 'train_hoj_research_engine'
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[ERROR] 실전용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 114, in main
+    train_HOJ_ENGINE_REAL.train_hoj_real_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_REAL' has no attribute 'train_hoj_real_engine'
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[STEP 2] 연구용 HOJ DB 생성 완료
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[STEP 3] 실전용 HOJ DB 생성 완료
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[ERROR] 연구용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 105, in main
+    train_HOJ_ENGINE_RESEARCH.train_hoj_research_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_RESEARCH' has no attribute 'train_hoj_research_engine'
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[ERROR] 실전용 엔진 학습 중 예외 발생
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\UTIL\full_update_pipeline.py", line 114, in main
+    train_HOJ_ENGINE_REAL.train_hoj_real_engine()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'train_HOJ_ENGINE_REAL' has no attribute 'train_hoj_real_engine'
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+==========================================
+[FULL UPDATE START] 251117
+==========================================
+
+[STEP 1] 피처 전체 재계산 시작
+[STEP 1] 피처 전체 재계산 완료
+
+[STEP 2] 연구용 HOJ DB 생성 시작
+[STEP 2] 연구용 HOJ DB 생성 완료
+
+[STEP 3] 실전용 HOJ DB 생성 시작
+[STEP 3] 실전용 HOJ DB 생성 완료
+
+[STEP 4] 연구용 HOJ 엔진 학습 시작
+[RUN] F:\autostockG\MODELENGINE\UTIL\train_HOJ_ENGINE_RESEARCH.py
+[STDOUT] === [RESEARCH] HOJ 엔진 학습 시작 ===
+[STDOUT]   📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+[STDOUT]   - DB 로드 완료: (5479016, 24)
+[STDOUT]   📅 학습 기간: 2015-05-14 ~ 2024-11-04
+[STDOUT]   📅 검증 기간: 2024-11-05 ~ 2025-11-07
+[STDOUT] 
+[STDOUT] [1] 회귀 모델 학습 (Return_5d)
+[STDOUT] Training until validation scores don't improve for 100 rounds
+[STDOUT] [50]	valid_0's rmse: 0.215445
+[STDOUT] [100]	valid_0's rmse: 0.265269
+[STDOUT] Early stopping, best iteration is:
+[STDOUT] [1]	valid_0's rmse: 0.127555
+[STDOUT]    ✅ 회귀 RMSE (valid): 0.127555
+[STDOUT] 
+[STDOUT] [2] 분류 모델 학습 (Label_5d)
+[STDOUT] Training until validation scores don't improve for 100 rounds
+[STDOUT] [50]	valid_0's binary_logloss: 0.68937
+[STDOUT] [100]	valid_0's binary_logloss: 0.690651
+[STDOUT] Early stopping, best iteration is:
+[STDOUT] [22]	valid_0's binary_logloss: 0.688668
+[STDOUT]    ✅ 분류 Logloss (valid): 0.688668
+[STDOUT]    📊 분류 정확도 (valid): 0.5380
+[STDOUT] 💾 연구용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+[STDOUT] === [RESEARCH] HOJ 엔진 학습 종료 ===
+[STEP 4] 연구용 HOJ 엔진 학습 완료
+
+[STEP 5] 실전용 HOJ 엔진 학습 시작
+[RUN] F:\autostockG\MODELENGINE\UTIL\train_HOJ_ENGINE_REAL.py
+[STDOUT] === [REAL] HOJ 엔진 학습 시작 ===
+[STDOUT]   📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+[STDOUT]   - DB 로드 완료: (5479016, 24)
+[STDOUT]   📅 학습 구간(REAL): 2015-05-14 ~ 2025-11-07
+[STDOUT] 
+[STDOUT] [1] 회귀 모델 학습 (FULL DATA)
+[STDOUT]    ℹ 학습 RMSE (train, 참고): 1.373144
+[STDOUT] 
+[STDOUT] [2] 분류 모델 학습 (FULL DATA)
+[STDOUT]    ℹ 학습 정확도 (train, 참고): 0.5556
+[STDOUT] 💾 실전용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+[STDOUT] === [REAL] HOJ 엔진 학습 종료 ===
+[STEP 5] 실전용 HOJ 엔진 학습 완료
+
+
+==========================================
+[FULL UPDATE END]
+==========================================
+
+📄 전체 로그 파일: F:\autostockG\MODELENGINE\LOG\full_update_251117.log

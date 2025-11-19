@@ -1,0 +1,5056 @@
+Base directory: F:\autostockG
+Generated at: 2025-11-15T03:42:24
+================================================================================
+
+=== PYTHON FILE: Hoj_V25_FinalValidation.py ===
+Absolute : F:\autostockG\Hoj_V25_FinalValidation.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 6750 bytes, 2025-11-13T19:27:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: Hoj_V25_Predict_Top10.py ===
+Absolute : F:\autostockG\Hoj_V25_Predict_Top10.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 1278 bytes, 2025-11-13T18:49:57
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_DB/OLD/check_env_for_hosle_V2.py ===
+Absolute : F:\autostockG\SLE_DB\OLD\check_env_for_hosle_V2.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 4009 bytes, 2025-11-13T05:34:48
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (0):
+
+External imports (8):
+  - datetime
+  - importlib.util
+  - os
+  - pkg_resources
+  - platform
+  - psutil
+  - sys
+  - time
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_DB/OLD/merge_hoj_sle_V30.py ===
+Absolute : F:\autostockG\SLE_DB\OLD\merge_hoj_sle_V30.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 4295 bytes, 2025-11-14T15:23:21
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (4):
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+Data access (1):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_DB/OLD/organize_SLE_V11.py ===
+Absolute : F:\autostockG\SLE_DB\OLD\organize_SLE_V11.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 3034 bytes, 2025-11-14T15:23:21
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (3):
+  - datetime
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_DB/OLD/organize_SLE_standardize.py ===
+Absolute : F:\autostockG\SLE_DB\OLD\organize_SLE_standardize.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 3120 bytes, 2025-11-14T15:23:21
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (3):
+  - datetime
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_DB/OLD/sle_sample_runner_multithread.py ===
+Absolute : F:\autostockG\SLE_DB\OLD\sle_sample_runner_multithread.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 6992 bytes, 2025-11-09T21:27:48
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (8):
+  - collections
+  - concurrent.futures
+  - datetime
+  - os
+  - pandas
+  - requests
+  - requests.adapters
+  - urllib3.util.retry
+
+I/O usage summary:
+  pandas_read (5 lines)
+  pandas_write (7 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_ENGINE/OLD/train_sle_engine_V30.py ===
+Absolute : F:\autostockG\SLE_ENGINE\OLD\train_sle_engine_V30.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 6948 bytes, 2025-11-14T15:23:21
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (7):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+Data access (1):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: SLE_ENGINE/OLD/train_sle_engine_V31.py ===
+Absolute : F:\autostockG\SLE_ENGINE\OLD\train_sle_engine_V31.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 6813 bytes, 2025-11-14T15:23:21
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (7):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+Data access (1):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: V25_Backtest_DailyMDD.py ===
+Absolute : F:\autostockG\V25_Backtest_DailyMDD.py
+Category : test
+Has __main__ : False
+Size/mtime   : 6084 bytes, 2025-11-13T18:37:47
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - matplotlib.pyplot
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: autopipeline_mapper.py ===
+Absolute : F:\autostockG\autopipeline_mapper.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9551 bytes, 2025-11-15T00:14:17
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - collections
+  - json
+  - os
+  - pathlib
+  - re
+
+I/O usage summary:
+  open_unknown (1 lines)
+  pandas_read (5 lines)
+  pickle_joblib (3 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backtest_model.py ===
+Absolute : F:\autostockG\backtest_model.py
+Category : test
+Has __main__ : False
+Size/mtime   : 4502 bytes, 2025-11-07T22:06:11
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - lightgbm
+  - numpy
+  - pandas
+  - re
+  - sklearn.metrics
+
+Data access (1):
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backtest_model_readable.py ===
+Absolute : F:\autostockG\backtest_model_readable.py
+Category : test
+Has __main__ : False
+Size/mtime   : 5673 bytes, 2025-11-07T23:35:34
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - lightgbm
+  - numpy
+  - pandas
+  - re
+  - sklearn.metrics
+
+Data access (1):
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/build_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch\build_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 7364 bytes, 2025-11-13T22:38:01
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - joblib
+  - lightgbm
+  - os
+  - pandas
+  - shutil
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/check_db_columns_V32.py ===
+Absolute : F:\autostockG\backup_auto_patch\check_db_columns_V32.py
+Category : test
+Has __main__ : True
+Size/mtime   : 1505 bytes, 2025-11-10T13:15:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/organize_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch\organize_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 3488 bytes, 2025-11-14T13:49:54
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/rename_files_v25.py ===
+Absolute : F:\autostockG\backup_auto_patch\rename_files_v25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 1119 bytes, 2025-11-13T22:46:54
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/run_hybrid_test_V33.py ===
+Absolute : F:\autostockG\backup_auto_patch\run_hybrid_test_V33.py
+Category : test
+Has __main__ : True
+Size/mtime   : 7541 bytes, 2025-11-10T14:41:52
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (7):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+Data access (2):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/scan_path_usage.py ===
+Absolute : F:\autostockG\backup_auto_patch\scan_path_usage.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2710 bytes, 2025-11-14T14:31:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - os
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/test_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch\test_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 6973 bytes, 2025-11-13T22:58:51
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - sys
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch/test_REAL_Hoj_ENGINE_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch\test_REAL_Hoj_ENGINE_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 6410 bytes, 2025-11-14T13:29:00
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - sys
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/Hoj_V25_FinalValidation.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\Hoj_V25_FinalValidation.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 6750 bytes, 2025-11-13T19:27:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/Hoj_V25_Predict_Top10.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\Hoj_V25_Predict_Top10.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 1278 bytes, 2025-11-13T18:49:57
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/V25_Backtest_DailyMDD.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\V25_Backtest_DailyMDD.py
+Category : test
+Has __main__ : False
+Size/mtime   : 6084 bytes, 2025-11-13T18:37:47
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - matplotlib.pyplot
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/backtest_model.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\backtest_model.py
+Category : test
+Has __main__ : False
+Size/mtime   : 4502 bytes, 2025-11-07T22:06:11
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - lightgbm
+  - numpy
+  - pandas
+  - re
+  - sklearn.metrics
+
+Data access (1):
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/backtest_model_readable.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\backtest_model_readable.py
+Category : test
+Has __main__ : False
+Size/mtime   : 5673 bytes, 2025-11-07T23:35:34
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - lightgbm
+  - numpy
+  - pandas
+  - re
+  - sklearn.metrics
+
+Data access (1):
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/build_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\build_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 7364 bytes, 2025-11-13T22:38:01
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - joblib
+  - lightgbm
+  - os
+  - pandas
+  - shutil
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 5935 bytes, 2025-11-13T21:33:58
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - joblib
+  - lightgbm
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/build_database_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\build_database_V25.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 1909 bytes, 2025-11-13T12:53:52
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - traceback
+
+Data access (3):
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_write)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_read)
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/build_full_Hoj_DB_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\build_full_Hoj_DB_V25.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 2543 bytes, 2025-11-13T18:34:09
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (2):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read)
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_db_columns_V32.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_db_columns_V32.py
+Category : test
+Has __main__ : True
+Size/mtime   : 1505 bytes, 2025-11-10T13:15:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_engine_structure.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_engine_structure.py
+Category : test
+Has __main__ : False
+Size/mtime   : 251 bytes, 2025-11-14T12:38:34
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (1):
+  - joblib
+
+I/O usage summary:
+  pickle_joblib (1 lines)
+
+autostockG 관련 경로 문자열:
+  - F:\autostockG\HOJ_ENGINE_REAL_V25.pkl
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_merge_keys.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_merge_keys.py
+Category : preprocess
+Has __main__ : False
+Size/mtime   : 2195 bytes, 2025-11-13T00:39:48
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - pandas
+  - sys
+
+Data access (2):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_nulls_in_V25_DB.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_nulls_in_V25_DB.py
+Category : test
+Has __main__ : False
+Size/mtime   : 3798 bytes, 2025-11-13T13:49:14
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - datetime
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_restored_file.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_restored_file.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 1340 bytes, 2025-11-13T02:48:13
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_restored_file_KOSPI.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_restored_file_KOSPI.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 1240 bytes, 2025-11-13T02:51:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/check_single_stock_V28.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\check_single_stock_V28.py
+Category : test
+Has __main__ : True
+Size/mtime   : 4420 bytes, 2025-11-10T10:18:55
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+
+Data access (3):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/collect_all_1y.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\collect_all_1y.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2490 bytes, 2025-11-07T19:47:08
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - os
+  - pandas
+  - pykrx
+  - time
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/collect_kospi.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\collect_kospi.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 1445 bytes, 2025-11-07T22:55:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - pandas
+  - pykrx
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/combine_data.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\combine_data.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2272 bytes, 2025-11-07T21:16:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - glob
+  - os
+  - pandas
+  - tqdm
+
+Data access (1):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/config_paths.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\config_paths.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2682 bytes, 2025-11-14T14:03:57
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - re
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/convert_full_db.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\convert_full_db.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 332 bytes, 2025-11-13T21:02:38
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+autostockG 관련 경로 문자열:
+  - F:\autostockG\new_Hoj_DB_V25_FULL.csv
+  - F:\autostockG\new_Hoj_DB_V25_FULL.parquet
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/create_target_and_split.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\create_target_and_split.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 3317 bytes, 2025-11-07T23:23:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - numpy
+  - pandas
+  - tqdm
+
+Data access (3):
+  - stock_data_10y_processed_v4.parquet [OTHER_DATA] (type=data_access)
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/create_target_urls.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\create_target_urls.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2175 bytes, 2025-11-09T05:29:39
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/create_ticker_map.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\create_ticker_map.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 1389 bytes, 2025-11-10T02:22:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - FinanceDataReader
+  - os
+  - pandas
+
+Data access (1):
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/daily_recommender.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\daily_recommender.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4434 bytes, 2025-11-13T03:34:10
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - joblib
+  - os
+  - pandas
+  - sys
+  - time
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/daily_recommender_FAST.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\daily_recommender_FAST.py
+Category : crawler
+Has __main__ : True
+Size/mtime   : 8035 bytes, 2025-11-09T04:42:45
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (12):
+  - bs4
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - requests
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/data_manager.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\data_manager.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7119 bytes, 2025-11-11T13:13:02
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - configparser
+  - datetime
+  - json
+  - os
+  - typing
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/data_manager_test.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\data_manager_test.py
+Category : test
+Has __main__ : True
+Size/mtime   : 6920 bytes, 2025-11-11T12:35:51
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - configparser
+  - datetime
+  - json
+  - os
+  - typing
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/detect_locked_file.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\detect_locked_file.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 1200 bytes, 2025-11-14T15:06:46
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/download_data.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\download_data.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 3057 bytes, 2025-11-11T04:14:50
+삭제 후보    : NO
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - sys
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/evaluate_engine_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\evaluate_engine_V25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 10345 bytes, 2025-11-13T18:14:44
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (7):
+  - datetime
+  - lightgbm
+  - matplotlib.pyplot
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/excel_to_csv_batch.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\excel_to_csv_batch.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2224 bytes, 2025-11-13T04:55:01
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_write (3 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/extract_excel.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\extract_excel.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 3207 bytes, 2025-11-11T02:10:25
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - openpyxl
+  - os
+
+I/O usage summary:
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/finance_collector.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\finance_collector.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4323 bytes, 2025-11-11T13:55:00
+삭제 후보    : NO
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/finance_collector_test.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\finance_collector_test.py
+Category : test
+Has __main__ : True
+Size/mtime   : 3097 bytes, 2025-11-11T13:07:04
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/fix_corrupted_KOSPI_v2.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\fix_corrupted_KOSPI_v2.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2293 bytes, 2025-11-13T02:59:19
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/fix_corrupted_data_v1.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\fix_corrupted_data_v1.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 4282 bytes, 2025-11-13T02:40:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/kakao_notifier.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\kakao_notifier.py
+Category : REST
+Has __main__ : True
+Size/mtime   : 8587 bytes, 2025-11-11T14:43:50
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (7):
+  - configparser
+  - datetime
+  - json
+  - os
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/kiwoom_api.fullbackup.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\kiwoom_api.fullbackup.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 19637 bytes, 2025-11-11T16:23:35
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (1):
+  - token_manager.py
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/kiwoom_api.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\kiwoom_api.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 11160 bytes, 2025-11-11T16:22:28
+삭제 후보    : NO
+
+Internal imports (1):
+  - token_manager.py
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/main_trading.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\main_trading.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 6292 bytes, 2025-11-11T14:52:48
+삭제 후보    : NO
+
+Internal imports (2):
+  - kakao_notifier.py
+  - kiwoom_api.py
+
+External imports (5):
+  - configparser
+  - datetime
+  - sys
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/make_kospi_index_10y.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\make_kospi_index_10y.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 531 bytes, 2025-11-13T12:51:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - FinanceDataReader
+  - datetime
+  - pandas
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_write)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/merge_pbr_per_V17.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\merge_pbr_per_V17.py
+Category : preprocess
+Has __main__ : True
+Size/mtime   : 1928 bytes, 2025-11-09T15:20:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - os
+  - pandas
+  - pathlib
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/naver_pbr_per_crawler_V16.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\naver_pbr_per_crawler_V16.py
+Category : crawler
+Has __main__ : True
+Size/mtime   : 8150 bytes, 2025-11-09T15:27:08
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (14):
+  - aiofiles
+  - aiohttp
+  - async_timeout
+  - asyncio
+  - bs4
+  - csv
+  - logging
+  - os
+  - pandas
+  - pathlib
+  - random
+  - sys
+  - time
+  - typing
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (2 lines)
+  open_unknown (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/naver_pbr_per_crawler_V17R.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\naver_pbr_per_crawler_V17R.py
+Category : crawler
+Has __main__ : False
+Size/mtime   : 3680 bytes, 2025-11-09T15:48:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - bs4
+  - concurrent.futures
+  - os
+  - pandas
+  - requests
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/organize_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\organize_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 3488 bytes, 2025-11-14T13:49:54
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/patch_engine.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\patch_engine.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2738 bytes, 2025-11-14T15:03:28
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - re
+  - shutil
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/process_data.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\process_data.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 3294 bytes, 2025-11-07T21:27:11
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (2):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/process_data_v2.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\process_data_v2.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2945 bytes, 2025-11-07T22:29:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (2):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed_v2.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/process_data_v4.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\process_data_v4.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 5009 bytes, 2025-11-07T22:56:53
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (3):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed_v4.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/rename_SLE_files.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\rename_SLE_files.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 2016 bytes, 2025-11-14T14:20:04
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - re
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/rename_files_v25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\rename_files_v25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 1119 bytes, 2025-11-13T22:46:54
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/rename_return5d.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\rename_return5d.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 400 bytes, 2025-11-13T13:56:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/restore_return5d.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\restore_return5d.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 504 bytes, 2025-11-13T13:59:43
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_grid_search.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_grid_search.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 11352 bytes, 2025-11-08T00:25:07
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_hoj_grid_search_V20.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_hoj_grid_search_V20.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 10869 bytes, 2025-11-09T22:43:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_hybrid_test_V33.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_hybrid_test_V33.py
+Category : test
+Has __main__ : True
+Size/mtime   : 7541 bytes, 2025-11-10T14:41:52
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (7):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+Data access (2):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_market_filter_V22B.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_market_filter_V22B.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7184 bytes, 2025-11-10T00:07:51
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_model_grid_search_V12.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_model_grid_search_V12.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9582 bytes, 2025-11-09T02:48:13
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (1):
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_pipeline_v6.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_pipeline_v6.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 11119 bytes, 2025-11-07T23:50:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_quantile_test_V23.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_quantile_test_V23.py
+Category : test
+Has __main__ : True
+Size/mtime   : 5823 bytes, 2025-11-10T14:01:38
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_regression_60_5.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_regression_60_5.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7896 bytes, 2025-11-08T02:25:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (11):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (3):
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_regression_pipeline.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_regression_pipeline.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9879 bytes, 2025-11-08T01:11:27
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_strategy_grid_search_V9.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_strategy_grid_search_V9.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9407 bytes, 2025-11-08T22:13:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_tuning_V22.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_tuning_V22.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 5869 bytes, 2025-11-09T23:56:03
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (1):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_ui_test.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_ui_test.py
+Category : UI
+Has __main__ : True
+Size/mtime   : 1907 bytes, 2025-11-08T21:39:12
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (2):
+  - PySide6.QtWidgets
+  - sys
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_v5_threshold_tuning.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_v5_threshold_tuning.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9220 bytes, 2025-11-08T00:06:22
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/run_weekly_update.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\run_weekly_update.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4953 bytes, 2025-11-12T21:28:27
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - os
+  - subprocess
+  - sys
+
+Data access (4):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/scan_path_usage.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\scan_path_usage.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2710 bytes, 2025-11-14T14:31:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - os
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/test_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\test_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 6973 bytes, 2025-11-13T22:58:51
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - sys
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/test_REAL_Hoj_ENGINE_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\test_REAL_Hoj_ENGINE_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 6410 bytes, 2025-11-14T13:29:00
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - sys
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/test_runner_hoj_gridsearch.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\test_runner_hoj_gridsearch.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 10295 bytes, 2025-11-09T21:10:28
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - itertools
+  - numpy
+  - os
+  - pandas
+  - time
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/test_single_date_fetch.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\test_single_date_fetch.py
+Category : test
+Has __main__ : True
+Size/mtime   : 1525 bytes, 2025-11-09T04:22:28
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - pandas
+  - pykrx
+  - time
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/token_manager.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\token_manager.py
+Category : REST
+Has __main__ : True
+Size/mtime   : 7157 bytes, 2025-11-11T00:08:15
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - os
+  - requests
+  - time
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/train_REAL_Hoj_ENGINE_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\train_REAL_Hoj_ENGINE_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 4693 bytes, 2025-11-13T20:29:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/train_champion_reg.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\train_champion_reg.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2137 bytes, 2025-11-08T18:35:48
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - lightgbm
+  - pandas
+  - re
+
+Data access (1):
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/train_model.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\train_model.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2513 bytes, 2025-11-07T23:09:22
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - lightgbm
+  - pandas
+  - re
+  - sklearn.model_selection
+
+Data access (1):
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/train_real_engine_V25.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\train_real_engine_V25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 6597 bytes, 2025-11-13T20:05:09
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/update_data_incrementally.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\update_data_incrementally.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 7188 bytes, 2025-11-13T11:57:21
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (8):
+  - FinanceDataReader
+  - datetime
+  - os
+  - pandas
+  - socket
+  - sys
+  - time
+  - traceback
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (3 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/update_features_incrementally.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\update_features_incrementally.py
+Category : preprocess
+Has __main__ : False
+Size/mtime   : 5446 bytes, 2025-11-13T12:52:32
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - traceback
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_read)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: backup_auto_patch_detect/verify_data_integrity.py ===
+Absolute : F:\autostockG\backup_auto_patch_detect\verify_data_integrity.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 4010 bytes, 2025-11-13T01:42:31
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: build_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\build_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 7439 bytes, 2025-11-14T14:36:32
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (6):
+  - datetime
+  - joblib
+  - lightgbm
+  - os
+  - pandas
+  - shutil
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py ===
+Absolute : F:\autostockG\build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 5935 bytes, 2025-11-13T21:33:58
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - joblib
+  - lightgbm
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: build_database_V25.py ===
+Absolute : F:\autostockG\build_database_V25.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 1909 bytes, 2025-11-13T12:53:52
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - traceback
+
+Data access (3):
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_write)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_read)
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: build_full_Hoj_DB_V25.py ===
+Absolute : F:\autostockG\build_full_Hoj_DB_V25.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 2543 bytes, 2025-11-13T18:34:09
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (2):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read)
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_db_columns_V32.py ===
+Absolute : F:\autostockG\check_db_columns_V32.py
+Category : test
+Has __main__ : True
+Size/mtime   : 1610 bytes, 2025-11-14T14:36:32
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (3):
+  - numpy
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_engine_structure.py ===
+Absolute : F:\autostockG\check_engine_structure.py
+Category : test
+Has __main__ : False
+Size/mtime   : 251 bytes, 2025-11-14T12:38:34
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (1):
+  - joblib
+
+I/O usage summary:
+  pickle_joblib (1 lines)
+
+autostockG 관련 경로 문자열:
+  - F:\autostockG\HOJ_ENGINE_REAL_V25.pkl
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_merge_keys.py ===
+Absolute : F:\autostockG\check_merge_keys.py
+Category : preprocess
+Has __main__ : False
+Size/mtime   : 2195 bytes, 2025-11-13T00:39:48
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - pandas
+  - sys
+
+Data access (2):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_nulls_in_V25_DB.py ===
+Absolute : F:\autostockG\check_nulls_in_V25_DB.py
+Category : test
+Has __main__ : False
+Size/mtime   : 3798 bytes, 2025-11-13T13:49:14
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - datetime
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_restored_file.py ===
+Absolute : F:\autostockG\check_restored_file.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 1340 bytes, 2025-11-13T02:48:13
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_restored_file_KOSPI.py ===
+Absolute : F:\autostockG\check_restored_file_KOSPI.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 1240 bytes, 2025-11-13T02:51:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: check_single_stock_V28.py ===
+Absolute : F:\autostockG\check_single_stock_V28.py
+Category : test
+Has __main__ : True
+Size/mtime   : 4420 bytes, 2025-11-10T10:18:55
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+
+Data access (3):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: collect_all_1y.py ===
+Absolute : F:\autostockG\collect_all_1y.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2490 bytes, 2025-11-07T19:47:08
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - os
+  - pandas
+  - pykrx
+  - time
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: collect_kospi.py ===
+Absolute : F:\autostockG\collect_kospi.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 1445 bytes, 2025-11-07T22:55:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - pandas
+  - pykrx
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: combine_data.py ===
+Absolute : F:\autostockG\combine_data.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2272 bytes, 2025-11-07T21:16:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - glob
+  - os
+  - pandas
+  - tqdm
+
+Data access (1):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: config_paths.py ===
+Absolute : F:\autostockG\config_paths.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 701 bytes, 2025-11-14T22:19:28
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pathlib
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: convert_full_db.py ===
+Absolute : F:\autostockG\convert_full_db.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 332 bytes, 2025-11-13T21:02:38
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+autostockG 관련 경로 문자열:
+  - F:\autostockG\new_Hoj_DB_V25_FULL.csv
+  - F:\autostockG\new_Hoj_DB_V25_FULL.parquet
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: create_target_and_split.py ===
+Absolute : F:\autostockG\create_target_and_split.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 3317 bytes, 2025-11-07T23:23:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - numpy
+  - pandas
+  - tqdm
+
+Data access (3):
+  - stock_data_10y_processed_v4.parquet [OTHER_DATA] (type=data_access)
+  - test_data.parquet [OTHER_DATA] (type=data_access)
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: create_target_urls.py ===
+Absolute : F:\autostockG\create_target_urls.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2175 bytes, 2025-11-09T05:29:39
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - datetime
+  - numpy
+  - os
+  - pandas
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: create_ticker_map.py ===
+Absolute : F:\autostockG\create_ticker_map.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 1389 bytes, 2025-11-10T02:22:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - FinanceDataReader
+  - os
+  - pandas
+
+Data access (1):
+  - ticker_map.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: daily_recommender.py ===
+Absolute : F:\autostockG\daily_recommender.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4434 bytes, 2025-11-13T03:34:10
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - joblib
+  - os
+  - pandas
+  - sys
+  - time
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: daily_recommender_FAST.py ===
+Absolute : F:\autostockG\daily_recommender_FAST.py
+Category : crawler
+Has __main__ : True
+Size/mtime   : 8035 bytes, 2025-11-09T04:42:45
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (12):
+  - bs4
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - requests
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: data_manager.py ===
+Absolute : F:\autostockG\data_manager.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7119 bytes, 2025-11-11T13:13:02
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (5):
+  - configparser
+  - datetime
+  - json
+  - os
+  - typing
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: data_manager_test.py ===
+Absolute : F:\autostockG\data_manager_test.py
+Category : test
+Has __main__ : True
+Size/mtime   : 6920 bytes, 2025-11-11T12:35:51
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - configparser
+  - datetime
+  - json
+  - os
+  - typing
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: detect_locked_file.py ===
+Absolute : F:\autostockG\detect_locked_file.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 1200 bytes, 2025-11-14T15:06:46
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: download_data.py ===
+Absolute : F:\autostockG\download_data.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 3057 bytes, 2025-11-11T04:14:50
+삭제 후보    : NO
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - sys
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: evaluate_engine_V25.py ===
+Absolute : F:\autostockG\evaluate_engine_V25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 10345 bytes, 2025-11-13T18:14:44
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (7):
+  - datetime
+  - lightgbm
+  - matplotlib.pyplot
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: excel_to_csv_batch.py ===
+Absolute : F:\autostockG\excel_to_csv_batch.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2224 bytes, 2025-11-13T04:55:01
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - datetime
+  - os
+  - pandas
+
+I/O usage summary:
+  pandas_write (3 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: extract_excel.py ===
+Absolute : F:\autostockG\extract_excel.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 3207 bytes, 2025-11-11T02:10:25
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - openpyxl
+  - os
+
+I/O usage summary:
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: finance_collector.py ===
+Absolute : F:\autostockG\finance_collector.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4323 bytes, 2025-11-11T13:55:00
+삭제 후보    : NO
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: finance_collector_test.py ===
+Absolute : F:\autostockG\finance_collector_test.py
+Category : test
+Has __main__ : True
+Size/mtime   : 3097 bytes, 2025-11-11T13:07:04
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (2):
+  - data_manager.py
+  - kiwoom_api.py
+
+External imports (3):
+  - datetime
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: fix_corrupted_KOSPI_v2.py ===
+Absolute : F:\autostockG\fix_corrupted_KOSPI_v2.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2293 bytes, 2025-11-13T02:59:19
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - os
+  - pandas
+  - sys
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: fix_corrupted_data_v1.py ===
+Absolute : F:\autostockG\fix_corrupted_data_v1.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 4282 bytes, 2025-11-13T02:40:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: kakao_notifier.py ===
+Absolute : F:\autostockG\kakao_notifier.py
+Category : REST
+Has __main__ : True
+Size/mtime   : 8587 bytes, 2025-11-11T14:43:50
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (7):
+  - configparser
+  - datetime
+  - json
+  - os
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: kiwoom_api.fullbackup.py ===
+Absolute : F:\autostockG\kiwoom_api.fullbackup.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 19637 bytes, 2025-11-11T16:23:35
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (1):
+  - token_manager.py
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: kiwoom_api.py ===
+Absolute : F:\autostockG\kiwoom_api.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 11160 bytes, 2025-11-11T16:22:28
+삭제 후보    : NO
+
+Internal imports (1):
+  - token_manager.py
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - requests
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: main_trading.py ===
+Absolute : F:\autostockG\main_trading.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 6292 bytes, 2025-11-11T14:52:48
+삭제 후보    : NO
+
+Internal imports (2):
+  - kakao_notifier.py
+  - kiwoom_api.py
+
+External imports (5):
+  - configparser
+  - datetime
+  - sys
+  - time
+  - typing
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: make_kospi_index_10y.py ===
+Absolute : F:\autostockG\make_kospi_index_10y.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 531 bytes, 2025-11-13T12:51:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - FinanceDataReader
+  - datetime
+  - pandas
+
+Data access (1):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_write)
+
+I/O usage summary:
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: merge_pbr_per_V17.py ===
+Absolute : F:\autostockG\merge_pbr_per_V17.py
+Category : preprocess
+Has __main__ : True
+Size/mtime   : 1928 bytes, 2025-11-09T15:20:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - os
+  - pandas
+  - pathlib
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: naver_pbr_per_crawler_V16.py ===
+Absolute : F:\autostockG\naver_pbr_per_crawler_V16.py
+Category : crawler
+Has __main__ : True
+Size/mtime   : 8150 bytes, 2025-11-09T15:27:08
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (14):
+  - aiofiles
+  - aiohttp
+  - async_timeout
+  - asyncio
+  - bs4
+  - csv
+  - logging
+  - os
+  - pandas
+  - pathlib
+  - random
+  - sys
+  - time
+  - typing
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (2 lines)
+  open_unknown (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: naver_pbr_per_crawler_V17R.py ===
+Absolute : F:\autostockG\naver_pbr_per_crawler_V17R.py
+Category : crawler
+Has __main__ : False
+Size/mtime   : 3680 bytes, 2025-11-09T15:48:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - bs4
+  - concurrent.futures
+  - os
+  - pandas
+  - requests
+  - tqdm
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: organize_HOJ_V25.py ===
+Absolute : F:\autostockG\organize_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 3563 bytes, 2025-11-14T14:36:32
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (3):
+  - datetime
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: patch_engine.py ===
+Absolute : F:\autostockG\patch_engine.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2738 bytes, 2025-11-14T15:03:28
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - re
+  - shutil
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: patch_paths_no_backup.py ===
+Absolute : F:\autostockG\patch_paths_no_backup.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 3280 bytes, 2025-11-14T15:23:09
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - re
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: pipeline_auto_analyzer.py ===
+Absolute : F:\autostockG\pipeline_auto_analyzer.py
+Category : UI
+Has __main__ : True
+Size/mtime   : 32118 bytes, 2025-11-15T03:40:02
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (8):
+  - argparse
+  - collections
+  - datetime
+  - json
+  - networkx
+  - os
+  - re
+  - sys
+
+I/O usage summary:
+  open_read (1 lines)
+  open_unknown (8 lines)
+  pandas_read (2 lines)
+  pandas_write (3 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: pipeline_graph_builder.py ===
+Absolute : F:\autostockG\pipeline_graph_builder.py
+Category : UI
+Has __main__ : True
+Size/mtime   : 2575 bytes, 2025-11-15T00:57:55
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - json
+  - matplotlib.pyplot
+  - networkx
+  - os
+  - pathlib
+  - re
+
+I/O usage summary:
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: pipeline_viewer/pipelineview.py ===
+Absolute : F:\autostockG\pipeline_viewer\pipelineview.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 4167 bytes, 2025-11-09T16:35:46
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (4):
+  - ast
+  - graphviz
+  - os
+  - re
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: process_data.py ===
+Absolute : F:\autostockG\process_data.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 3294 bytes, 2025-11-07T21:27:11
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (2):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: process_data_v2.py ===
+Absolute : F:\autostockG\process_data_v2.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2945 bytes, 2025-11-07T22:29:33
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (2):
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed_v2.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: process_data_v4.py ===
+Absolute : F:\autostockG\process_data_v4.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 5009 bytes, 2025-11-07T22:56:53
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - numpy
+  - pandas
+  - pandas_ta
+  - tqdm
+
+Data access (3):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_processed_v4.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: rename_SLE_files.py ===
+Absolute : F:\autostockG\rename_SLE_files.py
+Category : SLE
+Has __main__ : True
+Size/mtime   : 2016 bytes, 2025-11-14T14:20:04
+삭제 후보    : YES (reason=sle_related)
+
+Internal imports (0):
+
+External imports (2):
+  - os
+  - re
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: rename_files_v25.py ===
+Absolute : F:\autostockG\rename_files_v25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 1194 bytes, 2025-11-14T14:36:32
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (2):
+  - os
+  - shutil
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: rename_return5d.py ===
+Absolute : F:\autostockG\rename_return5d.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 400 bytes, 2025-11-13T13:56:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: restore_return5d.py ===
+Absolute : F:\autostockG\restore_return5d.py
+Category : REST
+Has __main__ : False
+Size/mtime   : 504 bytes, 2025-11-13T13:59:43
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - pandas
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_grid_search.py ===
+Absolute : F:\autostockG\run_grid_search.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 11352 bytes, 2025-11-08T00:25:07
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_hoj_grid_search_V20.py ===
+Absolute : F:\autostockG\run_hoj_grid_search_V20.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 10869 bytes, 2025-11-09T22:43:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_hybrid_test_V33.py ===
+Absolute : F:\autostockG\run_hybrid_test_V33.py
+Category : test
+Has __main__ : False
+Size/mtime   : 1807 bytes, 2025-11-14T22:20:03
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (2):
+  - joblib
+  - pandas
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_hybrid_test_V34.py ===
+Absolute : F:\autostockG\run_hybrid_test_V34.py
+Category : test
+Has __main__ : False
+Size/mtime   : 1068 bytes, 2025-11-14T22:24:55
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (3):
+  - joblib
+  - pandas
+  - pathlib
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_market_filter_V22B.py ===
+Absolute : F:\autostockG\run_market_filter_V22B.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7184 bytes, 2025-11-10T00:07:51
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_model_grid_search_V12.py ===
+Absolute : F:\autostockG\run_model_grid_search_V12.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9582 bytes, 2025-11-09T02:48:13
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (1):
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_pipeline_v6.py ===
+Absolute : F:\autostockG\run_pipeline_v6.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 11119 bytes, 2025-11-07T23:50:29
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_quantile_test_V23.py ===
+Absolute : F:\autostockG\run_quantile_test_V23.py
+Category : test
+Has __main__ : True
+Size/mtime   : 5823 bytes, 2025-11-10T14:01:38
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_regression_60_5.py ===
+Absolute : F:\autostockG\run_regression_60_5.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 7896 bytes, 2025-11-08T02:25:23
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (11):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (3):
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_regression_pipeline.py ===
+Absolute : F:\autostockG\run_regression_pipeline.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9879 bytes, 2025-11-08T01:11:27
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - time
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_strategy_grid_search_V9.py ===
+Absolute : F:\autostockG\run_strategy_grid_search_V9.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9407 bytes, 2025-11-08T22:13:38
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (2):
+  - all_features_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - champion_model_60_5.pkl [MODEL] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pandas_write (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_tuning_V22.py ===
+Absolute : F:\autostockG\run_tuning_V22.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 5869 bytes, 2025-11-09T23:56:03
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (10):
+  - datetime
+  - joblib
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - pykrx
+  - time
+  - tqdm
+
+Data access (1):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_ui_test.py ===
+Absolute : F:\autostockG\run_ui_test.py
+Category : UI
+Has __main__ : True
+Size/mtime   : 1907 bytes, 2025-11-08T21:39:12
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (2):
+  - PySide6.QtWidgets
+  - sys
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_v5_threshold_tuning.py ===
+Absolute : F:\autostockG\run_v5_threshold_tuning.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 9220 bytes, 2025-11-08T00:06:22
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (9):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pandas_ta
+  - re
+  - sklearn.metrics
+  - tqdm
+
+Data access (2):
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+  - stock_data_10y_combined.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (2 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: run_weekly_update.py ===
+Absolute : F:\autostockG\run_weekly_update.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 4953 bytes, 2025-11-12T21:28:27
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - os
+  - subprocess
+  - sys
+
+Data access (4):
+  - REAL_CHAMPION_MODEL_V25.pkl [MODEL] (type=data_access)
+  - V25_Hoj_DB.parquet [HOJ_DB] (type=data_access)
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: scan_path_usage.py ===
+Absolute : F:\autostockG\scan_path_usage.py
+Category : utility
+Has __main__ : True
+Size/mtime   : 2713 bytes, 2025-11-14T14:36:32
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (1):
+  - os
+
+I/O usage summary:
+  open_read (2 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: test_REAL_HOJ_V25.py ===
+Absolute : F:\autostockG\test_REAL_HOJ_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 7072 bytes, 2025-11-14T14:36:32
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - sys
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: test_REAL_Hoj_ENGINE_V25.py ===
+Absolute : F:\autostockG\test_REAL_Hoj_ENGINE_V25.py
+Category : HOJ
+Has __main__ : False
+Size/mtime   : 1793 bytes, 2025-11-14T18:04:02
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (2):
+  - joblib
+  - pandas
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: test_runner_hoj_gridsearch.py ===
+Absolute : F:\autostockG\test_runner_hoj_gridsearch.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 10295 bytes, 2025-11-09T21:10:28
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (5):
+  - itertools
+  - numpy
+  - os
+  - pandas
+  - time
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: test_single_date_fetch.py ===
+Absolute : F:\autostockG\test_single_date_fetch.py
+Category : test
+Has __main__ : True
+Size/mtime   : 1525 bytes, 2025-11-09T04:22:28
+삭제 후보    : YES (reason=filename_keyword)
+
+Internal imports (0):
+
+External imports (4):
+  - datetime
+  - pandas
+  - pykrx
+  - time
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: token_manager.py ===
+Absolute : F:\autostockG\token_manager.py
+Category : REST
+Has __main__ : True
+Size/mtime   : 7157 bytes, 2025-11-11T00:08:15
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - configparser
+  - datetime
+  - json
+  - os
+  - requests
+  - time
+
+I/O usage summary:
+  open_read (1 lines)
+  open_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: train_REAL_Hoj_ENGINE_V25.py ===
+Absolute : F:\autostockG\train_REAL_Hoj_ENGINE_V25.py
+Category : HOJ
+Has __main__ : True
+Size/mtime   : 4693 bytes, 2025-11-13T20:29:26
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+I/O usage summary:
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: train_champion_reg.py ===
+Absolute : F:\autostockG\train_champion_reg.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2137 bytes, 2025-11-08T18:35:48
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - joblib
+  - lightgbm
+  - pandas
+  - re
+
+Data access (1):
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: train_model.py ===
+Absolute : F:\autostockG\train_model.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 2513 bytes, 2025-11-07T23:09:22
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (4):
+  - lightgbm
+  - pandas
+  - re
+  - sklearn.model_selection
+
+Data access (1):
+  - train_data.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: train_real_engine_V25.py ===
+Absolute : F:\autostockG\train_real_engine_V25.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 6597 bytes, 2025-11-13T20:05:09
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (6):
+  - datetime
+  - lightgbm
+  - numpy
+  - os
+  - pandas
+  - pickle
+
+Data access (1):
+  - new_Hoj_DB_V25.parquet [HOJ_DB] (type=data_access)
+
+I/O usage summary:
+  open_write (1 lines)
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_app.py ===
+Absolute : F:\autostockG\ui\ui_app.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 2216 bytes, 2025-11-14T13:01:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (8):
+  - streamlit
+  - sys
+  - ui_pages.dashboard
+  - ui_pages.data_update
+  - ui_pages.engine_manager
+  - ui_pages.predict_stock
+  - ui_pages.settings
+  - ui_pages.today_top10
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/__init__.py ===
+Absolute : F:\autostockG\ui\ui_pages\__init__.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 0 bytes, 2025-11-14T00:45:59
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (0):
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/dashboard.py ===
+Absolute : F:\autostockG\ui\ui_pages\dashboard.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 3293 bytes, 2025-11-14T15:23:21
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (4):
+  - datetime
+  - os
+  - pandas
+  - streamlit
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/data_update.py ===
+Absolute : F:\autostockG\ui\ui_pages\data_update.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 911 bytes, 2025-11-13T23:37:37
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - streamlit
+  - subprocess
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/engine_manager.py ===
+Absolute : F:\autostockG\ui\ui_pages\engine_manager.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 847 bytes, 2025-11-13T23:33:43
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - streamlit
+  - subprocess
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/init.py ===
+Absolute : F:\autostockG\ui\ui_pages\init.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 0 bytes, 2025-11-14T00:58:13
+삭제 후보    : YES (reason=isolated_utility)
+
+Internal imports (0):
+
+External imports (0):
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/predict_stock.py ===
+Absolute : F:\autostockG\ui\ui_pages\predict_stock.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 2547 bytes, 2025-11-14T15:23:21
+삭제 후보    : NO
+
+Internal imports (1):
+  - config_paths.py
+
+External imports (4):
+  - joblib
+  - os
+  - pandas
+  - streamlit
+
+I/O usage summary:
+  pandas_read (1 lines)
+  pickle_joblib (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/settings.py ===
+Absolute : F:\autostockG\ui\ui_pages\settings.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 175 bytes, 2025-11-13T23:34:21
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (1):
+  - streamlit
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: ui/ui_pages/today_top10.py ===
+Absolute : F:\autostockG\ui\ui_pages\today_top10.py
+Category : UI
+Has __main__ : False
+Size/mtime   : 849 bytes, 2025-11-14T13:07:17
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (2):
+  - streamlit
+  - subprocess
+
+I/O usage summary:
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: update_data_incrementally.py ===
+Absolute : F:\autostockG\update_data_incrementally.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 7188 bytes, 2025-11-13T11:57:21
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (8):
+  - FinanceDataReader
+  - datetime
+  - os
+  - pandas
+  - socket
+  - sys
+  - time
+  - traceback
+
+Data access (1):
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read_write)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (3 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: update_features_incrementally.py ===
+Absolute : F:\autostockG\update_features_incrementally.py
+Category : preprocess
+Has __main__ : False
+Size/mtime   : 5446 bytes, 2025-11-13T12:52:32
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - numpy
+  - pandas
+  - traceback
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_read)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_read)
+
+I/O usage summary:
+  pandas_read (2 lines)
+  pandas_write (1 lines)
+
+--------------------------------------------------------------------------------
+
+=== PYTHON FILE: verify_data_integrity.py ===
+Absolute : F:\autostockG\verify_data_integrity.py
+Category : utility
+Has __main__ : False
+Size/mtime   : 4010 bytes, 2025-11-13T01:42:31
+삭제 후보    : NO
+
+Internal imports (0):
+
+External imports (3):
+  - os
+  - pandas
+  - sys
+
+Data access (3):
+  - all_features_cumulative_V21_Hoj.parquet [OTHER_DATA] (type=data_access)
+  - all_stocks_cumulative.parquet [OTHER_DATA] (type=data_access)
+  - kospi_index_10y.parquet [OTHER_DATA] (type=data_access)
+
+I/O usage summary:
+  pandas_read (1 lines)
+
+--------------------------------------------------------------------------------
+
+
+================================================================================
+DATA FILES
+================================================================================
+
+=== DATA FILE: HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251105.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251105.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 347556 bytes, 2025-11-13T01:14:22
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 347348 bytes, 2025-11-13T00:55:42
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_1.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_1.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 347332 bytes, 2025-11-13T01:00:29
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_2.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_2.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 347812 bytes, 2025-11-13T01:03:48
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_3.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_3.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 347316 bytes, 2025-11-13T01:07:44
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 305919 bytes, 2025-11-13T21:34:33
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 575555 bytes, 2025-11-13T20:29:59
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/REAL/HOJ_ENGINE_REAL_V25.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V25.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 305919 bytes, 2025-11-14T00:35:31
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: HOJ_ENGINE/RESEARCH/HOJ_ENGINE_RESEARCH_V25.pkl ===
+Absolute : F:\autostockG\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V25.pkl
+Category : data
+Subtype  : HOJ_ENGINE
+Size/mtime: 3233930 bytes, 2025-11-13T14:52:44
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T00:43:45
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_1.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_1.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T00:47:59
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_2.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_2.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T00:52:11
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_3.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_3.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T00:55:26
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_4.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_4.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T01:00:17
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_5.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_5.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T01:03:36
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/OLD/Hoj_DB_V25_251112_6.parquet ===
+Absolute : F:\autostockG\Hoj_DB\OLD\Hoj_DB_V25_251112_6.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 1014243 bytes, 2025-11-13T01:07:32
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/REAL/HOJ_DB_REAL_V25.parquet ===
+Absolute : F:\autostockG\Hoj_DB\REAL\HOJ_DB_REAL_V25.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 36467163 bytes, 2025-11-14T00:35:18
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: Hoj_DB/RESEARCH/HOJ_DB_RESEARCH_V25.parquet ===
+Absolute : F:\autostockG\Hoj_DB\RESEARCH\HOJ_DB_RESEARCH_V25.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 36768844 bytes, 2025-11-13T18:34:33
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: REAL_CHAMPION_MODEL_V25.pkl ===
+Absolute : F:\autostockG\REAL_CHAMPION_MODEL_V25.pkl
+Category : data
+Subtype  : MODEL
+Size/mtime: 2007974 bytes, 2025-11-10T03:13:01
+
+Used by:
+  - check_single_stock_V28.py (type=data_access)
+  - run_weekly_update.py (type=data_access)
+  - backup_auto_patch/run_hybrid_test_V33.py (type=data_access)
+  - backup_auto_patch_detect/check_single_stock_V28.py (type=data_access)
+  - backup_auto_patch_detect/run_hybrid_test_V33.py (type=data_access)
+  - backup_auto_patch_detect/run_weekly_update.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: SLE_DB/OLD/V11_partial_backup.parquet ===
+Absolute : F:\autostockG\SLE_DB\OLD\V11_partial_backup.parquet
+Category : data
+Subtype  : SLE_DB
+Size/mtime: 1752444 bytes, 2025-11-09T14:24:27
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: SLE_DB/REAL/SLE_DB_REAL_V11.parquet ===
+Absolute : F:\autostockG\SLE_DB\REAL\SLE_DB_REAL_V11.parquet
+Category : data
+Subtype  : SLE_DB
+Size/mtime: 784603 bytes, 2025-11-10T12:26:52
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: SLE_DB/REAL/V11_Database_Final.parquet ===
+Absolute : F:\autostockG\SLE_DB\REAL\V11_Database_Final.parquet
+Category : data
+Subtype  : SLE_DB
+Size/mtime: 2147140 bytes, 2025-11-09T14:24:56
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: SLE_ENGINE/REAL/SLE_ENGINE_REAL_V32.pkl ===
+Absolute : F:\autostockG\SLE_ENGINE\REAL\SLE_ENGINE_REAL_V32.pkl
+Category : data
+Subtype  : SLE_ENGINE
+Size/mtime: 1968255 bytes, 2025-11-10T13:21:22
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: V25_Hoj_DB.parquet ===
+Absolute : F:\autostockG\V25_Hoj_DB.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 693777767 bytes, 2025-11-14T00:34:10
+
+Used by:
+  - build_database_V25.py (type=data_write)
+  - check_single_stock_V28.py (type=data_access)
+  - run_quantile_test_V23.py (type=data_access)
+  - run_weekly_update.py (type=data_access)
+  - backup_auto_patch_detect/build_database_V25.py (type=data_write)
+  - backup_auto_patch_detect/check_single_stock_V28.py (type=data_access)
+  - backup_auto_patch_detect/run_quantile_test_V23.py (type=data_access)
+  - backup_auto_patch_detect/run_weekly_update.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: all_features_cumulative.parquet ===
+Absolute : F:\autostockG\all_features_cumulative.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 737173164 bytes, 2025-11-08T21:28:52
+
+Used by:
+  - daily_recommender_FAST.py (type=data_access)
+  - run_strategy_grid_search_V9.py (type=data_access)
+  - backup_auto_patch_detect/daily_recommender_FAST.py (type=data_access)
+  - backup_auto_patch_detect/run_strategy_grid_search_V9.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: all_features_cumulative_V21_Hoj.parquet ===
+Absolute : F:\autostockG\all_features_cumulative_V21_Hoj.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 631219076 bytes, 2025-11-14T00:31:15
+
+Used by:
+  - build_database_V25.py (type=data_read)
+  - check_merge_keys.py (type=data_access)
+  - fix_corrupted_data_v1.py (type=data_access)
+  - run_hoj_grid_search_V20.py (type=data_access)
+  - run_market_filter_V22B.py (type=data_access)
+  - run_tuning_V22.py (type=data_access)
+  - run_weekly_update.py (type=data_access)
+  - update_features_incrementally.py (type=data_access)
+  - verify_data_integrity.py (type=data_access)
+  - backup_auto_patch/run_hybrid_test_V33.py (type=data_access)
+  - backup_auto_patch_detect/build_database_V25.py (type=data_read)
+  - backup_auto_patch_detect/check_merge_keys.py (type=data_access)
+  - backup_auto_patch_detect/fix_corrupted_data_v1.py (type=data_access)
+  - backup_auto_patch_detect/run_hoj_grid_search_V20.py (type=data_access)
+  - backup_auto_patch_detect/run_hybrid_test_V33.py (type=data_access)
+  - backup_auto_patch_detect/run_market_filter_V22B.py (type=data_access)
+  - backup_auto_patch_detect/run_tuning_V22.py (type=data_access)
+  - backup_auto_patch_detect/run_weekly_update.py (type=data_access)
+  - backup_auto_patch_detect/update_features_incrementally.py (type=data_access)
+  - backup_auto_patch_detect/verify_data_integrity.py (type=data_access)
+  - SLE_DB/OLD/merge_hoj_sle_V30.py (type=data_access)
+  - SLE_ENGINE/OLD/train_sle_engine_V30.py (type=data_access)
+  - SLE_ENGINE/OLD/train_sle_engine_V31.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: all_stocks_cumulative.parquet ===
+Absolute : F:\autostockG\all_stocks_cumulative.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 117127180 bytes, 2025-11-14T00:27:33
+
+Used by:
+  - build_full_Hoj_DB_V25.py (type=data_read)
+  - check_restored_file.py (type=data_access)
+  - fix_corrupted_data_v1.py (type=data_access)
+  - run_hoj_grid_search_V20.py (type=data_access)
+  - run_weekly_update.py (type=data_access)
+  - test_runner_hoj_gridsearch.py (type=data_access)
+  - update_data_incrementally.py (type=data_read_write)
+  - update_features_incrementally.py (type=data_read)
+  - verify_data_integrity.py (type=data_access)
+  - backup_auto_patch_detect/build_full_Hoj_DB_V25.py (type=data_read)
+  - backup_auto_patch_detect/check_restored_file.py (type=data_access)
+  - backup_auto_patch_detect/fix_corrupted_data_v1.py (type=data_access)
+  - backup_auto_patch_detect/run_hoj_grid_search_V20.py (type=data_access)
+  - backup_auto_patch_detect/run_weekly_update.py (type=data_access)
+  - backup_auto_patch_detect/test_runner_hoj_gridsearch.py (type=data_access)
+  - backup_auto_patch_detect/update_data_incrementally.py (type=data_read_write)
+  - backup_auto_patch_detect/update_features_incrementally.py (type=data_read)
+  - backup_auto_patch_detect/verify_data_integrity.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: all_stocks_cumulative_backup_20251113_2308.parquet ===
+Absolute : F:\autostockG\all_stocks_cumulative_backup_20251113_2308.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 5983889 bytes, 2025-11-13T12:01:23
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: backup/DB_REAL/V25_251113.parquet ===
+Absolute : F:\autostockG\backup\DB_REAL\V25_251113.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 36467163 bytes, 2025-11-13T21:34:21
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: backup/DB_REAL/V25_251114.parquet ===
+Absolute : F:\autostockG\backup\DB_REAL\V25_251114.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 36467163 bytes, 2025-11-13T22:48:07
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: backup/ENGINE_REAL/V25_251114.pkl ===
+Absolute : F:\autostockG\backup\ENGINE_REAL\V25_251114.pkl
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 305919 bytes, 2025-11-13T22:48:20
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: champion_model_60_5.pkl ===
+Absolute : F:\autostockG\champion_model_60_5.pkl
+Category : data
+Subtype  : MODEL
+Size/mtime: 319028 bytes, 2025-11-08T18:48:52
+
+Used by:
+  - daily_recommender_FAST.py (type=data_access)
+  - run_model_grid_search_V12.py (type=data_access)
+  - run_regression_60_5.py (type=data_access)
+  - run_strategy_grid_search_V9.py (type=data_access)
+  - backup_auto_patch_detect/daily_recommender_FAST.py (type=data_access)
+  - backup_auto_patch_detect/run_model_grid_search_V12.py (type=data_access)
+  - backup_auto_patch_detect/run_regression_60_5.py (type=data_access)
+  - backup_auto_patch_detect/run_strategy_grid_search_V9.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: kospi_index_10y.parquet ===
+Absolute : F:\autostockG\kospi_index_10y.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 42818 bytes, 2025-11-13T12:52:06
+
+Used by:
+  - check_restored_file_KOSPI.py (type=data_access)
+  - collect_kospi.py (type=data_access)
+  - fix_corrupted_data_v1.py (type=data_access)
+  - fix_corrupted_KOSPI_v2.py (type=data_access)
+  - make_kospi_index_10y.py (type=data_write)
+  - process_data_v4.py (type=data_access)
+  - run_grid_search.py (type=data_access)
+  - run_hoj_grid_search_V20.py (type=data_access)
+  - run_market_filter_V22B.py (type=data_access)
+  - run_pipeline_v6.py (type=data_access)
+  - run_quantile_test_V23.py (type=data_access)
+  - run_regression_60_5.py (type=data_access)
+  - run_regression_pipeline.py (type=data_access)
+  - run_v5_threshold_tuning.py (type=data_access)
+  - update_features_incrementally.py (type=data_read)
+  - verify_data_integrity.py (type=data_access)
+  - backup_auto_patch_detect/check_restored_file_KOSPI.py (type=data_access)
+  - backup_auto_patch_detect/collect_kospi.py (type=data_access)
+  - backup_auto_patch_detect/fix_corrupted_data_v1.py (type=data_access)
+  - backup_auto_patch_detect/fix_corrupted_KOSPI_v2.py (type=data_access)
+  - backup_auto_patch_detect/make_kospi_index_10y.py (type=data_write)
+  - backup_auto_patch_detect/process_data_v4.py (type=data_access)
+  - backup_auto_patch_detect/run_grid_search.py (type=data_access)
+  - backup_auto_patch_detect/run_hoj_grid_search_V20.py (type=data_access)
+  - backup_auto_patch_detect/run_market_filter_V22B.py (type=data_access)
+  - backup_auto_patch_detect/run_pipeline_v6.py (type=data_access)
+  - backup_auto_patch_detect/run_quantile_test_V23.py (type=data_access)
+  - backup_auto_patch_detect/run_regression_60_5.py (type=data_access)
+  - backup_auto_patch_detect/run_regression_pipeline.py (type=data_access)
+  - backup_auto_patch_detect/run_v5_threshold_tuning.py (type=data_access)
+  - backup_auto_patch_detect/update_features_incrementally.py (type=data_read)
+  - backup_auto_patch_detect/verify_data_integrity.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: new_Hoj_DB_V25.parquet ===
+Absolute : F:\autostockG\new_Hoj_DB_V25.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 693777767 bytes, 2025-11-14T00:34:41
+
+Used by:
+  - build_database_V25.py (type=data_write)
+  - build_full_Hoj_DB_V25.py (type=data_read)
+  - check_nulls_in_V25_DB.py (type=data_read)
+  - daily_recommender.py (type=data_access)
+  - evaluate_engine_V25.py (type=data_access)
+  - rename_return5d.py (type=data_read_write)
+  - restore_return5d.py (type=data_read_write)
+  - train_real_engine_V25.py (type=data_access)
+  - backup_auto_patch_detect/build_database_V25.py (type=data_write)
+  - backup_auto_patch_detect/build_full_Hoj_DB_V25.py (type=data_read)
+  - backup_auto_patch_detect/check_nulls_in_V25_DB.py (type=data_read)
+  - backup_auto_patch_detect/daily_recommender.py (type=data_access)
+  - backup_auto_patch_detect/evaluate_engine_V25.py (type=data_access)
+  - backup_auto_patch_detect/rename_return5d.py (type=data_read_write)
+  - backup_auto_patch_detect/restore_return5d.py (type=data_read_write)
+  - backup_auto_patch_detect/train_real_engine_V25.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: stock_data_10y_combined.parquet ===
+Absolute : F:\autostockG\stock_data_10y_combined.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 161012206 bytes, 2025-11-07T21:22:51
+
+Used by:
+  - combine_data.py (type=data_access)
+  - process_data.py (type=data_access)
+  - process_data_v2.py (type=data_access)
+  - process_data_v4.py (type=data_access)
+  - run_grid_search.py (type=data_access)
+  - run_pipeline_v6.py (type=data_access)
+  - run_regression_60_5.py (type=data_access)
+  - run_regression_pipeline.py (type=data_access)
+  - run_v5_threshold_tuning.py (type=data_access)
+  - backup_auto_patch_detect/combine_data.py (type=data_access)
+  - backup_auto_patch_detect/process_data.py (type=data_access)
+  - backup_auto_patch_detect/process_data_v2.py (type=data_access)
+  - backup_auto_patch_detect/process_data_v4.py (type=data_access)
+  - backup_auto_patch_detect/run_grid_search.py (type=data_access)
+  - backup_auto_patch_detect/run_pipeline_v6.py (type=data_access)
+  - backup_auto_patch_detect/run_regression_60_5.py (type=data_access)
+  - backup_auto_patch_detect/run_regression_pipeline.py (type=data_access)
+  - backup_auto_patch_detect/run_v5_threshold_tuning.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: stock_data_10y_processed.parquet ===
+Absolute : F:\autostockG\stock_data_10y_processed.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 382054954 bytes, 2025-11-07T21:30:50
+
+Used by:
+  - process_data.py (type=data_access)
+  - backup_auto_patch_detect/process_data.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: stock_data_10y_processed_v2.parquet ===
+Absolute : F:\autostockG\stock_data_10y_processed_v2.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 470068756 bytes, 2025-11-07T22:34:16
+
+Used by:
+  - process_data_v2.py (type=data_access)
+  - backup_auto_patch_detect/process_data_v2.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: stock_data_10y_processed_v4.parquet ===
+Absolute : F:\autostockG\stock_data_10y_processed_v4.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 650905443 bytes, 2025-11-07T23:06:42
+
+Used by:
+  - create_target_and_split.py (type=data_access)
+  - process_data_v4.py (type=data_access)
+  - backup_auto_patch_detect/create_target_and_split.py (type=data_access)
+  - backup_auto_patch_detect/process_data_v4.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: test_data.parquet ===
+Absolute : F:\autostockG\test_data.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 80274021 bytes, 2025-11-07T23:24:46
+
+Used by:
+  - backtest_model.py (type=data_access)
+  - backtest_model_readable.py (type=data_access)
+  - create_target_and_split.py (type=data_access)
+  - backup_auto_patch_detect/backtest_model.py (type=data_access)
+  - backup_auto_patch_detect/backtest_model_readable.py (type=data_access)
+  - backup_auto_patch_detect/create_target_and_split.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: ticker_map.parquet ===
+Absolute : F:\autostockG\ticker_map.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 56347 bytes, 2025-11-10T02:24:58
+
+Used by:
+  - check_merge_keys.py (type=data_access)
+  - check_single_stock_V28.py (type=data_access)
+  - create_ticker_map.py (type=data_access)
+  - backup_auto_patch_detect/check_merge_keys.py (type=data_access)
+  - backup_auto_patch_detect/check_single_stock_V28.py (type=data_access)
+  - backup_auto_patch_detect/create_ticker_map.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: train_data.parquet ===
+Absolute : F:\autostockG\train_data.parquet
+Category : data
+Subtype  : OTHER_DATA
+Size/mtime: 574437992 bytes, 2025-11-07T23:24:45
+
+Used by:
+  - create_target_and_split.py (type=data_access)
+  - train_champion_reg.py (type=data_access)
+  - train_model.py (type=data_access)
+  - backup_auto_patch_detect/create_target_and_split.py (type=data_access)
+  - backup_auto_patch_detect/train_champion_reg.py (type=data_access)
+  - backup_auto_patch_detect/train_model.py (type=data_access)
+
+--------------------------------------------------------------------------------
+
+=== DATA FILE: zip/new_Hoj_DB_V25_FULL.parquet ===
+Absolute : F:\autostockG\zip\new_Hoj_DB_V25_FULL.parquet
+Category : data
+Subtype  : HOJ_DB
+Size/mtime: 36768844 bytes, 2025-11-13T18:34:33
+
+Used by: (no direct reference detected)
+
+--------------------------------------------------------------------------------

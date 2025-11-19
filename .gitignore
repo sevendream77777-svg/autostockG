@@ -1,0 +1,14 @@
+===========[데이터 파일 무시] 용량 문제 및 보안=========
+
+
+*.parquet*
+
+====================[특정 데이터 폴더 무시]역슬래시()는 슬래시(/)로 변경해야 인식됩니다.=============
+
+
+MODELENGINE/HOJ_ENGINE/RESEARCH/MODELENGINE/RAW/stocks/kospi_data/
+MODELENGINE/old"
+
+====================[파이썬/에디터 자동 생성 파일] 지저분함 방지================
+
+pycache/*.pyc.vscode/.idea/.DS_Store

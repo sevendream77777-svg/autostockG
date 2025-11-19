@@ -1,0 +1,277 @@
+[HOJ/SLE 자동화 프로젝트 진행 현황 - 2025-11-15 기준]
+
+========================================
+1. 프로젝트 범위 (이 방에서 다루는 것)
+========================================
+- HOJ 엔진(메인 12개 지표) 실전용 파이프라인 정리
+- 주간/수시 자동 업데이트 시스템
+  - 시세 증분 업데이트
+  - 피처 증분 업데이트
+  - V25 DB 빌드
+  - REAL 엔진 재학습
+- Streamlit 기반 통합 UI
+  - 대시보드
+  - 오늘의 TOP10
+  - 개별 종목 예측
+  - 데이터 업데이트
+  - 엔진 관리
+  - 매매 프로그램 실행
+- 인코딩(cp949/UTF-8), 경로, 엔진 선택 등의 안정화 작업
+
+========================================
+2. 주요 폴더/파일 구조 (현재 기준)
+========================================
+루트: F:\autostockG\
+  ├── all_stocks_cumulative.parquet
+  ├── all_features_cumulative_V21_Hoj.parquet
+  ├── V25_Hoj_DB.parquet
+  ├── new_Hoj_DB_V25.parquet
+  ├── run_weekly_update.py
+  ├── update_data_incrementally.py
+  ├── update_features_incrementally.py
+  ├── build_database_V25.py   ← (V25용 새 버전, 라벨 생성 포함)
+  ├── train_real_engine_V25.py
+  ├── config_paths.py
+  ├── HOJ_DB\
+  │     └── REAL\
+  │           └── HOJ_DB_REAL_*.parquet (실전용 DB)
+  ├── HOJ_ENGINE\
+  │     └── REAL\
+  │           └── HOJ_ENGINE_REAL_*.pkl (실전용 엔진들)
+  ├── SLE_DB\      (자리만 사용)
+  ├── SLE_ENGINE\  (자리만 사용)
+  ├── top10data\
+  │     └── recommendation_HOJ_*.csv  (추천 결과)
+  └── ui\
+        ├── ui_app.py
+        ├── engine_helper.py
+        └── ui_pages\
+              ├── dashboard.py
+              ├── today_top10.py
+              ├── predict_stock.py
+              ├── trading.py
+              ├── data_update.py
+              ├── engine_manager.py
+              ├── sle_pending.py
+              └── settings.py
+
+========================================
+3. 이 방에서 이미 완료한 작업 (순서대로)
+========================================
+
+[3-1] UI 기본 골격 정리
+------------------------
+- Streamlit 기반 단일 앱 구조 설계.
+- 사이드바 메뉴 구성:
+  1) 대시보드
+  2) 오늘의 TOP10
+  3) 개별 종목 예측
+  4) 매매 프로그램
+  5) 데이터 업데이트
+  6) 엔진 관리
+  7) SLE 엔진(준비중)
+  8) 설정
+- ui_app.py에서 각 메뉴를 ui_pages/*.py 로 분리 호출하는 구조로 통일.
+
+[3-2] config_paths.py 재작성
+-----------------------------
+- BASE = F:\autostockG 기준으로 경로 자동 세팅.
+- HOJ_DB_REAL, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL 최신 파일 자동 탐색.
+- TOP10_DIR = F:\autostockG\top10data 고정.
+- 실제 HOJ_DB_REAL / HOJ_ENGINE_REAL 을 항상 최신 버전으로 잡을 수 있게 구현.
+
+[3-3] engine_helper.py 설계
+-----------------------------
+- HOJ_ENGINE\REAL 폴더에서 HOJ_ENGINE_REAL_*.pkl 목록 관리.
+- .current_engine 파일에 “사용할 엔진”을 저장/로드.
+- get_current_engine() 우선순위:
+  1) .current_engine 에 지정된 엔진
+  2) config_paths.HOJ_ENGINE_REAL
+  3) 폴더에서 가장 최신 pkl
+→ UI / 예측 / 기타가 모두 같은 “현재 엔진”을 보게 됨.
+
+[3-4] 대시보드(dashboard.py)
+-----------------------------
+- HOJ_DB_REAL 경로/갱신 시각 표시.
+- 현재 사용 엔진 경로/갱신 시각 표시.
+- 최신 TOP10 CSV(recommendation_HOJ_*.csv) 경로 표시.
+- 시스템 플로우(업데이트 → DB → 엔진 → 추천 → UI)를 텍스트로 정리.
+
+[3-5] 오늘의 TOP10(today_top10.py)
+-----------------------------------
+- TOP10_DIR에서 최신 recommendation_HOJ_*.csv 자동 탐색.
+- 컬럼명:
+  - 종목명, Code, 현재가, 예상수익률(%), 예상수익률 등을 Name/Code/Price/ExpectedReturnPct 등으로 리네이밍.
+- st.dataframe(df, width='stretch') 로 표 표시.
+- Code 컬럼 기준으로 종목코드를 multiselect로 선택 → st.session_state["buy_candidates"] 에 저장.
+→ 매매 프로그램 페이지에서 이 리스트 사용 가능.
+
+[3-6] 개별 종목 예측(predict_stock.py)
+----------------------------------------
+- HOJ_DB_REAL에서 특정 코드의 최신 1일 데이터를 가져옴.
+- engine_helper.get_current_engine() 으로 엔진 로드:
+  - reg_model (회귀: Expected_Return_5d 예측)
+  - clf_model (분류: 상승 확률 예측, 없으면 N/A)
+  - feature_cols (모델이 기대하는 컬럼 리스트)
+- 예측 결과:
+  - 5일 예상수익률(%)
+  - 상승 확률(%)
+- 최근 60일 가격 차트 (Close/종가/현재가 등 자동 탐색).
+- 사용된 피처 값(feature_cols)의 최신 1일 값을 표로 표시.
+
+[3-7] 매매 프로그램(trading.py)
+--------------------------------
+- F:\autostockG\main_trading.py 를 subprocess로 실행하는 버튼 제공.
+- TOP10에서 선택된 buy_candidates 를 리스트로 표시.
+- 현재는 “기본 실행 + 후보 종목 확인” 단계까지, 추후 잔고/보유 종목/주문 내역 등 확장 예정.
+
+[3-8] 데이터 업데이트(data_update.py)
+--------------------------------------
+- 버튼 하나로 F:\autostockG\run_weekly_update.py 실행.
+- 실행 결과 로그를 텍스트로 출력.
+- 추후 계획:
+  - 시세 / 피처 / V25 DB / 엔진 학습을 단계별 버튼으로 분리.
+
+[3-9] 엔진 관리(engine_manager.py)
+-----------------------------------
+- HOJ_ENGINE\REAL 폴더에서 HOJ_ENGINE_REAL_*.pkl 리스트 가져오기.
+- 현재 사용 중인 엔진(override or 기본)을 표시.
+- 라디오 버튼으로 사용 엔진 선택 → .current_engine 에 경로 저장.
+- UI/예측/대시보드에서 이 선택사항을 공통으로 사용.
+
+[3-10] SLE 엔진 자리(sle_pending.py)
+--------------------------------------
+- 추후 SLE 엔진 UI를 넣기 위한 자리 확보.
+- 현재는 “준비중” 메시지만 표시.
+
+[3-11] 설정(settings.py)
+--------------------------
+- 추후 API 키, 알림, 실전/모의 모드 등을 넣기 위한 페이지 기본 골격 생성.
+
+[3-12] 인코딩 환경 정리
+------------------------
+- Windows 기본 cp949 인코딩으로 인해 이모지/한글이 깨지는 문제 발생.
+- 환경 변수:
+  - setx PYTHONUTF8 1
+  를 통해 Python 기본 인코딩을 UTF-8 모드로 전환.
+- 일부 스크립트에서 sys.stdout 래핑으로 UTF-8 강제.
+- 현재:
+  - 실행 에러는 대부분 해결.
+  - VS Code 터미널 글꼴/렌더링 문제로 “ㅁㅁㅁㅁ”로 보이는 부분은 있지만, 실행에는 영향 없음.
+
+[3-13] 증분 업데이트 파이프라인 확인
+-------------------------------------
+- update_data_incrementally.py:
+  - all_stocks_cumulative.parquet 로드 (6,050,292행).
+  - KRX 종목 리스트 2,878개 확보.
+  - 일부 스팩 종목 등은 Yahoo 쪽에서 404 → “수집 실패” 로그만 남기고 전체 진행은 유지.
+  - 최종 all_stocks_cumulative.parquet 저장 (6,050,295행).
+- update_features_incrementally.py:
+  - 시세 6,050,295행 로드.
+  - 15개 피처(SMA, RSI, MACD 등) 생성.
+  - all_features_cumulative_V21_Hoj.parquet 저장 (6,050,295행).
+- 두 스크립트 모두 run_weekly_update.py 에서 자동 호출됨.
+
+[3-14] build_database_V25.py 전체 재작성 (라벨 포함)
+-----------------------------------------------------
+- 기존 버전에서 Expected_Return_5d 컬럼 부재로 train_real_engine_V25.py 가 KeyError 발생.
+- 이를 해결하기 위해 스크립트를 풀버전으로 재작성:
+  1) 입력: all_features_cumulative_V21_Hoj.parquet
+  2) 코드/날짜/가격 컬럼 자동 인식:
+     - Code / Date / Close (현재 데이터 기준)
+  3) 피처 NaN 제거:
+     - 6,050,295 → 5,872,588행
+  4) 5일 수익률 라벨 생성:
+     - 종목별 날짜 정렬 후 5일 뒤 종가를 future_price로 가져옴.
+     - Return_5d = future_price / 현재가 - 1
+     - Expected_Return_5d = Return_5d (회귀 타깃)
+     - Label_5d = (Return_5d > 0) ? 1 : 0 (분류 타깃)
+     - 미래 가격이 없는 구간은 drop → 최종 5,858,293행.
+  5) 정렬 및 컬럼 정리 후:
+     - V25_Hoj_DB.parquet
+     - new_Hoj_DB_V25.parquet
+     로 저장.
+- 결과:
+  - new_Hoj_DB_V25.parquet 안에 Return_5d / Expected_Return_5d / Label_5d 컬럼이 모두 존재.
+  - train_real_engine_V25.py 가 요구하는 라벨 구성이 충족됨.
+
+========================================
+4. 현재 상태 요약 (진행률)
+========================================
+- UI 구조: 약 90% 완료 (기본 메뉴/기능은 동작, 세부 기능만 남음).
+- 증분 업데이트 (시세/피처/DB): end-to-end 성공.
+- V25 DB 빌드: 새 버전으로 재구성 완료, 라벨 포함 OK.
+- 엔진 관리/선택: UI + .current_engine 구조로 기본 골격 완성.
+- 인코딩 문제: 치명적인 실행 에러는 제거, 출력 깨짐만 일부 남음.
+
+→ 전체 프로젝트 기준 대략 70% 정도 진행된 상태.
+
+========================================
+5. 앞으로 해야 할 작업 (우선순위)
+========================================
+
+[5-1] train_real_engine_V25.py 정상 실행
+----------------------------------------
+- 입력 DB: new_Hoj_DB_V25.parquet.
+- Expected_Return_5d / Label_5d 컬럼을 사용해 실전용 회귀/분류 모델 학습.
+- 결과:
+  - HOJ_ENGINE_REAL_V25.pkl (또는 차기 버전) 생성.
+- 예상 체크 포인트:
+  - 컬럼명/타깃 선택
+  - 훈련/검증 기간 분리
+  - LightGBM 파라미터 등.
+
+[5-2] run_weekly_update.py 전체 파이프라인 1회 완주
+---------------------------------------------------
+- 순서:
+  1) update_data_incrementally.py
+  2) update_features_incrementally.py
+  3) build_database_V25.py
+  4) train_real_engine_V25.py
+- 위 4단계가 모두 0에러로 끝나면, 
+  “주간 HOJ 실전 엔진 자동 업데이트”가 완성된 상태.
+
+[5-3] UI와 엔진 연결 최종 점검
+--------------------------------
+- predict_stock 페이지에서:
+  - 새로 학습된 REAL 엔진이 실제로 사용되는지 확인.
+- 오늘의 TOP10:
+  - 최신 DB/엔진 기반 추천이 제대로 나온 CSV를 읽고 있는지 확인.
+
+[5-4] 데이터 업데이트 메뉴 세분화 (추후)
+----------------------------------------
+- run_weekly_update.py 통합 버튼 외에:
+  - 시세만 업데이트
+  - 피처만 재생성
+  - V25 DB만 재빌드
+  - 엔진만 재학습
+- 이런 버튼을 UI에 추가해, 문제 발생 시 특정 단계만 재실행 가능하게 개선.
+
+[5-5] SLE 엔진 연동 (다음 단계)
+-------------------------------
+- 현재는 단순 “준비중” 상태.
+- 다음 단계에서:
+  - SLE_DB_REAL / SLE_ENGINE_REAL 경로 연결
+  - SLE용 DB/엔진 학습/추천 로직을 HOJ와 유사한 구조로 설계.
+
+[5-6] 로그/모니터링 고급화 (선택)
+---------------------------------
+- 각 스크립트 로그를 파일로 저장 (예: logs/update_YYYYMMDD.log).
+- UI에서 최근 로그를 tail 형태로 확인 가능하게 구현.
+- “마지막 성공 시각”, “마지막 실패 원인” 등을 대시보드에 표시.
+
+========================================
+6. 이 방 이후 새 방으로 이어갈 때 요약 메모
+========================================
+- HOJ 실전 파이프라인 핵심:
+  - 데이터 증분 업데이트 → 피처 업데이트 → V25 DB 빌드 → REAL 엔진 학습 → 추천 생성 → UI 표시.
+- 현재까지 완료:
+  - UI 기본 골격 + 엔진/DB 연동
+  - 증분 업데이트 + V25 DB 빌드 자동화
+  - V25 DB 라벨(Expected_Return_5d 등) 세팅 정비.
+- 새 방에서 바로 이어서 할 것:
+  1) train_real_engine_V25.py 실행 및 오류 해결
+  2) run_weekly_update.py 전체 파이프라인 1회 완주
+  3) UI에서 새 엔진/새 DB 기반으로 예측/추천 되는지 최종 점검
+
+(끝)

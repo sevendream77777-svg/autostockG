@@ -1,0 +1,319 @@
+파일 유형,파일명,핵심 용도 (V25 기준)
+🥇 Hoj 엔진 (뇌),REAL_CHAMPION_MODEL_V25.pkl,"[10년 실전 엔진] (60d/5d, 나무 500개) 10년치(V25 DB)로 학습한 Hoj 최종 AI 뇌"
+🥇 Sle 엔진 (뇌),SLE_CHAMPION_MODEL_V32.pkl,[Sle 엔진] 51만 건 Sle DB(4개 피처: PBR/PER/수급)로 학습한 Sle AI 뇌
+💾 Hoj DB (최종),V25_Hoj_DB.parquet,[10년 Hoj DB] '종목명'이 포함된 10년치 Hoj 엔진(12개 피처) 최종 데이터베이스
+💾 Sle DB (최종),V11_Merged_SLE_Base.parquet,[Sle DB] 호정천재님이 확보하신 51만 건의 PBR/PER/수급 '핵심 샘플' DB
+💾 Hoj 원본 (시세),all_stocks_cumulative.parquet,[원본] 10년치 순수 시세(OHLCV) DB. (V25 DB의 원재료)
+💾 Hoj 원본 (시장),kospi_index_10y.parquet,[원본] 10년치 KOSPI DB. (ALPHA 계산용 원재료)
+💾 Hoj 이름 사전,ticker_map.parquet,[종목명 사전] pykrx의 '종목명' 버그(JSONDecodeError)를 해결하기 위한 핵심 파일 (fdr 기반)
+🚀 실전 추천기,daily_recommender.py,[Hoj 실전 추천기 (V27)] 'V25 실전 엔진'과 'V25 DB'를 로드하여 **'오늘의 Top 10'**을 뽑는 최종 실행 파일
+🔬 Hoj DB 구축,build_database_V25.py,[V25 DB 구축] V21_Hoj_DB + ticker_map.parquet을 합쳐 V25_Hoj_DB.parquet를 생성함
+🔬 Hoj 엔진 학습,train_real_engine_V25.py,[V25 엔진 학습] V25_Hoj_DB.parquet(10년치)로 REAL_CHAMPION_MODEL_V25.pkl을 생성함
+🔬 Hoj 가설 검증,run_hoj_grid_search_V20.py,[V21 그리드 서치] (60d/5d) 모델이 '실전 챔피언'임을 확정 (월 복리 +10.20%)
+🔬 Hoj 튜닝 검증,run_tuning_V22.py,[V22 Hoj 튜닝] '나무 500개' 튜닝 시 수익률이 +3.527%로 상승함을 검증함
+🔬 Sle 엔진 학습,train_sle_engine_V32.py,"[V32 Sle 엔진 학습] 51만 건 Sle DB로 SLE_CHAMPION_MODEL_V32.pkl을 생성하고, 단독 수익률(+3.337%)을 확인"
+🔬 하이브리드 검증,run_hybrid_test_V33.py,"[V33 결승전] Hoj/Sle 5가지 전략 비교. 'Sle → Hoj 필터'가 +17.858%로 1위 (단, 실전 적용 불가)"
+🔬 매도 전략 검증,run_strategy_grid_search_V9.py,"[V9 매도 전략] ""단순 보유(+3.6%)""가 ""익절/손절(+1.5%)""보다 낫다는 것을 검증함"
+🔬 이름 사전 구축,create_ticker_map.py,[종목명 사전 생성] FinanceDataReader를 이용해 ticker_map.parquet를 생성함
+📉 Hoj DB (구),all_features_cumulative_V21_Hoj.parquet,[V21 DB] '종목명'이 빠진 Hoj 엔진 구버전 DB. (V25 DB가 있으므로 삭제/보관 가능)
+📉 Hoj DB (구),all_features_cumulative.parquet,[V5 DB] '종목명'이 빠진 Hoj 엔진 초기 DB. (삭제/보관 가능)
+📉 Hoj 엔진 (구),champion_model_60_5.pkl,[9년 테스트 엔진] '10년 실전 엔진(V25)'이 있으므로 삭제/보관 가능
+🗑️ 실패 (Sle),build_database_V11.py / V12.py,[실패] pykrx PBR/PER 수집 실패 스크립트. (삭제 대상)
+🗑️ 실패 (Sle),extract_V11_samples.py,V11 샘플 리스트(v11_sample_list.parquet) 추출용 (Sle DB가 있으므로 삭제 가능)
+🗑️ 실패 (Sle),v11_sample_list.parquet,V11 샘플 리스트 (Sle DB가 있으므로 삭제 가능)
+🗑️ 실패 (Sle),targets.csv,네이버 크롤러용 51만개 URL (삭제 대상)
+🗑️ 실패 (Sle),naver_crawler_aio.py,네이버 PBR/PER 비동기 크롤러 (Sle DB가 있으므로 삭제 대상)
+🗑️ 실패 (Sle),test_v12_fetch.py,pykrx PBR/PER 기능 테스트 스크립트. (삭제 대상)
+🗑️ 실패 (32bit),numpy-1.24.4+mkl-cp311-cp311-win32.whl,32비트 파이썬 설치용 휠 파일 (삭제 대상)
+🗑️ 실패 (Kiwoom),run_auto_trade_V34_KiwoomREST.py,키움 REST API 연동 시도 (64/32비트 충돌로 보류/삭제)
+📄 로그 파일,detailed_trade_log_...csv,V21/V9 그리드 서치의 '일일 거래 상세 로그'. (분석 완료 시 삭제/보관 가능)
+📄 로그 파일,recommendation_Vxx...csv,과거 추천 로그. (삭제 가능)
+
+REAL_CHAMPION_MODEL_V25.pkl	[10년 실전 엔진] (60d/5d, 나무 500개) 10년치(V25 DB)로 학습한 최종 AI 뇌입니다.
+V25_Hoj_DB.parquet	[10년 Hoj DB (V25)] '종목명'이 포함된 10년치 Hoj 엔진(12개 피처) 최종 데이터베이스입니다.
+ticker_map.parquet	[종목명 사전] FinanceDataReader로 만든 2877개 종목코드-종목명 매칭 파일. pykrx 버그를 우회합니다.
+daily_recommender.py	[실전 추천기 (V27)] REAL_CHAMPION_MODEL_V25.pkl과 V25_Hoj_DB.parquet를 로드하여 **'오늘의 Top 10'**을 뽑는 최종 실행 파일입니다
+all_stocks_cumulative.parquet	[원본] 10년치 순수 시세(OHLCV) DB. (V25 DB의 원재료)
+kospi_index_10y.parquet	[원본] 10년치 KOSPI DB. (V25 DB의 원재료)
+all_features_cumulative_V21_Hoj.parquet	[V21 DB] '종목명'이 빠진 이전 버전 Hoj DB. (V25 DB 생성에 사용됨)
+champion_model_60_5.pkl	[9년 테스트 엔진] V21 그리드 서치 및 V22 튜닝에서 사용한 '9년 학습용' 뇌.
+run_hoj_grid_search_V20.py	[V21 그리드 서치] (40/60/90일)x(1/5/10/20일) 12개 가설을 테스트하여 **(60d/5d)**가 '실전 챔피언'임을 찾아낸 1등 공신 스크립트.
+run_tuning_V22.py	[V22 튜닝] (60d/5d) 모델의 '나무 개수'를 100개에서 500개로 튜닝하여 수익률(+3.527%)을 올린 스크립트.
+build_database_V25.py	[V25 DB 구축] V21 DB와 종목명 사전을 합쳐 **V25_Hoj_DB.parquet**를 생성한 스크립트.
+train_real_engine_V25.py	[V25 엔진 학습] V25 DB(10년)로 **REAL_CHAMPION_MODEL_V25.pkl**을 생성한 스크립트.
+create_ticker_map.py	[종목명 사전] FinanceDataReader로 **ticker_map.parquet**를 생성한 스크립트.
+run_strategy_grid_search_V9.py	[V9 매도 전략] "단순 보유(+3.6%)"가 "익절/손절(+1.5%)"보다 낫다는 것을 검증한 스크립트.
+detailed_trade_log_V21_Hoj_Engine.csv	[V21 로그] 12개 가설 그리드 서치의 '일일 거래 상세 로그' (77,846건)
+
+백테스트용 파일만 따로 선별 리스트
+단계	파일명	용도
+시세	all_stocks_cumulative.parquet	10년 원본 시세
+피처	all_features_cumulative_V21_Hoj.parquet	15개 피처
+DB	new_Hoj_DB_V25.parquet	학습/검증용 종합 DB
+모델	new_Hoj_MODELENGINE_V25.pkl	연구용 최신 엔진
+모델 백업	Hoj_MODELENGINE/	과거 엔진 백업
+리포트	Hoj_MODELREPORT/	백테스트 결과 보고서
+리포트	REPORT_V25_YYMMDD.txt	백테스트 결과 파일
+스크립트	evaluate_engine_V25.py	백테스트 실행
+
+251115최신
+🟥 1. HOJ 엔진 관련 (핵심)
+
+이 파일들이 HOJ 시스템의 "뇌"와 "데이터"와 직접 연결됨.
+
+🔸 HOJ 엔진 / 데이터
+F:\autostockG\HOJ_DB\REAL\HOJ_DB_REAL_V25.parquet
+
+(핵심)
+
+HOJ 실전 DB (273k rows).
+
+HOJ 엔진이 예측할 때 실제 사용하는 입력데이터.
+
+F:\autostockG\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V25.parquet
+
+(보조)
+
+연구용 DB. HOJ 실전 DB의 형제.
+
+F:\autostockG\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V25.pkl
+
+(핵심)
+
+HOJ 실전 엔진(reg + clf + features) 완전본.
+
+F:\autostockG\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V25.pkl
+
+(보조)
+
+연구용 모델 엔진.
+
+🔸 HOJ 엔진 학습 및 테스트 코드
+build_REAL_HOJ_V25.py
+
+(핵심) HOJ 엔진 학습 코드.
+
+HOJ_DB_REAL_V25 → HOJ_ENGINE_REAL_V25.pkl 생성하는 마스터 파일.
+
+test_REAL_Hoj_ENGINE_V25.py
+
+(핵심)
+
+HOJ 엔진 테스트용. 최신 날짜 TOP 예측 실행.
+
+run_hybrid_test_V34.py
+
+(핵심)
+
+Hybrid 구조 → HOJ Only 유지하며 실전 점검.
+
+V33은 폐기.
+
+check_db_columns_V32.py
+
+(보조)
+
+DB 컬럼 검증용. HOJ DB 품질 체크.
+
+organize_HOJ_V25.py
+
+(보조)
+
+HOJ DB 정리 스크립트.
+
+🟦 2. SLE 엔진 관련 (현재 비활성화 상태)
+
+지금은 HOJ-only 환경이라 실행 동작은 차단되어 있음.
+하지만 관계는 정확하게 정리함.
+
+🔸 SLE 엔진 / 데이터 (DB / 모델)
+F:\autostockG\SLE_DB\REAL\SLE_DB_REAL_V11.parquet
+
+(보조/비활성화)
+
+V11 기반 SLE DB.
+
+내부 컬럼: date, code, 기관합계, 외국인, PER, PBR, per, pbr
+
+V11_Merged_SLE_Base.parquet
+
+(보조/비활성화)
+
+SLE용 메인 데이터셋.
+
+PER/PBR 수집 실패·결측 포함.
+
+V11_Database_Final.parquet
+
+(보조/비활성화)
+
+V11 단계 최종본.
+
+V11_Merged 파일과 함께 SLE의 원본 DB.
+
+V11_partial_backup.parquet
+
+(삭제가능)
+
+중간 병합 실패 대비 백업본.
+
+**F:\autostockG\SLE_ENGINE\REAL\SLE_ENGINE_REAL_V32.pkl
+
+(SLE_CHAMPION_MODEL_V32.pkl)**
+
+(보조/비활성화)
+
+SLE 엔진 완성본.
+
+reg_model + feature 기반.
+
+🔸 SLE 관련 크롤러 / 머지 / 학습 코드
+naver_pbr_per_crawler_V16.py
+
+(보조)
+
+네이버 PER/PBR 대량 수집기 (구버전).
+
+naver_pbr_per_crawler_V17R.py
+
+(보조)
+
+개선된 네이버 PER/PBR 수집기.
+
+merge_pbr_per_V17.py
+
+(보조)
+
+PER/PBR 병합기.
+
+DB 생성 파이프라인 중간 단계.
+
+train_sle_engine_V30.py / train_sle_engine_V31.py
+
+(보조)
+
+SLE 엔진 학습 코드.
+
+sle_sample_runner_multithread.py
+
+(삭제가능)
+
+멀티스레드 샘플 실행용. 실전 파이프라인에는 미사용.
+
+merge_hoj_sle_V30.py
+
+(보조)
+
+HOJ + SLE DB 합치던 실험용 코드.
+
+🟧 3. 경로 자동 감지 / 패치 시스템 (핵심)
+config_paths.py
+
+(핵심★)
+
+HOJ / SLE 자동 경로(locating latest 파일) 관리하는 "중앙 허브".
+
+현재 버전은 SLE 완전 비활성화로 패치 완료.
+
+scan_path_usage.py
+
+(보조)
+
+전체 코드의 경로 하드코딩 스캔.
+
+apply_auto_patch.py
+
+(삭제가능)
+
+실패한 자동 패치 엔진 초기 시도.
+
+patch_engine.py
+
+(삭제가능)
+
+patch_paths_no_backup.py
+
+(보조)
+
+경로 하드코딩 제거 패치.
+
+detect_locked_file.py
+
+(보조)
+
+어떤 파일이 윈도우에서 잠겨 있는지 찾는 도구.
+
+🟩 4. Pipeline 분석/그래프 도구
+generate_pipeline_map.py
+
+(보조) 프로젝트 전체 의존성 맵 생성용.
+
+pipeline_graph_builder.py
+
+(보조) networkx 기반 그래프 생성기.
+
+pipeline_map.txt
+
+(보조) 그래프 텍스트 저장본.
+
+🟪 5. 파일명 변경 / 정리 도구
+rename_files_v25.py
+
+(보조)
+
+HOJ DB/ENGINE 이름 변경.
+
+rename_SLE_files.py
+
+(보조/비활성화)
+
+SLE DB/ENGINE 명명표준 변환.
+
+🟫 6. 임시 테스트 파일 / 중복 파일 (삭제 가능)
+backtest_model.py
+
+(삭제가능)
+
+파일 락 감지 실험 중 생성.
+
+fix_hybrid_test_temp.py
+
+(삭제가능)
+
+applied_patch_backup…
+
+(삭제가능)
+
+🟩 7. 이번 방에서 "호봉이"가 실제로 손댄 핵심 파일 7개
+상태	파일명	설명
+핵심	config_paths.py	자동 경로 관리 · SLE 비활성화 완료
+핵심	run_hybrid_test_V34.py	HOJ 전용 hybrid 테스트 최종본
+핵심	test_REAL_Hoj_ENGINE_V25.py	HOJ 엔진 정상 테스트 코드
+핵심	build_REAL_HOJ_V25.py	HOJ 엔진 학습 마스터 코드
+보조	rename_files_v25.py	HOJ 파일명 구조 표준화
+보조	scan_path_usage.py	경로 하드코딩 스캐너
+보조	detect_locked_file.py	파일 락 진단기
+⭐ 최종 정리
+🔥 삭제해도 되는 파일
+
+(너무 많아서 정확하게 표시함)
+
+apply_auto_patch.py
+
+patch_engine.py
+
+fix_hybrid_test_temp.py
+
+sle_sample_runner_multithread.py
+
+backup_auto_patch_detect 전체
+
+run_hybrid_test_V33.py
+
+patch_paths_no_backup.py
+
+backtest_model.py
+
+SLE 엔진/DB 관련 모든 코드 (현재 비활성화 사용X)
+
+SLE를 나중에 정상화할 때만 일부 되살리면 됨.

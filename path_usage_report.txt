@@ -1,0 +1,95 @@
+
+=== 파일: F:\autostockG\build_REAL_HOJ_V25.py ===
+  [줄 20] (HOJ_DB_RESEARCH_V25.parquet) DB_RESEARCH = os.path.join(BASE_DIR, "HOJ_DB_RESEARCH_V25.parquet")  # 연구용 FULL
+  [줄 21] (HOJ_DB_REAL_V25.parquet) DB_REAL = os.path.join(BASE_DIR, "HOJ_DB_REAL_V25.parquet")          # 실전용 CLEAN
+  [줄 23] (HOJ_ENGINE_RESEARCH_V25.pkl) ENGINE_RESEARCH = os.path.join(BASE_DIR, "HOJ_ENGINE_RESEARCH_V25.pkl")  # 연구 엔진 (참고용)
+  [줄 24] (HOJ_ENGINE_REAL_V25.pkl) ENGINE_REAL = os.path.join(BASE_DIR, "HOJ_ENGINE_REAL_V25.pkl")          # 실전 엔진
+  [줄 218] (HOJ_DB_REAL_V25.parquet)     print("1) 실전용 DB 생성 (HOJ_DB_REAL_V25.parquet)")
+  [줄 219] (HOJ_ENGINE_REAL_V25.pkl)     print("2) REAL_HOJ 엔진 재학습 (HOJ_ENGINE_REAL_V25.pkl)")
+
+=== 파일: F:\autostockG\check_db_columns_V32.py ===
+  [줄 7] (V11_Merged_SLE_Base.parquet) SLE_DB_FILE = "V11_Merged_SLE_Base.parquet" # (★★★ 확인할 Sle DB 파일 ★★★)
+
+=== 파일: F:\autostockG\check_engine_structure.py ===
+  [줄 3] (HOJ_ENGINE_REAL_V25.pkl) path = r"F:\autostockG\HOJ_ENGINE_REAL_V25.pkl"
+
+=== 파일: F:\autostockG\config_paths.py ===
+  [줄 13] (HOJ_DB_RESEARCH_V25.parquet)     ex) HOJ_DB_RESEARCH_V25.parquet → 버전 25 자동 인식
+
+=== 파일: F:\autostockG\excel_to_csv_batch.py ===
+  [줄 44] (F:\\autostockG)     print("입력 폴더: F:\\autostockG")
+
+=== 파일: F:\autostockG\organize_HOJ_V25.py ===
+  [줄 9] (HOJ_DB_RESEARCH_V25.parquet)     "HOJ_DB_RESEARCH": "HOJ_DB_RESEARCH_V25.parquet",
+  [줄 10] (HOJ_DB_REAL_V25.parquet)     "HOJ_DB_REAL": "HOJ_DB_REAL_V25.parquet",
+  [줄 11] (HOJ_ENGINE_RESEARCH_V25.pkl)     "HOJ_ENGINE_RESEARCH": "HOJ_ENGINE_RESEARCH_V25.pkl",
+  [줄 12] (HOJ_ENGINE_REAL_V25.pkl)     "HOJ_ENGINE_REAL": "HOJ_ENGINE_REAL_V25.pkl",
+
+=== 파일: F:\autostockG\rename_files_v25.py ===
+  [줄 12] (HOJ_DB_RESEARCH_V25.parquet)     "new_Hoj_DB_V25_FULL.parquet": "HOJ_DB_RESEARCH_V25.parquet",
+  [줄 13] (HOJ_DB_REAL_V25.parquet)     "new_Hoj_DB_V25_FULL_CLEAN.parquet": "HOJ_DB_REAL_V25.parquet",
+  [줄 14] (HOJ_ENGINE_RESEARCH_V25.pkl)     "new_Hoj_MODELENGINE_V25.pkl": "HOJ_ENGINE_RESEARCH_V25.pkl",
+  [줄 15] (HOJ_ENGINE_REAL_V25.pkl)     "REAL_Hoj_MODELENGINE_V25.pkl": "HOJ_ENGINE_REAL_V25.pkl",
+
+=== 파일: F:\autostockG\run_hybrid_test_V33.py ===
+  [줄 12] (V11_Merged_SLE_Base.parquet) SLE_DB_FILE = "V11_Merged_SLE_Base.parquet"        # (Sle 4 피처 DB)
+  [줄 15] (SLE_CHAMPION_MODEL_V32.pkl) SLE_MODEL_FILE = "SLE_CHAMPION_MODEL_V32.pkl" # (Sle 뇌 V32)
+
+=== 파일: F:\autostockG\scan_path_usage.py ===
+  [줄 8] (HOJ_DB_RESEARCH_V25.parquet)     "HOJ_DB_RESEARCH_V25.parquet",
+  [줄 9] (HOJ_DB_REAL_V25.parquet)     "HOJ_DB_REAL_V25.parquet",
+  [줄 10] (HOJ_ENGINE_RESEARCH_V25.pkl)     "HOJ_ENGINE_RESEARCH_V25.pkl",
+  [줄 11] (HOJ_ENGINE_REAL_V25.pkl)     "HOJ_ENGINE_REAL_V25.pkl",
+  [줄 14] (V11_Merged_SLE_Base.parquet)     "V11_Merged_SLE_Base.parquet",
+  [줄 15] (V11_Database_Final.parquet)     "V11_Database_Final.parquet",
+  [줄 16] (SLE_CHAMPION_MODEL_V32.pkl)     "SLE_CHAMPION_MODEL_V32.pkl",
+  [줄 17] (SLE_DB_REAL_V11.parquet)     "SLE_DB_REAL_V11.parquet",
+  [줄 18] (SLE_ENGINE_REAL_V32.pkl)     "SLE_ENGINE_REAL_V32.pkl",
+  [줄 21] (F:\\autostockG)     r"F:\\autostockG",
+  [줄 22] (F:/autostockG)     r"F:/autostockG",
+
+=== 파일: F:\autostockG\test_REAL_Hoj_ENGINE_V25.py ===
+  [줄 16] (HOJ_DB_REAL_V25.parquet) DB_PATH = os.path.join(BASE_DIR, "HOJ_DB_REAL_V25.parquet")
+
+=== 파일: F:\autostockG\test_REAL_HOJ_V25.py ===
+  [줄 4] (HOJ_DB_REAL_V25.parquet) # - HOJ_DB_REAL_V25.parquet 기준 최신 날짜 Top10 점검
+  [줄 17] (HOJ_DB_REAL_V25.parquet) DB_REAL = os.path.join(BASE_DIR, "HOJ_DB_REAL_V25.parquet")
+  [줄 18] (HOJ_ENGINE_REAL_V25.pkl) ENGINE_REAL = os.path.join(BASE_DIR, "HOJ_ENGINE_REAL_V25.pkl")
+
+=== 파일: F:\autostockG\SLE_DB\OLD\merge_hoj_sle_V30.py ===
+  [줄 9] (V11_Merged_SLE_Base.parquet) SLE_DB_FILE = "V11_Merged_SLE_Base.parquet"        # (4개 Sle 피처)
+
+=== 파일: F:\autostockG\SLE_DB\OLD\organize_SLE_standardize.py ===
+  [줄 9] (V11_Merged_SLE_Base.parquet)     "V11_Merged_SLE_Base.parquet": "SLE_DB_RESEARCH_V11.parquet",
+  [줄 10] (V11_Database_Final.parquet)     "V11_Database_Final.parquet": "SLE_DB_REAL_V11.parquet",
+  [줄 11] (SLE_CHAMPION_MODEL_V32.pkl)     "SLE_CHAMPION_MODEL_V32.pkl": "SLE_ENGINE_REAL_V32.pkl",
+
+=== 파일: F:\autostockG\SLE_DB\OLD\organize_SLE_V11.py ===
+  [줄 9] (V11_Merged_SLE_Base.parquet)     "SLE_DB_RESEARCH": "V11_Merged_SLE_Base.parquet",
+  [줄 10] (V11_Database_Final.parquet)     "SLE_DB_REAL": "V11_Database_Final.parquet",
+  [줄 11] (SLE_CHAMPION_MODEL_V32.pkl)     "SLE_ENGINE_REAL": "SLE_CHAMPION_MODEL_V32.pkl"
+
+=== 파일: F:\autostockG\SLE_ENGINE\OLD\train_sle_engine_V30.py ===
+  [줄 12] (V11_Merged_SLE_Base.parquet) SLE_DB_FILE = "V11_Merged_SLE_Base.parquet"        # (X 입력 피처)
+
+=== 파일: F:\autostockG\SLE_ENGINE\OLD\train_sle_engine_V31.py ===
+  [줄 12] (V11_Merged_SLE_Base.parquet) SLE_DB_FILE = "V11_Merged_SLE_Base.parquet"        # (X 입력 피처)
+  [줄 13] (SLE_CHAMPION_MODEL_V32.pkl) FINAL_SLE_MODEL_FILE = "SLE_CHAMPION_MODEL_V32.pkl" # (★★★ V32: Sle 엔진 뇌 ★★★)
+
+=== 파일: F:\autostockG\ui\ui_pages\dashboard.py ===
+  [줄 23] (F:/autostockG)     base_path = "F:/autostockG"
+  [줄 25] (HOJ_DB_RESEARCH_V25.parquet)     db_research = os.path.join(base_path, "HOJ_DB_RESEARCH_V25.parquet")
+  [줄 26] (HOJ_DB_REAL_V25.parquet)     db_real = os.path.join(base_path, "HOJ_DB_REAL_V25.parquet")
+  [줄 27] (HOJ_ENGINE_RESEARCH_V25.pkl)     engine_research = os.path.join(base_path, "HOJ_ENGINE_RESEARCH_V25.pkl")
+  [줄 28] (HOJ_ENGINE_REAL_V25.pkl)     engine_real = os.path.join(base_path, "HOJ_ENGINE_REAL_V25.pkl")
+
+=== 파일: F:\autostockG\ui\ui_pages\engine_manager.py ===
+  [줄 5] (F:/autostockG) BASE = "F:/autostockG"
+
+=== 파일: F:\autostockG\ui\ui_pages\predict_stock.py ===
+  [줄 11] (F:/autostockG) BASE = "F:/autostockG"
+  [줄 12] (HOJ_DB_REAL_V25.parquet) REAL_DB = os.path.join(BASE, "HOJ_DB_REAL_V25.parquet")
+  [줄 13] (HOJ_ENGINE_REAL_V25.pkl) REAL_ENGINE = os.path.join(BASE, "HOJ_ENGINE_REAL_V25.pkl")
+
+=== 파일: F:\autostockG\ui\ui_pages\today_top10.py ===
+  [줄 7] (HOJ_ENGINE_REAL_V25.pkl)     st.write("실전 엔진(HOJ_ENGINE_REAL_V25.pkl)을 사용해 최신 날짜 기준 Top10을 예측합니다.")

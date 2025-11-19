@@ -1,0 +1,41 @@
+1. 추천 프로그램 (AI 분석 파이프라인)
+***실행파일 python daily_recommender.py***
+'오늘의 Top 10' 추천 종목 리스트(recommendation_...csv)를 생성하는 **'오프라인 연구소'**입니다.
+
+1-1. 핵심 실행 파일 (.py)
+create_ticker_map.py: [종목명 사전 생성] FinanceDataReader를 이용해 ticker_map.parquet 파일을 생성합니다.
+build_database_V25.py: [V25 DB 구축] 'V21 DB'(all_features_cumulative_V21_Hoj.parquet)와 '종목명 사전'(ticker_map.parquet)을 병합하여 'V25 최종 DB'(V25_Hoj_DB.parquet)를 생성합니다.
+train_real_engine_V25.py: [V25 엔진 학습] 'V25 최종 DB'를 10년치 전체로 학습시켜 'Hoj AI 뇌'(REAL_CHAMPION_MODEL_V25.pkl)를 생성합니다.
+daily_recommender.py: [Hoj 실전 추천기] 'AI 뇌'와 'V25 DB'를 로드하여 '오늘의 Top 10'을 .csv 파일과 화면으로 출력합니다.
+
+1-2. 데이터 및 AI 모델 파일 (.parquet, .pkl)
+REAL_CHAMPION_MODEL_V25.pkl: 🥇 Hoj 엔진 AI '뇌' (최종 결과물).
+V25_Hoj_DB.parquet: 💾 Hoj 엔진 '최종 DB' (1단계 결과물).
+ticker_map.parquet: 💾 '종목명 사전' (create_ticker_map.py의 결과물).
+all_features_cumulative_V21_Hoj.parquet: (숨겨진 재료) 12개 피처가 계산된 'V21 Hoj DB' (build_database_V25.py의 입력 재료).
+all_stocks_cumulative.parquet: 💾 (원본 재료) 10년치 순수 시세 (V21 DB의 원재료로 추정).
+kospi_index_10y.parquet: 💾 (원본 재료) 10년치 KOSPI (V21 DB의 원재료로 추정).
+
+1-3. (참고) Sle 엔진 및 연구/검증용 파일
+SLE_CHAMPION_MODEL_V32.pkl: 🥇 Sle 엔진 AI '뇌'.
+V11_Merged_SLE_Base.parquet: 💾 Sle 엔진 'DB'.
+train_sle_engine_V32.py: 🔬 Sle '뇌'를 학습시키는 파일.
+run_hoj_grid_search_V20.py: 🔬 Hoj 엔진 '가설 검증' 스크립트.
+run_tuning_V22.py: 🔬 Hoj 엔진 '튜닝 검증' 스크립트.
+run_hybrid_test_V33.py: 🔬 Hoj/Sle '하이브리드 전략 검증' 스크립트.
+run_strategy_grid_search_V9.py: 🔬 '매도 전략 검증' 스크립트.
+
+2. 매매 프로그램 (주문 및 알림 봇)
+***실행파일 python main_trading.py***
+'추천 프로그램'의 결과를 받아 실제 주문과 알림을 실행하는 **'온라인 실전 부대'**입니다.
+
+2-1. 핵심 실행 파일 (.py)
+main_trading.py: '실전 매매'의 지휘자. (매매 대상 수동 설정, 매수 타이밍 계산, API/카톡 호출)
+kiwoom_api.py: 키움증권 API(주문, 차트 조회) 실제 통신 담당.
+token_manager.py: 키움 API 토큰 발급/관리 담당.
+kakao_notifier.py: 카카오톡 알림 발송 및 토큰 관리 담당.
+
+2-2. 설정 및 인증 파일 (.ini, .json)
+config.ini: 모든 API 키(키움, 카카오), 계좌번호, 모드(실전/모의)를 저장하는 필수 핵심 설정 파일.
+token.json: token_manager.py가 생성/관리하는 키움 인증 토큰 저장 파일.
+kakao_token.json: kakao_notifier.py가 생성/관리하는 카카오 인증 토큰(Access/Refresh) 저장 파일.

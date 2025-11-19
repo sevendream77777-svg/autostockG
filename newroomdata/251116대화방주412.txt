@@ -1,0 +1,370 @@
+1. MODELENGINE 전체 파이프라인 목차 (1 ~ 끝)
+1) 폴더 구조/역할 정리 ✅
+
+F:\autostockG\MODELENGINE\
+
+RAW → 원본 시세 데이터
+
+FEATURE → 기술적 지표 피처
+
+HOJ_DB\RESEARCH → 연구용 HOJ DB
+
+HOJ_DB\REAL → 실전용 HOJ DB
+
+HOJ_ENGINE\RESEARCH → 연구용 HOJ 엔진
+
+HOJ_ENGINE\REAL → 실전용 HOJ 엔진
+
+SLE_DB\RESEARCH → (현재 비움, 설계만)
+
+SLE_DB\REAL → 실전용 SLE DB (V21)
+
+SLE_ENGINE\RESEARCH → (현재 없음, 설계만)
+
+SLE_ENGINE\REAL → 실전용 SLE 엔진
+
+util → 공통 스크립트들
+
+상태: 구조/폴더명 통일 완료.
+
+2) 공통 경로 시스템(config_paths.py) 확정 ✅
+
+MODELENGINE\util\config_paths.py 최종판:
+
+BASE = F:\autostockG\MODELENGINE
+
+get_path(component, mode, filename)
+
+get_raw_path(filename)
+
+get_feature_path(filename)
+
+get_util_path(filename)
+
+역할:
+모든 스크립트가 하드코딩 경로 없이 이 함수들만 써서 파일 찾게 만드는 “주소록”.
+
+상태: 최종판 적용 완료, 잘 동작 중.
+
+3) RAW 단계 표준화 (update_raw_data.py) ✅
+
+위치: MODELENGINE\RAW\update_raw_data.py
+
+내용(최종 버전):
+
+외부 원본 (예: F:\autostockG\all_stocks_cumulative.parquet) →
+MODELENGINE\RAW\all_stocks_cumulative.parquet 로 복사
+
+기존 RAW 백업(타임스탬프 붙여서) 후 새 파일 덮어쓰기
+
+“오늘 기준 최신 시세”를 MODELENGINE 안으로 가져오는 역할.
+
+상태: 코드 수정 완료, 한 번 실행 성공.
+
+4) FEATURE 생성 단계 (build_features.py) ✅
+
+위치: MODELENGINE\FEATURE\build_features.py
+
+최종판(호봉이 FINAL SAFE VERSION):
+
+RAW\all_stocks_cumulative.parquet 로드
+
+컬럼 자동 매핑/표준화:
+
+Date / Code / Open / High / Low / Close / Volume 강제 정리
+
+종목별 정렬 후:
+
+SMA_20
+
+RSI_14
+
+MACD, MACD_Sig
+
+ATR_14
+
+(필요 최소 피처) 계산
+
+NaN 제거 후
+
+FEATURE\features_V1.parquet 로 저장
+
+상태: 에러 없이 실행 성공 → features_V1.parquet 생성 완료.
+
+5) 연구용 HOJ_DB 생성 (build_HOJ_DB_RESEARCH.py) ✅
+
+위치: MODELENGINE\util\build_HOJ_DB_RESEARCH.py (최종판으로 교체 완료)
+
+동작:
+
+FEATURE\features_V1.parquet 로드
+
+종목별 Date 정렬
+
+5일 후 종가로 Return_5d 생성
+
+Label_5d = (Return_5d > 0) 이진 라벨
+
+결측 제거 후:
+
+HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet 저장
+
+상태: 방금 성공적으로 실행 완료. 확인사항 기존 같은이름으로 있던 원본이 덮여진거같음. 지금 다른 파일은 버전 수정해 바꿔놨음
+
+6) 연구용 HOJ 엔진 학습 (train_HOJ_ENGINE_RESEARCH.py) ⏳(재실행 예정)
+
+역할:
+
+입력: HOJ_DB_RESEARCH_V31.parquet
+
+LightGBM으로 Label_5d 학습
+
+출력: HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+
+현재 상황:
+
+예전에 한 번 돌렸는데,
+그때는 DB/FEATURE 구조가 지금이랑 살짝 달랐을 가능성 있음.
+
+지금은 새 DB(최종판) 기준으로 다시 한 번 돌려서 맞추는 게 깔끔함.
+
+계획:
+
+방 옮긴 다음:
+
+train_HOJ_ENGINE_RESEARCH.py 코드에서
+
+object 컬럼 제거
+
+FEATURE 컬럼 리스트 재확인
+
+한 번 재학습 → 로그 확인 후 “연구용 엔진 OK”로 마무리.
+
+7) 실전용 HOJ_DB 생성 (build_HOJ_DB_REAL.py) ⏳(실행 필요)
+
+역할:
+
+전체 기간 + 실전용 설정 기준으로
+
+HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet 생성.
+
+구조는 RESEARCH와 유사하지만,
+
+기간/필터링,
+
+향후 실전용 전략(최근 N년만 포함 등)이 다를 수 있음.
+
+계획:
+
+기존 build_HOJ_DB_REAL.py 파일을:
+
+config_paths 방식으로 전면 교체 (RESEARCH와 비슷하게)
+
+Return_5d / Label_5d 생성 로직 통일
+
+실행 후:
+
+행 수 / 기간 / Code 유효성 간단 체크.
+
+8) 실전용 HOJ 엔진 학습 (train_HOJ_ENGINE_REAL.py) ⏳(재실행 예정)
+
+역할:
+
+입력: HOJ_DB_REAL_V31.parquet
+
+실전용 LightGBM 학습
+
+출력: HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+
+계획:
+
+연구 엔진과 같은 방식으로:
+
+object 컬럼 제거
+
+동일 FEATURE 세트 사용
+
+검증 전략(최근 1년/6개월) 간단히 포함
+
+실행 후:
+
+성능 로그(간단한 accuracy / AUC / hit ratio) 정도만 출력.
+
+9) SLE_DB / SLE_ENGINE 구조 정리 ⏳(점검 + 최소 작업)
+
+현재 상태:
+
+SLE_DB\REAL\SLE_DB_REAL_V21.parquet 이미 있음
+
+SLE_DB\RESEARCH → 의도적으로 없음 (설계 상 “실전 전용 DB”)
+
+SLE_ENGINE\REAL\SLE_ENGINE_REAL_V21.pkl → 이전 방에서 한 번 학습 완료했음.
+
+우리가 새로 한 작업:
+
+train_SLE_ENGINE_REAL.py (MODELENGINE/util 버전) 생성 완료
+(HOJ와 비슷한 LightGBM 구조)
+
+계획:
+
+새 구조 기준으로 train_SLE_ENGINE_REAL.py 확인:
+
+입력 경로: SLE_DB_REAL_V21.parquet
+
+출력 경로: SLE_ENGINE_REAL_V21.pkl
+
+한 번 재학습해서
+SLE 엔진도 MODELENGINE 안에서 “완전 독립 실행 가능” 상태로 맞추기.
+
+연구용 SLE_DB/ENGINE은
+나중에 필요해지면 별도 설계(지금은 유지보수 대상 아님).
+
+10) version_utils / pipeline_utils 정리 ⏳(정리 단계)
+
+현재:
+
+version_utils.py → backup_file(path) 정도의 단순 기능 있음.
+
+pipeline_utils.py → ensure_exists, load_clean_df 정도가 있었음 (지금은 거의 안 씀).
+
+계획:
+
+최소 필요 기능만 남기고:
+
+backup_file(path):
+
+DB/엔진 덮어쓰기 직전에 호출
+
+나머지 복잡한 기능은 정리하거나 주석 처리.
+
+전체적으로 “없어도 돌아가는데 있으면 더 안전한” 수준으로 유지.
+
+11) full_update_pipeline.py 최종 확정 ⏳(마무리 핵심)
+
+목표:
+한 줄로 전체 파이프라인:
+
+python full_update_pipeline.py
+
+
+실행하면 아래 순서로 자동 수행:
+
+RAW\update_raw_data.py
+
+FEATURE\build_features.py
+
+util\build_HOJ_DB_RESEARCH.py
+
+util\build_HOJ_DB_REAL.py
+
+util\train_HOJ_ENGINE_RESEARCH.py
+
+util\train_HOJ_ENGINE_REAL.py
+
+util\train_SLE_ENGINE_REAL.py
+
+(선택) version_utils로 DB/엔진 자동 백업
+
+계획:
+
+방 옮긴 뒤:
+
+경로 전부 절대경로로 확정
+
+실패 시 어느 단계에서 끊겼는지 로그 딱 나오게
+
+한 번 수동으로 각 단계 확인 후
+full_update_pipeline 마지막에 고정.
+
+12) 전체 요약 문서/지도 만들기 ⏳(정리용)
+
+마지막으로:
+
+MODELENGINE_전체기록_V3.txt 같은 이름으로
+
+폴더 구조
+
+각 파일 역할
+
+실행 순서
+
+자주 쓰는 명령어
+
+“문제 생겼을 때 체크리스트”
+
+까지 정리해서,
+다음에 새 방 만들어도 이 파일 하나만 보면 바로 기억 복구되게 만드는 게 목표.
+
+2. 지금 “정확히 어디까지 왔냐” 요약
+
+✅ 완료된 것
+
+MODELENGINE 폴더 구조 정리
+
+config_paths.py 최종판
+
+update_raw_data.py 최종판 + 실행
+
+build_features.py FINAL + 실행 성공 (features_V1.parquet 생성)
+
+build_HOJ_DB_RESEARCH.py FINAL + 실행 성공 (HOJ_DB_RESEARCH_V31.parquet 생성)
+
+⏳ 바로 다음에 할 것 (우선순위)
+
+train_HOJ_ENGINE_RESEARCH.py → 새 DB 기준 재학습
+
+build_HOJ_DB_REAL.py → FINAL 버전으로 교체 + 실행
+
+train_HOJ_ENGINE_REAL.py → 새 REAL DB 기준 재학습
+
+train_SLE_ENGINE_REAL.py → SLE 엔진 재학습
+
+version_utils / pipeline_utils 최소 정리
+
+full_update_pipeline.py 최종 고정
+
+최종 정리 문서(V3) 생성
+
+3. 앞으로 남은 부분 “어떤 식으로 진행할지” (계획 흐름)
+
+새 방으로 옮긴 다음 흐름 제안:
+
+HOJ 연구 엔진 정리
+
+train_HOJ_ENGINE_RESEARCH.py 코드 점검
+
+새 DB로 재학습 → 결과 로그 확인
+
+문제가 없으면 “연구 라인” 고정
+
+HOJ 실전 라인 정리
+
+build_HOJ_DB_REAL.py 새 버전 코드 제공/적용
+
+실행해서 REAL DB 생성 확인
+
+train_HOJ_ENGINE_REAL.py 재학습
+
+실전 엔진 최종 파일 위치/이름 고정
+
+SLE 라인 정리 (최소 작업)
+
+SLE_DB_REAL_V21.parquet 구조만 가볍게 체크
+
+train_SLE_ENGINE_REAL.py 맞춰서 재학습
+
+SLE 실전 엔진 고정
+
+full_update_pipeline 최종 확정
+
+각 단계 수동 실행해서 “깨끗하게 한 번 통과” 확인
+
+그 순서 그대로 full_update_pipeline에 고정
+
+실패/성공 로그 형식 통일
+
+최종 문서화 & 백업
+
+지금 방 + 새 방까지 포함해서
+
+MODELENGINE 전용 “사용설명서/지도” txt로 만들어서 저장.

@@ -1,0 +1,3552 @@
+{
+  "base_dir": "F:\\autostockG",
+  "generated_at": "2025-11-15T03:42:24",
+  "nodes": [
+    {
+      "id": "autopipeline_mapper.py",
+      "abs_path": "F:\\autostockG\\autopipeline_mapper.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9551,
+      "mtime": 1763133257.0622797
+    },
+    {
+      "id": "backtest_model.py",
+      "abs_path": "F:\\autostockG\\backtest_model.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 4502,
+      "mtime": 1762520771.0860946
+    },
+    {
+      "id": "backtest_model_readable.py",
+      "abs_path": "F:\\autostockG\\backtest_model_readable.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 5673,
+      "mtime": 1762526134.0965433
+    },
+    {
+      "id": "build_database_V25.py",
+      "abs_path": "F:\\autostockG\\build_database_V25.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1909,
+      "mtime": 1763006032.112874
+    },
+    {
+      "id": "build_full_Hoj_DB_V25.py",
+      "abs_path": "F:\\autostockG\\build_full_Hoj_DB_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2543,
+      "mtime": 1763026449.874877
+    },
+    {
+      "id": "build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py",
+      "abs_path": "F:\\autostockG\\build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5935,
+      "mtime": 1763037238.115857
+    },
+    {
+      "id": "build_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\build_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7439,
+      "mtime": 1763098592.1923003
+    },
+    {
+      "id": "check_db_columns_V32.py",
+      "abs_path": "F:\\autostockG\\check_db_columns_V32.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1610,
+      "mtime": 1763098592.1982832
+    },
+    {
+      "id": "check_engine_structure.py",
+      "abs_path": "F:\\autostockG\\check_engine_structure.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 251,
+      "mtime": 1763091514.8856263
+    },
+    {
+      "id": "check_merge_keys.py",
+      "abs_path": "F:\\autostockG\\check_merge_keys.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2195,
+      "mtime": 1762961988.819597
+    },
+    {
+      "id": "check_nulls_in_V25_DB.py",
+      "abs_path": "F:\\autostockG\\check_nulls_in_V25_DB.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3798,
+      "mtime": 1763009354.6432242
+    },
+    {
+      "id": "check_restored_file.py",
+      "abs_path": "F:\\autostockG\\check_restored_file.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1340,
+      "mtime": 1762969693.5153801
+    },
+    {
+      "id": "check_restored_file_KOSPI.py",
+      "abs_path": "F:\\autostockG\\check_restored_file_KOSPI.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1240,
+      "mtime": 1762969898.899205
+    },
+    {
+      "id": "check_single_stock_V28.py",
+      "abs_path": "F:\\autostockG\\check_single_stock_V28.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4420,
+      "mtime": 1762737535.4065688
+    },
+    {
+      "id": "collect_all_1y.py",
+      "abs_path": "F:\\autostockG\\collect_all_1y.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 2490,
+      "mtime": 1762512428.5060053
+    },
+    {
+      "id": "collect_kospi.py",
+      "abs_path": "F:\\autostockG\\collect_kospi.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1445,
+      "mtime": 1762523729.7759097
+    },
+    {
+      "id": "combine_data.py",
+      "abs_path": "F:\\autostockG\\combine_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2272,
+      "mtime": 1762517786.1332648
+    },
+    {
+      "id": "config_paths.py",
+      "abs_path": "F:\\autostockG\\config_paths.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 701,
+      "mtime": 1763126368.4886549
+    },
+    {
+      "id": "convert_full_db.py",
+      "abs_path": "F:\\autostockG\\convert_full_db.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 332,
+      "mtime": 1763035358.9302647
+    },
+    {
+      "id": "create_target_and_split.py",
+      "abs_path": "F:\\autostockG\\create_target_and_split.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3317,
+      "mtime": 1762525417.145892
+    },
+    {
+      "id": "create_target_urls.py",
+      "abs_path": "F:\\autostockG\\create_target_urls.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2175,
+      "mtime": 1762633779.03623
+    },
+    {
+      "id": "create_ticker_map.py",
+      "abs_path": "F:\\autostockG\\create_ticker_map.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1389,
+      "mtime": 1762708953.784331
+    },
+    {
+      "id": "daily_recommender.py",
+      "abs_path": "F:\\autostockG\\daily_recommender.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4434,
+      "mtime": 1762972450.9592965
+    },
+    {
+      "id": "daily_recommender_FAST.py",
+      "abs_path": "F:\\autostockG\\daily_recommender_FAST.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8035,
+      "mtime": 1762630965.839654
+    },
+    {
+      "id": "data_manager.py",
+      "abs_path": "F:\\autostockG\\data_manager.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7119,
+      "mtime": 1762834382.6841412
+    },
+    {
+      "id": "data_manager_test.py",
+      "abs_path": "F:\\autostockG\\data_manager_test.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6920,
+      "mtime": 1762832151.9103763
+    },
+    {
+      "id": "detect_locked_file.py",
+      "abs_path": "F:\\autostockG\\detect_locked_file.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1200,
+      "mtime": 1763100406.0852742
+    },
+    {
+      "id": "download_data.py",
+      "abs_path": "F:\\autostockG\\download_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3057,
+      "mtime": 1762802090.912826
+    },
+    {
+      "id": "evaluate_engine_V25.py",
+      "abs_path": "F:\\autostockG\\evaluate_engine_V25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 10345,
+      "mtime": 1763025284.3903184
+    },
+    {
+      "id": "excel_to_csv_batch.py",
+      "abs_path": "F:\\autostockG\\excel_to_csv_batch.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2224,
+      "mtime": 1762977301.6028304
+    },
+    {
+      "id": "extract_excel.py",
+      "abs_path": "F:\\autostockG\\extract_excel.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3207,
+      "mtime": 1762794625.4041674
+    },
+    {
+      "id": "finance_collector.py",
+      "abs_path": "F:\\autostockG\\finance_collector.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4323,
+      "mtime": 1762836900.7033634
+    },
+    {
+      "id": "finance_collector_test.py",
+      "abs_path": "F:\\autostockG\\finance_collector_test.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 3097,
+      "mtime": 1762834024.0272255
+    },
+    {
+      "id": "fix_corrupted_data_v1.py",
+      "abs_path": "F:\\autostockG\\fix_corrupted_data_v1.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4282,
+      "mtime": 1762969237.3504124
+    },
+    {
+      "id": "fix_corrupted_KOSPI_v2.py",
+      "abs_path": "F:\\autostockG\\fix_corrupted_KOSPI_v2.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2293,
+      "mtime": 1762970359.8186717
+    },
+    {
+      "id": "Hoj_V25_FinalValidation.py",
+      "abs_path": "F:\\autostockG\\Hoj_V25_FinalValidation.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6750,
+      "mtime": 1763029643.273164
+    },
+    {
+      "id": "Hoj_V25_Predict_Top10.py",
+      "abs_path": "F:\\autostockG\\Hoj_V25_Predict_Top10.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1278,
+      "mtime": 1763027397.5110035
+    },
+    {
+      "id": "kakao_notifier.py",
+      "abs_path": "F:\\autostockG\\kakao_notifier.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8587,
+      "mtime": 1762839830.947679
+    },
+    {
+      "id": "kiwoom_api.fullbackup.py",
+      "abs_path": "F:\\autostockG\\kiwoom_api.fullbackup.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 19637,
+      "mtime": 1762845815.6376657
+    },
+    {
+      "id": "kiwoom_api.py",
+      "abs_path": "F:\\autostockG\\kiwoom_api.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11160,
+      "mtime": 1762845748.9448082
+    },
+    {
+      "id": "main_trading.py",
+      "abs_path": "F:\\autostockG\\main_trading.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6292,
+      "mtime": 1762840368.3478215
+    },
+    {
+      "id": "make_kospi_index_10y.py",
+      "abs_path": "F:\\autostockG\\make_kospi_index_10y.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 531,
+      "mtime": 1763005897.16744
+    },
+    {
+      "id": "merge_pbr_per_V17.py",
+      "abs_path": "F:\\autostockG\\merge_pbr_per_V17.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1928,
+      "mtime": 1762669223.6053135
+    },
+    {
+      "id": "naver_pbr_per_crawler_V16.py",
+      "abs_path": "F:\\autostockG\\naver_pbr_per_crawler_V16.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8150,
+      "mtime": 1762669628.119369
+    },
+    {
+      "id": "naver_pbr_per_crawler_V17R.py",
+      "abs_path": "F:\\autostockG\\naver_pbr_per_crawler_V17R.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3680,
+      "mtime": 1762670906.4709213
+    },
+    {
+      "id": "organize_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\organize_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3563,
+      "mtime": 1763098592.2417762
+    },
+    {
+      "id": "patch_engine.py",
+      "abs_path": "F:\\autostockG\\patch_engine.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2738,
+      "mtime": 1763100208.3803473
+    },
+    {
+      "id": "patch_paths_no_backup.py",
+      "abs_path": "F:\\autostockG\\patch_paths_no_backup.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 3280,
+      "mtime": 1763101389.8294628
+    },
+    {
+      "id": "pipeline_auto_analyzer.py",
+      "abs_path": "F:\\autostockG\\pipeline_auto_analyzer.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 32118,
+      "mtime": 1763145602.3132734
+    },
+    {
+      "id": "pipeline_graph_builder.py",
+      "abs_path": "F:\\autostockG\\pipeline_graph_builder.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2575,
+      "mtime": 1763135875.1560607
+    },
+    {
+      "id": "process_data.py",
+      "abs_path": "F:\\autostockG\\process_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3294,
+      "mtime": 1762518431.5579908
+    },
+    {
+      "id": "process_data_v2.py",
+      "abs_path": "F:\\autostockG\\process_data_v2.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2945,
+      "mtime": 1762522173.841107
+    },
+    {
+      "id": "process_data_v4.py",
+      "abs_path": "F:\\autostockG\\process_data_v4.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5009,
+      "mtime": 1762523813.6738148
+    },
+    {
+      "id": "rename_files_v25.py",
+      "abs_path": "F:\\autostockG\\rename_files_v25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1194,
+      "mtime": 1763098592.249357
+    },
+    {
+      "id": "rename_return5d.py",
+      "abs_path": "F:\\autostockG\\rename_return5d.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 400,
+      "mtime": 1763009798.9117434
+    },
+    {
+      "id": "rename_SLE_files.py",
+      "abs_path": "F:\\autostockG\\rename_SLE_files.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 2016,
+      "mtime": 1763097604.799081
+    },
+    {
+      "id": "restore_return5d.py",
+      "abs_path": "F:\\autostockG\\restore_return5d.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 504,
+      "mtime": 1763009983.5650735
+    },
+    {
+      "id": "run_grid_search.py",
+      "abs_path": "F:\\autostockG\\run_grid_search.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11352,
+      "mtime": 1762529107.2920969
+    },
+    {
+      "id": "run_hoj_grid_search_V20.py",
+      "abs_path": "F:\\autostockG\\run_hoj_grid_search_V20.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 10869,
+      "mtime": 1762695806.9370904
+    },
+    {
+      "id": "run_hybrid_test_V33.py",
+      "abs_path": "F:\\autostockG\\run_hybrid_test_V33.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1807,
+      "mtime": 1763126403.0278156
+    },
+    {
+      "id": "run_hybrid_test_V34.py",
+      "abs_path": "F:\\autostockG\\run_hybrid_test_V34.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1068,
+      "mtime": 1763126695.918526
+    },
+    {
+      "id": "run_market_filter_V22B.py",
+      "abs_path": "F:\\autostockG\\run_market_filter_V22B.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7184,
+      "mtime": 1762700871.3017974
+    },
+    {
+      "id": "run_model_grid_search_V12.py",
+      "abs_path": "F:\\autostockG\\run_model_grid_search_V12.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9582,
+      "mtime": 1762624093.5326705
+    },
+    {
+      "id": "run_pipeline_v6.py",
+      "abs_path": "F:\\autostockG\\run_pipeline_v6.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11119,
+      "mtime": 1762527029.9858046
+    },
+    {
+      "id": "run_quantile_test_V23.py",
+      "abs_path": "F:\\autostockG\\run_quantile_test_V23.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 5823,
+      "mtime": 1762750898.1547697
+    },
+    {
+      "id": "run_regression_60_5.py",
+      "abs_path": "F:\\autostockG\\run_regression_60_5.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7896,
+      "mtime": 1762536323.5363977
+    },
+    {
+      "id": "run_regression_pipeline.py",
+      "abs_path": "F:\\autostockG\\run_regression_pipeline.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9879,
+      "mtime": 1762531887.0408962
+    },
+    {
+      "id": "run_strategy_grid_search_V9.py",
+      "abs_path": "F:\\autostockG\\run_strategy_grid_search_V9.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9407,
+      "mtime": 1762607618.0608463
+    },
+    {
+      "id": "run_tuning_V22.py",
+      "abs_path": "F:\\autostockG\\run_tuning_V22.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5869,
+      "mtime": 1762700163.9273977
+    },
+    {
+      "id": "run_ui_test.py",
+      "abs_path": "F:\\autostockG\\run_ui_test.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1907,
+      "mtime": 1762605552.758437
+    },
+    {
+      "id": "run_v5_threshold_tuning.py",
+      "abs_path": "F:\\autostockG\\run_v5_threshold_tuning.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 9220,
+      "mtime": 1762527982.1651058
+    },
+    {
+      "id": "run_weekly_update.py",
+      "abs_path": "F:\\autostockG\\run_weekly_update.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4953,
+      "mtime": 1762950507.3224602
+    },
+    {
+      "id": "scan_path_usage.py",
+      "abs_path": "F:\\autostockG\\scan_path_usage.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2713,
+      "mtime": 1763098592.2749197
+    },
+    {
+      "id": "test_REAL_Hoj_ENGINE_V25.py",
+      "abs_path": "F:\\autostockG\\test_REAL_Hoj_ENGINE_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1793,
+      "mtime": 1763111042.07698
+    },
+    {
+      "id": "test_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\test_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 7072,
+      "mtime": 1763098592.286399
+    },
+    {
+      "id": "test_runner_hoj_gridsearch.py",
+      "abs_path": "F:\\autostockG\\test_runner_hoj_gridsearch.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 10295,
+      "mtime": 1762690228.0819588
+    },
+    {
+      "id": "test_single_date_fetch.py",
+      "abs_path": "F:\\autostockG\\test_single_date_fetch.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1525,
+      "mtime": 1762629748.6426697
+    },
+    {
+      "id": "token_manager.py",
+      "abs_path": "F:\\autostockG\\token_manager.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7157,
+      "mtime": 1762787295.370211
+    },
+    {
+      "id": "train_champion_reg.py",
+      "abs_path": "F:\\autostockG\\train_champion_reg.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2137,
+      "mtime": 1762594548.4127383
+    },
+    {
+      "id": "train_model.py",
+      "abs_path": "F:\\autostockG\\train_model.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2513,
+      "mtime": 1762524562.1858165
+    },
+    {
+      "id": "train_real_engine_V25.py",
+      "abs_path": "F:\\autostockG\\train_real_engine_V25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6597,
+      "mtime": 1763031909.4517448
+    },
+    {
+      "id": "train_REAL_Hoj_ENGINE_V25.py",
+      "abs_path": "F:\\autostockG\\train_REAL_Hoj_ENGINE_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4693,
+      "mtime": 1763033366.91367
+    },
+    {
+      "id": "update_data_incrementally.py",
+      "abs_path": "F:\\autostockG\\update_data_incrementally.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7188,
+      "mtime": 1763002641.090363
+    },
+    {
+      "id": "update_features_incrementally.py",
+      "abs_path": "F:\\autostockG\\update_features_incrementally.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5446,
+      "mtime": 1763005952.4171145
+    },
+    {
+      "id": "V25_Backtest_DailyMDD.py",
+      "abs_path": "F:\\autostockG\\V25_Backtest_DailyMDD.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6084,
+      "mtime": 1763026667.3872056
+    },
+    {
+      "id": "verify_data_integrity.py",
+      "abs_path": "F:\\autostockG\\verify_data_integrity.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4010,
+      "mtime": 1762965751.0662694
+    },
+    {
+      "id": "backup_auto_patch/build_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\build_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7364,
+      "mtime": 1763041081.1623435
+    },
+    {
+      "id": "backup_auto_patch/check_db_columns_V32.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\check_db_columns_V32.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1505,
+      "mtime": 1762748133.854271
+    },
+    {
+      "id": "backup_auto_patch/organize_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\organize_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3488,
+      "mtime": 1763095794.7228787
+    },
+    {
+      "id": "backup_auto_patch/rename_files_v25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\rename_files_v25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 1119,
+      "mtime": 1763041614.1723328
+    },
+    {
+      "id": "backup_auto_patch/run_hybrid_test_V33.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\run_hybrid_test_V33.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 7541,
+      "mtime": 1762753312.4933796
+    },
+    {
+      "id": "backup_auto_patch/scan_path_usage.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\scan_path_usage.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2710,
+      "mtime": 1763098289.7939665
+    },
+    {
+      "id": "backup_auto_patch/test_REAL_Hoj_ENGINE_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\test_REAL_Hoj_ENGINE_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6410,
+      "mtime": 1763094540.4139805
+    },
+    {
+      "id": "backup_auto_patch/test_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch\\test_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6973,
+      "mtime": 1763042331.4534724
+    },
+    {
+      "id": "backup_auto_patch_detect/backtest_model.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\backtest_model.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 4502,
+      "mtime": 1762520771.0860946
+    },
+    {
+      "id": "backup_auto_patch_detect/backtest_model_readable.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\backtest_model_readable.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 5673,
+      "mtime": 1762526134.0965433
+    },
+    {
+      "id": "backup_auto_patch_detect/build_database_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\build_database_V25.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1909,
+      "mtime": 1763006032.112874
+    },
+    {
+      "id": "backup_auto_patch_detect/build_full_Hoj_DB_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\build_full_Hoj_DB_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2543,
+      "mtime": 1763026449.874877
+    },
+    {
+      "id": "backup_auto_patch_detect/build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5935,
+      "mtime": 1763037238.115857
+    },
+    {
+      "id": "backup_auto_patch_detect/build_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\build_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7364,
+      "mtime": 1763041081.1623435
+    },
+    {
+      "id": "backup_auto_patch_detect/check_db_columns_V32.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_db_columns_V32.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1505,
+      "mtime": 1762748133.854271
+    },
+    {
+      "id": "backup_auto_patch_detect/check_engine_structure.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_engine_structure.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 251,
+      "mtime": 1763091514.8856263
+    },
+    {
+      "id": "backup_auto_patch_detect/check_merge_keys.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_merge_keys.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2195,
+      "mtime": 1762961988.819597
+    },
+    {
+      "id": "backup_auto_patch_detect/check_nulls_in_V25_DB.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_nulls_in_V25_DB.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3798,
+      "mtime": 1763009354.6432242
+    },
+    {
+      "id": "backup_auto_patch_detect/check_restored_file.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_restored_file.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1340,
+      "mtime": 1762969693.5153801
+    },
+    {
+      "id": "backup_auto_patch_detect/check_restored_file_KOSPI.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_restored_file_KOSPI.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1240,
+      "mtime": 1762969898.899205
+    },
+    {
+      "id": "backup_auto_patch_detect/check_single_stock_V28.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\check_single_stock_V28.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4420,
+      "mtime": 1762737535.4065688
+    },
+    {
+      "id": "backup_auto_patch_detect/collect_all_1y.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\collect_all_1y.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 2490,
+      "mtime": 1762512428.5060053
+    },
+    {
+      "id": "backup_auto_patch_detect/collect_kospi.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\collect_kospi.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1445,
+      "mtime": 1762523729.7759097
+    },
+    {
+      "id": "backup_auto_patch_detect/combine_data.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\combine_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2272,
+      "mtime": 1762517786.1332648
+    },
+    {
+      "id": "backup_auto_patch_detect/config_paths.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\config_paths.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2682,
+      "mtime": 1763096637.5308027
+    },
+    {
+      "id": "backup_auto_patch_detect/convert_full_db.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\convert_full_db.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 332,
+      "mtime": 1763035358.9302647
+    },
+    {
+      "id": "backup_auto_patch_detect/create_target_and_split.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\create_target_and_split.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3317,
+      "mtime": 1762525417.145892
+    },
+    {
+      "id": "backup_auto_patch_detect/create_target_urls.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\create_target_urls.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2175,
+      "mtime": 1762633779.03623
+    },
+    {
+      "id": "backup_auto_patch_detect/create_ticker_map.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\create_ticker_map.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1389,
+      "mtime": 1762708953.784331
+    },
+    {
+      "id": "backup_auto_patch_detect/daily_recommender.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\daily_recommender.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4434,
+      "mtime": 1762972450.9592965
+    },
+    {
+      "id": "backup_auto_patch_detect/daily_recommender_FAST.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\daily_recommender_FAST.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8035,
+      "mtime": 1762630965.839654
+    },
+    {
+      "id": "backup_auto_patch_detect/data_manager.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\data_manager.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7119,
+      "mtime": 1762834382.6841412
+    },
+    {
+      "id": "backup_auto_patch_detect/data_manager_test.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\data_manager_test.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6920,
+      "mtime": 1762832151.9103763
+    },
+    {
+      "id": "backup_auto_patch_detect/detect_locked_file.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\detect_locked_file.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1200,
+      "mtime": 1763100406.0852742
+    },
+    {
+      "id": "backup_auto_patch_detect/download_data.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\download_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3057,
+      "mtime": 1762802090.912826
+    },
+    {
+      "id": "backup_auto_patch_detect/evaluate_engine_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\evaluate_engine_V25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 10345,
+      "mtime": 1763025284.3903184
+    },
+    {
+      "id": "backup_auto_patch_detect/excel_to_csv_batch.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\excel_to_csv_batch.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2224,
+      "mtime": 1762977301.6028304
+    },
+    {
+      "id": "backup_auto_patch_detect/extract_excel.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\extract_excel.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3207,
+      "mtime": 1762794625.4041674
+    },
+    {
+      "id": "backup_auto_patch_detect/finance_collector.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\finance_collector.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4323,
+      "mtime": 1762836900.7033634
+    },
+    {
+      "id": "backup_auto_patch_detect/finance_collector_test.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\finance_collector_test.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 3097,
+      "mtime": 1762834024.0272255
+    },
+    {
+      "id": "backup_auto_patch_detect/fix_corrupted_data_v1.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\fix_corrupted_data_v1.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4282,
+      "mtime": 1762969237.3504124
+    },
+    {
+      "id": "backup_auto_patch_detect/fix_corrupted_KOSPI_v2.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\fix_corrupted_KOSPI_v2.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2293,
+      "mtime": 1762970359.8186717
+    },
+    {
+      "id": "backup_auto_patch_detect/Hoj_V25_FinalValidation.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\Hoj_V25_FinalValidation.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6750,
+      "mtime": 1763029643.273164
+    },
+    {
+      "id": "backup_auto_patch_detect/Hoj_V25_Predict_Top10.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\Hoj_V25_Predict_Top10.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1278,
+      "mtime": 1763027397.5110035
+    },
+    {
+      "id": "backup_auto_patch_detect/kakao_notifier.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\kakao_notifier.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8587,
+      "mtime": 1762839830.947679
+    },
+    {
+      "id": "backup_auto_patch_detect/kiwoom_api.fullbackup.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\kiwoom_api.fullbackup.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 19637,
+      "mtime": 1762845815.6376657
+    },
+    {
+      "id": "backup_auto_patch_detect/kiwoom_api.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\kiwoom_api.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11160,
+      "mtime": 1762845748.9448082
+    },
+    {
+      "id": "backup_auto_patch_detect/main_trading.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\main_trading.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6292,
+      "mtime": 1762840368.3478215
+    },
+    {
+      "id": "backup_auto_patch_detect/make_kospi_index_10y.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\make_kospi_index_10y.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 531,
+      "mtime": 1763005897.16744
+    },
+    {
+      "id": "backup_auto_patch_detect/merge_pbr_per_V17.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\merge_pbr_per_V17.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1928,
+      "mtime": 1762669223.6053135
+    },
+    {
+      "id": "backup_auto_patch_detect/naver_pbr_per_crawler_V16.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\naver_pbr_per_crawler_V16.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 8150,
+      "mtime": 1762669628.119369
+    },
+    {
+      "id": "backup_auto_patch_detect/naver_pbr_per_crawler_V17R.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\naver_pbr_per_crawler_V17R.py",
+      "type": "py",
+      "category": "crawler",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3680,
+      "mtime": 1762670906.4709213
+    },
+    {
+      "id": "backup_auto_patch_detect/organize_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\organize_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3488,
+      "mtime": 1763095794.7228787
+    },
+    {
+      "id": "backup_auto_patch_detect/patch_engine.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\patch_engine.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2738,
+      "mtime": 1763100208.3803473
+    },
+    {
+      "id": "backup_auto_patch_detect/process_data.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\process_data.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3294,
+      "mtime": 1762518431.5579908
+    },
+    {
+      "id": "backup_auto_patch_detect/process_data_v2.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\process_data_v2.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2945,
+      "mtime": 1762522173.841107
+    },
+    {
+      "id": "backup_auto_patch_detect/process_data_v4.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\process_data_v4.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5009,
+      "mtime": 1762523813.6738148
+    },
+    {
+      "id": "backup_auto_patch_detect/rename_files_v25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\rename_files_v25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 1119,
+      "mtime": 1763041614.1723328
+    },
+    {
+      "id": "backup_auto_patch_detect/rename_return5d.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\rename_return5d.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 400,
+      "mtime": 1763009798.9117434
+    },
+    {
+      "id": "backup_auto_patch_detect/rename_SLE_files.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\rename_SLE_files.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 2016,
+      "mtime": 1763097604.799081
+    },
+    {
+      "id": "backup_auto_patch_detect/restore_return5d.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\restore_return5d.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 504,
+      "mtime": 1763009983.5650735
+    },
+    {
+      "id": "backup_auto_patch_detect/run_grid_search.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_grid_search.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11352,
+      "mtime": 1762529107.2920969
+    },
+    {
+      "id": "backup_auto_patch_detect/run_hoj_grid_search_V20.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_hoj_grid_search_V20.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 10869,
+      "mtime": 1762695806.9370904
+    },
+    {
+      "id": "backup_auto_patch_detect/run_hybrid_test_V33.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_hybrid_test_V33.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 7541,
+      "mtime": 1762753312.4933796
+    },
+    {
+      "id": "backup_auto_patch_detect/run_market_filter_V22B.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_market_filter_V22B.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7184,
+      "mtime": 1762700871.3017974
+    },
+    {
+      "id": "backup_auto_patch_detect/run_model_grid_search_V12.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_model_grid_search_V12.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9582,
+      "mtime": 1762624093.5326705
+    },
+    {
+      "id": "backup_auto_patch_detect/run_pipeline_v6.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_pipeline_v6.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 11119,
+      "mtime": 1762527029.9858046
+    },
+    {
+      "id": "backup_auto_patch_detect/run_quantile_test_V23.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_quantile_test_V23.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 5823,
+      "mtime": 1762750898.1547697
+    },
+    {
+      "id": "backup_auto_patch_detect/run_regression_60_5.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_regression_60_5.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7896,
+      "mtime": 1762536323.5363977
+    },
+    {
+      "id": "backup_auto_patch_detect/run_regression_pipeline.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_regression_pipeline.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9879,
+      "mtime": 1762531887.0408962
+    },
+    {
+      "id": "backup_auto_patch_detect/run_strategy_grid_search_V9.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_strategy_grid_search_V9.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 9407,
+      "mtime": 1762607618.0608463
+    },
+    {
+      "id": "backup_auto_patch_detect/run_tuning_V22.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_tuning_V22.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5869,
+      "mtime": 1762700163.9273977
+    },
+    {
+      "id": "backup_auto_patch_detect/run_ui_test.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_ui_test.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1907,
+      "mtime": 1762605552.758437
+    },
+    {
+      "id": "backup_auto_patch_detect/run_v5_threshold_tuning.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_v5_threshold_tuning.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 9220,
+      "mtime": 1762527982.1651058
+    },
+    {
+      "id": "backup_auto_patch_detect/run_weekly_update.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\run_weekly_update.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4953,
+      "mtime": 1762950507.3224602
+    },
+    {
+      "id": "backup_auto_patch_detect/scan_path_usage.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\scan_path_usage.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2710,
+      "mtime": 1763098289.7939665
+    },
+    {
+      "id": "backup_auto_patch_detect/test_REAL_Hoj_ENGINE_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\test_REAL_Hoj_ENGINE_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6410,
+      "mtime": 1763094540.4139805
+    },
+    {
+      "id": "backup_auto_patch_detect/test_REAL_HOJ_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\test_REAL_HOJ_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6973,
+      "mtime": 1763042331.4534724
+    },
+    {
+      "id": "backup_auto_patch_detect/test_runner_hoj_gridsearch.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\test_runner_hoj_gridsearch.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 10295,
+      "mtime": 1762690228.0819588
+    },
+    {
+      "id": "backup_auto_patch_detect/test_single_date_fetch.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\test_single_date_fetch.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 1525,
+      "mtime": 1762629748.6426697
+    },
+    {
+      "id": "backup_auto_patch_detect/token_manager.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\token_manager.py",
+      "type": "py",
+      "category": "REST",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7157,
+      "mtime": 1762787295.370211
+    },
+    {
+      "id": "backup_auto_patch_detect/train_champion_reg.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\train_champion_reg.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2137,
+      "mtime": 1762594548.4127383
+    },
+    {
+      "id": "backup_auto_patch_detect/train_model.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\train_model.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2513,
+      "mtime": 1762524562.1858165
+    },
+    {
+      "id": "backup_auto_patch_detect/train_real_engine_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\train_real_engine_V25.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 6597,
+      "mtime": 1763031909.4517448
+    },
+    {
+      "id": "backup_auto_patch_detect/train_REAL_Hoj_ENGINE_V25.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\train_REAL_Hoj_ENGINE_V25.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4693,
+      "mtime": 1763033366.91367
+    },
+    {
+      "id": "backup_auto_patch_detect/update_data_incrementally.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\update_data_incrementally.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 7188,
+      "mtime": 1763002641.090363
+    },
+    {
+      "id": "backup_auto_patch_detect/update_features_incrementally.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\update_features_incrementally.py",
+      "type": "py",
+      "category": "preprocess",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5446,
+      "mtime": 1763005952.4171145
+    },
+    {
+      "id": "backup_auto_patch_detect/V25_Backtest_DailyMDD.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\V25_Backtest_DailyMDD.py",
+      "type": "py",
+      "category": "test",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6084,
+      "mtime": 1763026667.3872056
+    },
+    {
+      "id": "backup_auto_patch_detect/verify_data_integrity.py",
+      "abs_path": "F:\\autostockG\\backup_auto_patch_detect\\verify_data_integrity.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4010,
+      "mtime": 1762965751.0662694
+    },
+    {
+      "id": "pipeline_viewer/pipelineview.py",
+      "abs_path": "F:\\autostockG\\pipeline_viewer\\pipelineview.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 4167,
+      "mtime": 1762673746.7229702
+    },
+    {
+      "id": "SLE_DB/OLD/check_env_for_hosle_V2.py",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\check_env_for_hosle_V2.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 4009,
+      "mtime": 1762979688.7937977
+    },
+    {
+      "id": "SLE_DB/OLD/merge_hoj_sle_V30.py",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\merge_hoj_sle_V30.py",
+      "type": "py",
+      "category": "HOJ",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 4295,
+      "mtime": 1763101401.117203
+    },
+    {
+      "id": "SLE_DB/OLD/organize_SLE_standardize.py",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\organize_SLE_standardize.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 3120,
+      "mtime": 1763101401.1557088
+    },
+    {
+      "id": "SLE_DB/OLD/organize_SLE_V11.py",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\organize_SLE_V11.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 3034,
+      "mtime": 1763101401.1976316
+    },
+    {
+      "id": "SLE_DB/OLD/sle_sample_runner_multithread.py",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\sle_sample_runner_multithread.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "filename_keyword",
+      "size": 6992,
+      "mtime": 1762691268.3294506
+    },
+    {
+      "id": "SLE_ENGINE/OLD/train_sle_engine_V30.py",
+      "abs_path": "F:\\autostockG\\SLE_ENGINE\\OLD\\train_sle_engine_V30.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 6948,
+      "mtime": 1763101401.2986581
+    },
+    {
+      "id": "SLE_ENGINE/OLD/train_sle_engine_V31.py",
+      "abs_path": "F:\\autostockG\\SLE_ENGINE\\OLD\\train_sle_engine_V31.py",
+      "type": "py",
+      "category": "SLE",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "sle_related",
+      "size": 6813,
+      "mtime": 1763101401.3696065
+    },
+    {
+      "id": "ui/ui_app.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_app.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2216,
+      "mtime": 1763092897.986538
+    },
+    {
+      "id": "ui/ui_pages/dashboard.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\dashboard.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3293,
+      "mtime": 1763101401.4692986
+    },
+    {
+      "id": "ui/ui_pages/data_update.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\data_update.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 911,
+      "mtime": 1763044657.918593
+    },
+    {
+      "id": "ui/ui_pages/engine_manager.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\engine_manager.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 847,
+      "mtime": 1763044423.5499446
+    },
+    {
+      "id": "ui/ui_pages/init.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\init.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 0,
+      "mtime": 1763049493.1972418
+    },
+    {
+      "id": "ui/ui_pages/predict_stock.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\predict_stock.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2547,
+      "mtime": 1763101401.589991
+    },
+    {
+      "id": "ui/ui_pages/settings.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\settings.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 175,
+      "mtime": 1763044461.8344882
+    },
+    {
+      "id": "ui/ui_pages/today_top10.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\today_top10.py",
+      "type": "py",
+      "category": "UI",
+      "data_subtype": null,
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 849,
+      "mtime": 1763093237.7190356
+    },
+    {
+      "id": "ui/ui_pages/__init__.py",
+      "abs_path": "F:\\autostockG\\ui\\ui_pages\\__init__.py",
+      "type": "py",
+      "category": "utility",
+      "data_subtype": null,
+      "deletion_candidate": true,
+      "deletion_reason": "isolated_utility",
+      "size": 0,
+      "mtime": 1763048759.463985
+    },
+    {
+      "id": "all_features_cumulative.parquet",
+      "abs_path": "F:\\autostockG\\all_features_cumulative.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 737173164,
+      "mtime": 1762604932.0124865
+    },
+    {
+      "id": "all_features_cumulative_V21_Hoj.parquet",
+      "abs_path": "F:\\autostockG\\all_features_cumulative_V21_Hoj.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 631219076,
+      "mtime": 1763047875.3118007
+    },
+    {
+      "id": "all_stocks_cumulative.parquet",
+      "abs_path": "F:\\autostockG\\all_stocks_cumulative.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 117127180,
+      "mtime": 1763047653.0028207
+    },
+    {
+      "id": "all_stocks_cumulative_backup_20251113_2308.parquet",
+      "abs_path": "F:\\autostockG\\all_stocks_cumulative_backup_20251113_2308.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 5983889,
+      "mtime": 1763002883.8545077
+    },
+    {
+      "id": "champion_model_60_5.pkl",
+      "abs_path": "F:\\autostockG\\champion_model_60_5.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "MODEL",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 319028,
+      "mtime": 1762595332.3747058
+    },
+    {
+      "id": "kospi_index_10y.parquet",
+      "abs_path": "F:\\autostockG\\kospi_index_10y.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 42818,
+      "mtime": 1763005926.0718706
+    },
+    {
+      "id": "new_Hoj_DB_V25.parquet",
+      "abs_path": "F:\\autostockG\\new_Hoj_DB_V25.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 693777767,
+      "mtime": 1763048081.5418785
+    },
+    {
+      "id": "REAL_CHAMPION_MODEL_V25.pkl",
+      "abs_path": "F:\\autostockG\\REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "MODEL",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2007974,
+      "mtime": 1762711981.7712588
+    },
+    {
+      "id": "stock_data_10y_combined.parquet",
+      "abs_path": "F:\\autostockG\\stock_data_10y_combined.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 161012206,
+      "mtime": 1762518171.7056642
+    },
+    {
+      "id": "stock_data_10y_processed.parquet",
+      "abs_path": "F:\\autostockG\\stock_data_10y_processed.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 382054954,
+      "mtime": 1762518650.53764
+    },
+    {
+      "id": "stock_data_10y_processed_v2.parquet",
+      "abs_path": "F:\\autostockG\\stock_data_10y_processed_v2.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 470068756,
+      "mtime": 1762522456.8481994
+    },
+    {
+      "id": "stock_data_10y_processed_v4.parquet",
+      "abs_path": "F:\\autostockG\\stock_data_10y_processed_v4.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 650905443,
+      "mtime": 1762524402.81556
+    },
+    {
+      "id": "test_data.parquet",
+      "abs_path": "F:\\autostockG\\test_data.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 80274021,
+      "mtime": 1762525486.7011223
+    },
+    {
+      "id": "ticker_map.parquet",
+      "abs_path": "F:\\autostockG\\ticker_map.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 56347,
+      "mtime": 1762709098.93207
+    },
+    {
+      "id": "train_data.parquet",
+      "abs_path": "F:\\autostockG\\train_data.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 574437992,
+      "mtime": 1762525485.0819373
+    },
+    {
+      "id": "V25_Hoj_DB.parquet",
+      "abs_path": "F:\\autostockG\\V25_Hoj_DB.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 693777767,
+      "mtime": 1763048050.2814462
+    },
+    {
+      "id": "backup/DB_REAL/V25_251113.parquet",
+      "abs_path": "F:\\autostockG\\backup\\DB_REAL\\V25_251113.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 36467163,
+      "mtime": 1763037261.1082249
+    },
+    {
+      "id": "backup/DB_REAL/V25_251114.parquet",
+      "abs_path": "F:\\autostockG\\backup\\DB_REAL\\V25_251114.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 36467163,
+      "mtime": 1763041687.3972585
+    },
+    {
+      "id": "backup/ENGINE_REAL/V25_251114.pkl",
+      "abs_path": "F:\\autostockG\\backup\\ENGINE_REAL\\V25_251114.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "OTHER_DATA",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 305919,
+      "mtime": 1763041700.5093615
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762962225.0507784
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_1.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_1.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762962479.2194245
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_2.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_2.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762962731.8348339
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_3.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_3.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762962926.228067
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_4.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_4.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762963217.585486
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_5.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_5.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762963416.4448366
+    },
+    {
+      "id": "Hoj_DB/OLD/Hoj_DB_V25_251112_6.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\OLD\\Hoj_DB_V25_251112_6.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1014243,
+      "mtime": 1762963652.2847044
+    },
+    {
+      "id": "Hoj_DB/REAL/HOJ_DB_REAL_V25.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\REAL\\HOJ_DB_REAL_V25.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 36467163,
+      "mtime": 1763048118.1304655
+    },
+    {
+      "id": "Hoj_DB/RESEARCH/HOJ_DB_RESEARCH_V25.parquet",
+      "abs_path": "F:\\autostockG\\Hoj_DB\\RESEARCH\\HOJ_DB_RESEARCH_V25.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 36768844,
+      "mtime": 1763026473.9981954
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251105.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\Hoj_MODELENGINE_V25_251105.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 347556,
+      "mtime": 1762964062.832128
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\Hoj_MODELENGINE_V25_251112.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 347348,
+      "mtime": 1762962942.4430685
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_1.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\Hoj_MODELENGINE_V25_251112_1.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 347332,
+      "mtime": 1762963229.806544
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_2.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\Hoj_MODELENGINE_V25_251112_2.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 347812,
+      "mtime": 1762963428.5928588
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_3.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\Hoj_MODELENGINE_V25_251112_3.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 347316,
+      "mtime": 1762963664.5490816
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\REAL_Hoj_MODELENGINE_V25.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 305919,
+      "mtime": 1763037273.827438
+    },
+    {
+      "id": "HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\OLD\\REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 575555,
+      "mtime": 1763033399.222796
+    },
+    {
+      "id": "HOJ_ENGINE/REAL/HOJ_ENGINE_REAL_V25.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\REAL\\HOJ_ENGINE_REAL_V25.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 305919,
+      "mtime": 1763048131.9087675
+    },
+    {
+      "id": "HOJ_ENGINE/RESEARCH/HOJ_ENGINE_RESEARCH_V25.pkl",
+      "abs_path": "F:\\autostockG\\HOJ_ENGINE\\RESEARCH\\HOJ_ENGINE_RESEARCH_V25.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 3233930,
+      "mtime": 1763013164.581841
+    },
+    {
+      "id": "SLE_DB/OLD/V11_partial_backup.parquet",
+      "abs_path": "F:\\autostockG\\SLE_DB\\OLD\\V11_partial_backup.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "SLE_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1752444,
+      "mtime": 1762665867.9029713
+    },
+    {
+      "id": "SLE_DB/REAL/SLE_DB_REAL_V11.parquet",
+      "abs_path": "F:\\autostockG\\SLE_DB\\REAL\\SLE_DB_REAL_V11.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "SLE_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 784603,
+      "mtime": 1762745212.8799734
+    },
+    {
+      "id": "SLE_DB/REAL/V11_Database_Final.parquet",
+      "abs_path": "F:\\autostockG\\SLE_DB\\REAL\\V11_Database_Final.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "SLE_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 2147140,
+      "mtime": 1762665896.1373022
+    },
+    {
+      "id": "SLE_ENGINE/REAL/SLE_ENGINE_REAL_V32.pkl",
+      "abs_path": "F:\\autostockG\\SLE_ENGINE\\REAL\\SLE_ENGINE_REAL_V32.pkl",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "SLE_ENGINE",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 1968255,
+      "mtime": 1762748482.3638794
+    },
+    {
+      "id": "zip/new_Hoj_DB_V25_FULL.parquet",
+      "abs_path": "F:\\autostockG\\zip\\new_Hoj_DB_V25_FULL.parquet",
+      "type": "data",
+      "category": "data",
+      "data_subtype": "HOJ_DB",
+      "deletion_candidate": false,
+      "deletion_reason": null,
+      "size": 36768844,
+      "mtime": 1763026473.9981954
+    }
+  ],
+  "edges": [
+    {
+      "source": "backtest_model.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backtest_model_readable.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "build_database_V25.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "build_database_V25.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "build_database_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "build_full_Hoj_DB_V25.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "build_full_Hoj_DB_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "build_REAL_HOJ_V25.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "check_db_columns_V32.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "check_merge_keys.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "check_merge_keys.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "check_nulls_in_V25_DB.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "check_restored_file.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "check_restored_file_KOSPI.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "check_single_stock_V28.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "check_single_stock_V28.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "check_single_stock_V28.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "collect_kospi.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "combine_data.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "create_target_and_split.py",
+      "target": "stock_data_10y_processed_v4.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "create_target_and_split.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "create_target_and_split.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "create_ticker_map.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "daily_recommender.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "daily_recommender_FAST.py",
+      "target": "all_features_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "daily_recommender_FAST.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "download_data.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "download_data.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "evaluate_engine_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "finance_collector.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "finance_collector.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "finance_collector_test.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "finance_collector_test.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "fix_corrupted_data_v1.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "fix_corrupted_data_v1.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "fix_corrupted_data_v1.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "fix_corrupted_KOSPI_v2.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "kiwoom_api.fullbackup.py",
+      "target": "token_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "kiwoom_api.py",
+      "target": "token_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "main_trading.py",
+      "target": "kakao_notifier.py",
+      "type": "import"
+    },
+    {
+      "source": "main_trading.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "make_kospi_index_10y.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "organize_HOJ_V25.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "process_data.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data.py",
+      "target": "stock_data_10y_processed.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data_v2.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data_v2.py",
+      "target": "stock_data_10y_processed_v2.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data_v4.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data_v4.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "process_data_v4.py",
+      "target": "stock_data_10y_processed_v4.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "rename_files_v25.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "rename_return5d.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "restore_return5d.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "run_grid_search.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_grid_search.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_hoj_grid_search_V20.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_hoj_grid_search_V20.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_hoj_grid_search_V20.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_hybrid_test_V33.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "run_market_filter_V22B.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_market_filter_V22B.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_model_grid_search_V12.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "run_pipeline_v6.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_pipeline_v6.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_quantile_test_V23.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_quantile_test_V23.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_regression_60_5.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "run_regression_60_5.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_regression_60_5.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_regression_pipeline.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_regression_pipeline.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_strategy_grid_search_V9.py",
+      "target": "all_features_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_strategy_grid_search_V9.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "run_tuning_V22.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_v5_threshold_tuning.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_v5_threshold_tuning.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_weekly_update.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "run_weekly_update.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_weekly_update.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "run_weekly_update.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "scan_path_usage.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "test_REAL_Hoj_ENGINE_V25.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "test_REAL_HOJ_V25.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "test_runner_hoj_gridsearch.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "train_champion_reg.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "train_model.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "train_real_engine_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "update_data_incrementally.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "update_features_incrementally.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "update_features_incrementally.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "update_features_incrementally.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "verify_data_integrity.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "verify_data_integrity.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "verify_data_integrity.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch/run_hybrid_test_V33.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch/run_hybrid_test_V33.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/backtest_model.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/backtest_model_readable.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/build_database_V25.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/build_database_V25.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/build_database_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/build_full_Hoj_DB_V25.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/build_full_Hoj_DB_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_merge_keys.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_merge_keys.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_nulls_in_V25_DB.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_restored_file.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_restored_file_KOSPI.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_single_stock_V28.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_single_stock_V28.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/check_single_stock_V28.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/collect_kospi.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/combine_data.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/create_target_and_split.py",
+      "target": "stock_data_10y_processed_v4.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/create_target_and_split.py",
+      "target": "test_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/create_target_and_split.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/create_ticker_map.py",
+      "target": "ticker_map.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/daily_recommender.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/daily_recommender_FAST.py",
+      "target": "all_features_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/daily_recommender_FAST.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/download_data.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/download_data.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/evaluate_engine_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/finance_collector.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/finance_collector.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/finance_collector_test.py",
+      "target": "data_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/finance_collector_test.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/fix_corrupted_data_v1.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/fix_corrupted_data_v1.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/fix_corrupted_data_v1.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/fix_corrupted_KOSPI_v2.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/kiwoom_api.fullbackup.py",
+      "target": "token_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/kiwoom_api.py",
+      "target": "token_manager.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/main_trading.py",
+      "target": "kakao_notifier.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/main_trading.py",
+      "target": "kiwoom_api.py",
+      "type": "import"
+    },
+    {
+      "source": "backup_auto_patch_detect/make_kospi_index_10y.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data.py",
+      "target": "stock_data_10y_processed.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data_v2.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data_v2.py",
+      "target": "stock_data_10y_processed_v2.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data_v4.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data_v4.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/process_data_v4.py",
+      "target": "stock_data_10y_processed_v4.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/rename_return5d.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/restore_return5d.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_grid_search.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_grid_search.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_hoj_grid_search_V20.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_hoj_grid_search_V20.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_hoj_grid_search_V20.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_hybrid_test_V33.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_hybrid_test_V33.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_market_filter_V22B.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_market_filter_V22B.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_model_grid_search_V12.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_pipeline_v6.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_pipeline_v6.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_quantile_test_V23.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_quantile_test_V23.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_regression_60_5.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_regression_60_5.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_regression_60_5.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_regression_pipeline.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_regression_pipeline.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_strategy_grid_search_V9.py",
+      "target": "all_features_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_strategy_grid_search_V9.py",
+      "target": "champion_model_60_5.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_tuning_V22.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_v5_threshold_tuning.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_v5_threshold_tuning.py",
+      "target": "stock_data_10y_combined.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_weekly_update.py",
+      "target": "REAL_CHAMPION_MODEL_V25.pkl",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_weekly_update.py",
+      "target": "V25_Hoj_DB.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_weekly_update.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/run_weekly_update.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/test_runner_hoj_gridsearch.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/train_champion_reg.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/train_model.py",
+      "target": "train_data.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/train_real_engine_V25.py",
+      "target": "new_Hoj_DB_V25.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/update_data_incrementally.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read_write"
+    },
+    {
+      "source": "backup_auto_patch_detect/update_features_incrementally.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/update_features_incrementally.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/update_features_incrementally.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_read"
+    },
+    {
+      "source": "backup_auto_patch_detect/verify_data_integrity.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/verify_data_integrity.py",
+      "target": "all_stocks_cumulative.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "backup_auto_patch_detect/verify_data_integrity.py",
+      "target": "kospi_index_10y.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "SLE_DB/OLD/merge_hoj_sle_V30.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "SLE_DB/OLD/merge_hoj_sle_V30.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "SLE_DB/OLD/organize_SLE_standardize.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "SLE_DB/OLD/organize_SLE_V11.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "SLE_ENGINE/OLD/train_sle_engine_V30.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "SLE_ENGINE/OLD/train_sle_engine_V30.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "SLE_ENGINE/OLD/train_sle_engine_V31.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "SLE_ENGINE/OLD/train_sle_engine_V31.py",
+      "target": "all_features_cumulative_V21_Hoj.parquet",
+      "type": "data_access"
+    },
+    {
+      "source": "ui/ui_pages/dashboard.py",
+      "target": "config_paths.py",
+      "type": "import"
+    },
+    {
+      "source": "ui/ui_pages/predict_stock.py",
+      "target": "config_paths.py",
+      "type": "import"
+    }
+  ]
+}

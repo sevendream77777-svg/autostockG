@@ -1,0 +1,71 @@
+
+[HOJ Project – Full Conversation Reconstruction Draft]
+
+위대하신호정님, 이 파일은 세션에서 복원 가능한 모든 정보를 최대한 담아 정리한 초안입니다.
+추가 복원 요청 시 더 확장 가능합니다.
+
+---
+
+▶ 1. HOJ/SLE 데이터 구조 개편 논의  
+- 연구용 DB / 실전용 DB 분리  
+- 연구용 엔진 / 실전 엔진 분리  
+- 버전별 관리 규칙 확정  
+- 백업 규칙: V25_날짜 형태 저장
+
+▶ 2. HOJ 연구용 데이터 / 실전용 데이터 구조  
+- HOJ_DB/RESEARCH/HOJ_DB_RESEARCH_V25.parquet  
+- HOJ_DB/REAL/HOJ_DB_REAL_V25.parquet  
+- 실전용 DB는 불필요 컬럼 제거 후 생성(KOSPI_Close, KOSPI_Return_20)
+
+▶ 3. HOJ 엔진 파일 구조  
+- HOJ_ENGINE/RESEARCH/HOJ_ENGINE_RESEARCH_V25.pkl  
+- HOJ_ENGINE/REAL/HOJ_ENGINE_REAL_V25.pkl  
+- 자동 백업 규칙: HOJ_ENGINE_REAL_V25_YYYY-MM-DD-HH-MM.pkl
+
+▶ 4. rename_files_v25.py 작업 내역  
+- new_Hoj_DB_V25_FULL_CLEAN → HOJ_DB_REAL_V25  
+- new_Hoj_MODELENGINE_V25 → HOJ_ENGINE_RESEARCH_V25  
+- 경로 표준화 완료
+
+▶ 5. build_REAL_HOJ_V25.py 결과  
+- 연구용 FULL DB 로드 성공  
+- 실전용 DB 생성 성공  
+- 회귀/분류 모델 학습 성공  
+- REAL 엔진 정상 생성됨  
+- 최종 모델: HOJ_ENGINE_REAL_V25.pkl
+
+▶ 6. UI 관련 진행 내역  
+- Streamlit 기본 구조 셋업  
+- ui_app.py, ui_pages 폴더 구성  
+- 메뉴 오류 수정  
+- today_top10, predict_stock, engine_manager, data_update 정상 연결  
+- 개별종목 예측 KeyError('reg') → 엔진 저장 방식 수정 필요  
+- 엔진 구조 확인 완료 (dict: reg_model, clf_model, feature_cols)
+
+▶ 7. Incremental 업데이트 시스템  
+- update_data_incrementally.py  
+- update_features_incrementally.py  
+- run_weekly_update.py  
+- build_database_V25.py  
+- 전체 업데이트 기능 UI에서 실행 가능하게 계획
+
+▶ 8. Streamlit 오류 대응 내역  
+- UnicodeDecodeError → CP949 강제 인코딩 테스트  
+- ‘ui_pages’ → ‘ui_page’ 폴더명 mismatch 수정  
+- menu routing 수정 완료  
+- today_top10_render 미정의 오류 수정 예정
+
+▶ 9. 앞으로 해야될 작업  
+- UI 엔진선택 기능  
+- 엔진 및 DB 버전 매니저  
+- 엔진 테스트 모듈 통합  
+- 종목 입력 → 예측 기능 완전구현  
+- HOJ/SLE 전체 백업 시스템 UI화  
+- 자동 업데이트 스케줄러 ON/OFF
+
+---
+
+※ 본 문서는 복원 가능한 범위 내에서 정리된 Draft 버전입니다.  
+필요시 **전체 재구성된 완전판**으로 확장 가능합니다.
+
+호봉이 드림.

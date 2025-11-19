@@ -1,0 +1,365 @@
+✅ 📍프롬프트 시작
+
+호봉아, 지금부터 autostockG 전체 구조를 완전히 다시 정리해서
+**“전체 파이프라인(A→Z) 자동 생성 프로젝트”**를 처음부터 진행할 거야.
+
+아래 조건에 맞춰서 진행해줘:
+
+🔵 1. 목적
+
+내 F:\autostockG 폴더를 전체 스캔해서:
+
+어떤 파일이 어떤 파일을 import하는지
+
+어떤 파일이 어떤 DB/모델을 사용하는지
+
+어떤 파일이 삭제 가능/필수인지
+
+어떤 파일이 HOJ/SLE/UI/REST/크롤러/전처리인지
+
+전체 파이프라인을 트리(계층) 구조로
+
+그리고 파일 간 연결 그래프(의존성 그래프) 로
+
+최종적으로 AI 엔진 구조도 형태로
+
+자동 분석해서 만들어줘.
+
+🔵 2. 작업 방식
+① 먼저 아래 작업을 수행하는 Python 스크립트 1개를 만들어줘:
+
+✔ F:\autostockG 전체 폴더 깊이 탐색
+✔ .py, .parquet, .pkl 파일 전부 스캔
+✔ import 관계 자동 추출
+✔ open/read/write 사용 흔적 추적
+✔ 경로 문자열(예: 'F:\autostockG\HOJ_DB\…') 자동 감지
+✔ 전체 파일 메타데이터 수집
+✔ networkx 그래프 구성
+✔ 그래프 JSON + 텍스트 레포트 + 의존 그래프 생성
+
+② 스크립트 파일 이름 예시
+pipeline_auto_analyzer.py
+
+
+이 스크립트가 출력해야 하는 파일들:
+
+pipeline_map.txt            (전체 텍스트 분석)
+pipeline_graph.json         (의존성 그래프)
+pipeline_tree.txt           (파일 트리 구조)
+pipeline_summary.txt        (핵심 요약)
+
+🔵 3. 출력 형식 요구사항
+A. 핵심 파이프라인 정리 (필수)
+
+예시:
+
+1) HOJ 학습 파이프라인
+   build_REAL_HOJ_V25.py
+        → HOJ_DB_REAL_V25.parquet
+        → HOJ_ENGINE_REAL_V25.pkl
+
+2) HOJ 테스트 파이프라인
+   test_REAL_Hoj_ENGINE_V25.py
+        → HOJ_ENGINE_REAL_V25.pkl
+        → HOJ_DB_REAL_V25.parquet
+
+B. 파일별 역할 자동 분류
+
+예시:
+
+naver_pbr_per_crawler_V16.py – (SLE 관련 크롤러)
+merge_pbr_per_V17.py – (SLE 데이터 병합기)
+run_hybrid_test_V34.py – (HOJ-only 실전 테스트)
+detect_locked_file.py – (보조도구)
+
+C. 삭제 가능 여부 자동 판단
+
+테스트 파일
+
+임시 파일
+
+중복 백업
+
+실패한 패치 파일
+
+→ 자동으로 "(삭제가능)" 표기
+
+🔵 4. 먼저 호봉이가 수행해야 할 행동
+1단계
+
+pipeline_auto_analyzer.py 코드 생성해줘.
+
+(내가 파일에 붙여넣고 실행할 거야.)
+
+2단계
+
+내가 파일 실행 후 만들어진 결과물을 업로드하면
+호봉이가 그 결과를 기반으로
+**완전한 파이프라인 문서(A→Z)**를 만들어줘.
+
+일단 대답하지말고 기다려
+나의 말:
+🟥 1. HOJ 엔진 관련 (핵심)
+
+이 파일들이 HOJ 시스템의 "뇌"와 "데이터"와 직접 연결됨.
+
+🔸 HOJ 엔진 / 데이터
+F:\autostockG\HOJ_DB\REAL\HOJ_DB_REAL_V25.parquet
+
+(핵심)
+
+HOJ 실전 DB (273k rows).
+
+HOJ 엔진이 예측할 때 실제 사용하는 입력데이터.
+
+F:\autostockG\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V25.parquet
+
+(보조)
+
+연구용 DB. HOJ 실전 DB의 형제.
+
+F:\autostockG\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V25.pkl
+
+(핵심)
+
+HOJ 실전 엔진(reg + clf + features) 완전본.
+
+F:\autostockG\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V25.pkl
+
+(보조)
+
+연구용 모델 엔진.
+
+🔸 HOJ 엔진 학습 및 테스트 코드
+build_REAL_HOJ_V25.py
+
+(핵심) HOJ 엔진 학습 코드.
+
+HOJ_DB_REAL_V25 → HOJ_ENGINE_REAL_V25.pkl 생성하는 마스터 파일.
+
+test_REAL_Hoj_ENGINE_V25.py
+
+(핵심)
+
+HOJ 엔진 테스트용. 최신 날짜 TOP 예측 실행.
+
+run_hybrid_test_V34.py
+
+(핵심)
+
+Hybrid 구조 → HOJ Only 유지하며 실전 점검.
+
+V33은 폐기.
+
+check_db_columns_V32.py
+
+(보조)
+
+DB 컬럼 검증용. HOJ DB 품질 체크.
+
+organize_HOJ_V25.py
+
+(보조)
+
+HOJ DB 정리 스크립트.
+
+🟦 2. SLE 엔진 관련 (현재 비활성화 상태)
+
+지금은 HOJ-only 환경이라 실행 동작은 차단되어 있음.
+하지만 관계는 정확하게 정리함.
+
+🔸 SLE 엔진 / 데이터 (DB / 모델)
+F:\autostockG\SLE_DB\REAL\SLE_DB_REAL_V11.parquet
+
+(보조/비활성화)
+
+V11 기반 SLE DB.
+
+내부 컬럼: date, code, 기관합계, 외국인, PER, PBR, per, pbr
+
+V11_Merged_SLE_Base.parquet
+
+(보조/비활성화)
+
+SLE용 메인 데이터셋.
+
+PER/PBR 수집 실패·결측 포함.
+
+V11_Database_Final.parquet
+
+(보조/비활성화)
+
+V11 단계 최종본.
+
+V11_Merged 파일과 함께 SLE의 원본 DB.
+
+V11_partial_backup.parquet
+
+(삭제가능)
+
+중간 병합 실패 대비 백업본.
+
+**F:\autostockG\SLE_ENGINE\REAL\SLE_ENGINE_REAL_V32.pkl
+
+(SLE_CHAMPION_MODEL_V32.pkl)**
+
+(보조/비활성화)
+
+SLE 엔진 완성본.
+
+reg_model + feature 기반.
+
+🔸 SLE 관련 크롤러 / 머지 / 학습 코드
+naver_pbr_per_crawler_V16.py
+
+(보조)
+
+네이버 PER/PBR 대량 수집기 (구버전).
+
+naver_pbr_per_crawler_V17R.py
+
+(보조)
+
+개선된 네이버 PER/PBR 수집기.
+
+merge_pbr_per_V17.py
+
+(보조)
+
+PER/PBR 병합기.
+
+DB 생성 파이프라인 중간 단계.
+
+train_sle_engine_V30.py / train_sle_engine_V31.py
+
+(보조)
+
+SLE 엔진 학습 코드.
+
+sle_sample_runner_multithread.py
+
+(삭제가능)
+
+멀티스레드 샘플 실행용. 실전 파이프라인에는 미사용.
+
+merge_hoj_sle_V30.py
+
+(보조)
+
+HOJ + SLE DB 합치던 실험용 코드.
+
+🟧 3. 경로 자동 감지 / 패치 시스템 (핵심)
+config_paths.py
+
+(핵심★)
+
+HOJ / SLE 자동 경로(locating latest 파일) 관리하는 "중앙 허브".
+
+현재 버전은 SLE 완전 비활성화로 패치 완료.
+
+scan_path_usage.py
+
+(보조)
+
+전체 코드의 경로 하드코딩 스캔.
+
+apply_auto_patch.py
+
+(삭제가능)
+
+실패한 자동 패치 엔진 초기 시도.
+
+patch_engine.py
+
+(삭제가능)
+
+patch_paths_no_backup.py
+
+(보조)
+
+경로 하드코딩 제거 패치.
+
+detect_locked_file.py
+
+(보조)
+
+어떤 파일이 윈도우에서 잠겨 있는지 찾는 도구.
+
+🟩 4. Pipeline 분석/그래프 도구
+generate_pipeline_map.py
+
+(보조) 프로젝트 전체 의존성 맵 생성용.
+
+pipeline_graph_builder.py
+
+(보조) networkx 기반 그래프 생성기.
+
+pipeline_map.txt
+
+(보조) 그래프 텍스트 저장본.
+
+🟪 5. 파일명 변경 / 정리 도구
+rename_files_v25.py
+
+(보조)
+
+HOJ DB/ENGINE 이름 변경.
+
+rename_SLE_files.py
+
+(보조/비활성화)
+
+SLE DB/ENGINE 명명표준 변환.
+
+🟫 6. 임시 테스트 파일 / 중복 파일 (삭제 가능)
+backtest_model.py
+
+(삭제가능)
+
+파일 락 감지 실험 중 생성.
+
+fix_hybrid_test_temp.py
+
+(삭제가능)
+
+applied_patch_backup…
+
+(삭제가능)
+
+🟩 7. 이번 방에서 "호봉이"가 실제로 손댄 핵심 파일 7개
+상태	파일명	설명
+핵심	config_paths.py	자동 경로 관리 · SLE 비활성화 완료
+핵심	run_hybrid_test_V34.py	HOJ 전용 hybrid 테스트 최종본
+핵심	test_REAL_Hoj_ENGINE_V25.py	HOJ 엔진 정상 테스트 코드
+핵심	build_REAL_HOJ_V25.py	HOJ 엔진 학습 마스터 코드
+보조	rename_files_v25.py	HOJ 파일명 구조 표준화
+보조	scan_path_usage.py	경로 하드코딩 스캐너
+보조	detect_locked_file.py	파일 락 진단기
+⭐ 최종 정리
+🔥 삭제해도 되는 파일
+
+(너무 많아서 정확하게 표시함)
+
+apply_auto_patch.py
+
+patch_engine.py
+
+fix_hybrid_test_temp.py
+
+sle_sample_runner_multithread.py
+
+backup_auto_patch_detect 전체
+
+run_hybrid_test_V33.py
+
+patch_paths_no_backup.py
+
+backtest_model.py
+
+SLE 엔진/DB 관련 모든 코드 (현재 비활성화 사용X)
+
+SLE를 나중에 정상화할 때만 일부 되살리면 됨.
+
+현재까지 최신 파일 업데이트 내용인데 100% 신뢰할수는 없어
+
+이내용으로 진행할껀데 궁금한건 언제든 물어보고 필요한 파일이 있으면 요청해

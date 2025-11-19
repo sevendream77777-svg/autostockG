@@ -1,0 +1,260 @@
+Base directory: F:\autostockG
+======================================================================
+
+HOJ_ENGINE/
+Hoj_DB/
+- Hoj_V25_FinalValidation.py [HOJ]
+- Hoj_V25_Predict_Top10.py [HOJ]
+- REAL_CHAMPION_MODEL_V25.pkl [data/MODEL]
+SLE_DB/
+SLE_ENGINE/
+- V25_Backtest_DailyMDD.py [test](삭제후보)
+- V25_Hoj_DB.parquet [data/HOJ_DB]
+- all_features_cumulative.parquet [data/OTHER_DATA]
+- all_features_cumulative_V21_Hoj.parquet [data/OTHER_DATA]
+- all_stocks_cumulative.parquet [data/OTHER_DATA]
+- all_stocks_cumulative_backup_20251113_2308.parquet [data/OTHER_DATA]
+- autopipeline_mapper.py [utility]
+- backtest_model.py [test](삭제후보)
+- backtest_model_readable.py [test](삭제후보)
+backup/
+backup_auto_patch/
+backup_auto_patch_detect/
+- build_REAL_HOJ_V25.py [HOJ]
+- build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py [HOJ]
+- build_database_V25.py [UI]
+- build_full_Hoj_DB_V25.py [HOJ]
+- champion_model_60_5.pkl [data/MODEL]
+- check_db_columns_V32.py [test]
+- check_engine_structure.py [test](삭제후보)
+- check_merge_keys.py [preprocess]
+- check_nulls_in_V25_DB.py [test]
+- check_restored_file.py [REST]
+- check_restored_file_KOSPI.py [REST]
+- check_single_stock_V28.py [test]
+- collect_all_1y.py [utility](삭제후보)
+- collect_kospi.py [utility]
+- combine_data.py [utility]
+- config_paths.py [utility]
+- convert_full_db.py [utility](삭제후보)
+- create_target_and_split.py [utility]
+- create_target_urls.py [utility]
+- create_ticker_map.py [utility]
+- daily_recommender.py [utility]
+- daily_recommender_FAST.py [crawler]
+- data_manager.py [utility]
+- data_manager_test.py [test](삭제후보)
+- detect_locked_file.py [utility]
+- download_data.py [utility]
+- evaluate_engine_V25.py [utility]
+- excel_to_csv_batch.py [utility]
+- extract_excel.py [utility]
+- finance_collector.py [utility]
+- finance_collector_test.py [test](삭제후보)
+- fix_corrupted_KOSPI_v2.py [utility]
+- fix_corrupted_data_v1.py [utility]
+- kakao_notifier.py [REST]
+- kiwoom_api.fullbackup.py [REST](삭제후보)
+- kiwoom_api.py [REST]
+- kospi_index_10y.parquet [data/OTHER_DATA]
+- main_trading.py [utility]
+- make_kospi_index_10y.py [utility]
+- merge_pbr_per_V17.py [preprocess]
+- naver_pbr_per_crawler_V16.py [crawler]
+- naver_pbr_per_crawler_V17R.py [crawler]
+- new_Hoj_DB_V25.parquet [data/HOJ_DB]
+- organize_HOJ_V25.py [HOJ]
+- patch_engine.py [utility]
+- patch_paths_no_backup.py [utility](삭제후보)
+- pipeline_auto_analyzer.py [UI]
+- pipeline_graph_builder.py [UI]
+pipeline_viewer/
+- process_data.py [utility]
+- process_data_v2.py [utility]
+- process_data_v4.py [utility]
+- rename_SLE_files.py [SLE](삭제후보)
+- rename_files_v25.py [utility]
+- rename_return5d.py [utility]
+- restore_return5d.py [REST]
+- run_grid_search.py [utility]
+- run_hoj_grid_search_V20.py [HOJ]
+- run_hybrid_test_V33.py [test](삭제후보)
+- run_hybrid_test_V34.py [test](삭제후보)
+- run_market_filter_V22B.py [utility]
+- run_model_grid_search_V12.py [utility]
+- run_pipeline_v6.py [utility]
+- run_quantile_test_V23.py [test](삭제후보)
+- run_regression_60_5.py [utility]
+- run_regression_pipeline.py [utility]
+- run_strategy_grid_search_V9.py [utility]
+- run_tuning_V22.py [utility]
+- run_ui_test.py [UI](삭제후보)
+- run_v5_threshold_tuning.py [utility](삭제후보)
+- run_weekly_update.py [utility]
+- scan_path_usage.py [utility]
+- stock_data_10y_combined.parquet [data/OTHER_DATA]
+- stock_data_10y_processed.parquet [data/OTHER_DATA]
+- stock_data_10y_processed_v2.parquet [data/OTHER_DATA]
+- stock_data_10y_processed_v4.parquet [data/OTHER_DATA]
+- test_REAL_HOJ_V25.py [HOJ](삭제후보)
+- test_REAL_Hoj_ENGINE_V25.py [HOJ](삭제후보)
+- test_data.parquet [data/OTHER_DATA]
+- test_runner_hoj_gridsearch.py [HOJ](삭제후보)
+- test_single_date_fetch.py [test](삭제후보)
+- ticker_map.parquet [data/OTHER_DATA]
+- token_manager.py [REST]
+- train_REAL_Hoj_ENGINE_V25.py [HOJ]
+- train_champion_reg.py [utility]
+- train_data.parquet [data/OTHER_DATA]
+- train_model.py [utility]
+- train_real_engine_V25.py [utility]
+ui/
+- update_data_incrementally.py [utility]
+- update_features_incrementally.py [preprocess]
+- verify_data_integrity.py [utility]
+zip/
+  HOJ_ENGINE/OLD/
+  HOJ_ENGINE/REAL/
+  HOJ_ENGINE/RESEARCH/
+  Hoj_DB/OLD/
+  Hoj_DB/REAL/
+  Hoj_DB/RESEARCH/
+  SLE_DB/OLD/
+  SLE_DB/REAL/
+  SLE_ENGINE/OLD/
+  SLE_ENGINE/REAL/
+  backup/DB_REAL/
+  backup/ENGINE_REAL/
+  - backup_auto_patch/build_REAL_HOJ_V25.py [HOJ]
+  - backup_auto_patch/check_db_columns_V32.py [test]
+  - backup_auto_patch/organize_HOJ_V25.py [HOJ]
+  - backup_auto_patch/rename_files_v25.py [utility](삭제후보)
+  - backup_auto_patch/run_hybrid_test_V33.py [test](삭제후보)
+  - backup_auto_patch/scan_path_usage.py [utility]
+  - backup_auto_patch/test_REAL_HOJ_V25.py [HOJ](삭제후보)
+  - backup_auto_patch/test_REAL_Hoj_ENGINE_V25.py [HOJ](삭제후보)
+  - backup_auto_patch_detect/Hoj_V25_FinalValidation.py [HOJ]
+  - backup_auto_patch_detect/Hoj_V25_Predict_Top10.py [HOJ]
+  - backup_auto_patch_detect/V25_Backtest_DailyMDD.py [test](삭제후보)
+  - backup_auto_patch_detect/backtest_model.py [test](삭제후보)
+  - backup_auto_patch_detect/backtest_model_readable.py [test](삭제후보)
+  - backup_auto_patch_detect/build_REAL_HOJ_V25.py [HOJ]
+  - backup_auto_patch_detect/build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py [HOJ]
+  - backup_auto_patch_detect/build_database_V25.py [UI]
+  - backup_auto_patch_detect/build_full_Hoj_DB_V25.py [HOJ]
+  - backup_auto_patch_detect/check_db_columns_V32.py [test]
+  - backup_auto_patch_detect/check_engine_structure.py [test](삭제후보)
+  - backup_auto_patch_detect/check_merge_keys.py [preprocess]
+  - backup_auto_patch_detect/check_nulls_in_V25_DB.py [test]
+  - backup_auto_patch_detect/check_restored_file.py [REST]
+  - backup_auto_patch_detect/check_restored_file_KOSPI.py [REST]
+  - backup_auto_patch_detect/check_single_stock_V28.py [test]
+  - backup_auto_patch_detect/collect_all_1y.py [utility](삭제후보)
+  - backup_auto_patch_detect/collect_kospi.py [utility]
+  - backup_auto_patch_detect/combine_data.py [utility]
+  - backup_auto_patch_detect/config_paths.py [utility]
+  - backup_auto_patch_detect/convert_full_db.py [utility](삭제후보)
+  - backup_auto_patch_detect/create_target_and_split.py [utility]
+  - backup_auto_patch_detect/create_target_urls.py [utility]
+  - backup_auto_patch_detect/create_ticker_map.py [utility]
+  - backup_auto_patch_detect/daily_recommender.py [utility]
+  - backup_auto_patch_detect/daily_recommender_FAST.py [crawler]
+  - backup_auto_patch_detect/data_manager.py [utility]
+  - backup_auto_patch_detect/data_manager_test.py [test](삭제후보)
+  - backup_auto_patch_detect/detect_locked_file.py [utility]
+  - backup_auto_patch_detect/download_data.py [utility]
+  - backup_auto_patch_detect/evaluate_engine_V25.py [utility]
+  - backup_auto_patch_detect/excel_to_csv_batch.py [utility]
+  - backup_auto_patch_detect/extract_excel.py [utility]
+  - backup_auto_patch_detect/finance_collector.py [utility]
+  - backup_auto_patch_detect/finance_collector_test.py [test](삭제후보)
+  - backup_auto_patch_detect/fix_corrupted_KOSPI_v2.py [utility]
+  - backup_auto_patch_detect/fix_corrupted_data_v1.py [utility]
+  - backup_auto_patch_detect/kakao_notifier.py [REST]
+  - backup_auto_patch_detect/kiwoom_api.fullbackup.py [REST](삭제후보)
+  - backup_auto_patch_detect/kiwoom_api.py [REST]
+  - backup_auto_patch_detect/main_trading.py [utility]
+  - backup_auto_patch_detect/make_kospi_index_10y.py [utility]
+  - backup_auto_patch_detect/merge_pbr_per_V17.py [preprocess]
+  - backup_auto_patch_detect/naver_pbr_per_crawler_V16.py [crawler]
+  - backup_auto_patch_detect/naver_pbr_per_crawler_V17R.py [crawler]
+  - backup_auto_patch_detect/organize_HOJ_V25.py [HOJ]
+  - backup_auto_patch_detect/patch_engine.py [utility]
+  - backup_auto_patch_detect/process_data.py [utility]
+  - backup_auto_patch_detect/process_data_v2.py [utility]
+  - backup_auto_patch_detect/process_data_v4.py [utility]
+  - backup_auto_patch_detect/rename_SLE_files.py [SLE](삭제후보)
+  - backup_auto_patch_detect/rename_files_v25.py [utility](삭제후보)
+  - backup_auto_patch_detect/rename_return5d.py [utility]
+  - backup_auto_patch_detect/restore_return5d.py [REST]
+  - backup_auto_patch_detect/run_grid_search.py [utility]
+  - backup_auto_patch_detect/run_hoj_grid_search_V20.py [HOJ]
+  - backup_auto_patch_detect/run_hybrid_test_V33.py [test](삭제후보)
+  - backup_auto_patch_detect/run_market_filter_V22B.py [utility]
+  - backup_auto_patch_detect/run_model_grid_search_V12.py [utility]
+  - backup_auto_patch_detect/run_pipeline_v6.py [utility]
+  - backup_auto_patch_detect/run_quantile_test_V23.py [test](삭제후보)
+  - backup_auto_patch_detect/run_regression_60_5.py [utility]
+  - backup_auto_patch_detect/run_regression_pipeline.py [utility]
+  - backup_auto_patch_detect/run_strategy_grid_search_V9.py [utility]
+  - backup_auto_patch_detect/run_tuning_V22.py [utility]
+  - backup_auto_patch_detect/run_ui_test.py [UI](삭제후보)
+  - backup_auto_patch_detect/run_v5_threshold_tuning.py [utility](삭제후보)
+  - backup_auto_patch_detect/run_weekly_update.py [utility]
+  - backup_auto_patch_detect/scan_path_usage.py [utility]
+  - backup_auto_patch_detect/test_REAL_HOJ_V25.py [HOJ](삭제후보)
+  - backup_auto_patch_detect/test_REAL_Hoj_ENGINE_V25.py [HOJ](삭제후보)
+  - backup_auto_patch_detect/test_runner_hoj_gridsearch.py [HOJ](삭제후보)
+  - backup_auto_patch_detect/test_single_date_fetch.py [test](삭제후보)
+  - backup_auto_patch_detect/token_manager.py [REST]
+  - backup_auto_patch_detect/train_REAL_Hoj_ENGINE_V25.py [HOJ]
+  - backup_auto_patch_detect/train_champion_reg.py [utility]
+  - backup_auto_patch_detect/train_model.py [utility]
+  - backup_auto_patch_detect/train_real_engine_V25.py [utility]
+  - backup_auto_patch_detect/update_data_incrementally.py [utility]
+  - backup_auto_patch_detect/update_features_incrementally.py [preprocess]
+  - backup_auto_patch_detect/verify_data_integrity.py [utility]
+  - pipeline_viewer/pipelineview.py [utility](삭제후보)
+  - ui/ui_app.py [UI]
+  ui/ui_pages/
+  - zip/new_Hoj_DB_V25_FULL.parquet [data/HOJ_DB]
+    - HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251105.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_1.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_2.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/Hoj_MODELENGINE_V25_251112_3.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/OLD/REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/REAL/HOJ_ENGINE_REAL_V25.pkl [data/HOJ_ENGINE]
+    - HOJ_ENGINE/RESEARCH/HOJ_ENGINE_RESEARCH_V25.pkl [data/HOJ_ENGINE]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_1.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_2.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_3.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_4.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_5.parquet [data/HOJ_DB]
+    - Hoj_DB/OLD/Hoj_DB_V25_251112_6.parquet [data/HOJ_DB]
+    - Hoj_DB/REAL/HOJ_DB_REAL_V25.parquet [data/HOJ_DB]
+    - Hoj_DB/RESEARCH/HOJ_DB_RESEARCH_V25.parquet [data/HOJ_DB]
+    - SLE_DB/OLD/V11_partial_backup.parquet [data/SLE_DB]
+    - SLE_DB/OLD/check_env_for_hosle_V2.py [SLE](삭제후보)
+    - SLE_DB/OLD/merge_hoj_sle_V30.py [HOJ]
+    - SLE_DB/OLD/organize_SLE_V11.py [SLE](삭제후보)
+    - SLE_DB/OLD/organize_SLE_standardize.py [SLE](삭제후보)
+    - SLE_DB/OLD/sle_sample_runner_multithread.py [SLE](삭제후보)
+    - SLE_DB/REAL/SLE_DB_REAL_V11.parquet [data/SLE_DB]
+    - SLE_DB/REAL/V11_Database_Final.parquet [data/SLE_DB]
+    - SLE_ENGINE/OLD/train_sle_engine_V30.py [SLE](삭제후보)
+    - SLE_ENGINE/OLD/train_sle_engine_V31.py [SLE](삭제후보)
+    - SLE_ENGINE/REAL/SLE_ENGINE_REAL_V32.pkl [data/SLE_ENGINE]
+    - backup/DB_REAL/V25_251113.parquet [data/OTHER_DATA]
+    - backup/DB_REAL/V25_251114.parquet [data/OTHER_DATA]
+    - backup/ENGINE_REAL/V25_251114.pkl [data/OTHER_DATA]
+    - ui/ui_pages/__init__.py [utility](삭제후보)
+    - ui/ui_pages/dashboard.py [UI]
+    - ui/ui_pages/data_update.py [UI]
+    - ui/ui_pages/engine_manager.py [UI]
+    - ui/ui_pages/init.py [utility](삭제후보)
+    - ui/ui_pages/predict_stock.py [UI]
+    - ui/ui_pages/settings.py [UI]
+    - ui/ui_pages/today_top10.py [UI]

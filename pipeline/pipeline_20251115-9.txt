@@ -1,0 +1,320 @@
+F:\autostockG Pipeline Report
+====================================
+
+생성 시각 : 2025-11-15 16:38:34
+루트 폴더 : F:\autostockG
+출력 파일 : pipeline_20251115-9.txt
+
+이 리포트는 실행 시점 기준으로 F:\autostockG 전체 구조를 스캔하여,
+HOJ / SLE / SLE / REST / pipeline / test / utility / 데이터 파일을 분류한 요약본입니다.
+
+※ 실제 프로그램 로직(학습/백테스트/매매)은 이 리포트를 기반으로
+   별도 상세 문서에서 설명할 수 있습니다.
+
+1. 전체 카테고리 요약
+-------------
+  - HOJ 관련 코드      : 26개
+  - SLE 관련 코드      : 9개
+  - REST / 키움 연동   : 14개
+  - 파이프라인 스크립트: 39개
+  - 테스트/실험 코드   : 23개
+  - 유틸리티 코드      : 74개
+  - 데이터(.parquet)   : 29개
+  - 모델(.pkl)         : 13개
+
+2. 핵심 DB 파일 (Core DB)
+---------------------
+  - all_features_cumulative.parquet
+  - all_features_cumulative_V21_Hoj.parquet
+  - all_stocks_cumulative.parquet
+  - all_stocks_cumulative_backup_20251113_2308.parquet
+  - backup\DB_REAL\V25_251113.parquet
+  - backup\DB_REAL\V25_251114.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_1.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_2.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_3.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_4.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_5.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_6.parquet
+  - Hoj_DB\REAL\HOJ_DB_REAL_V25.parquet
+  - Hoj_DB\RESEARCH\HOJ_DB_RESEARCH_V25.parquet
+  - kospi_index_10y.parquet
+  - new_Hoj_DB_V25.parquet
+  - SLE_DB\REAL\SLE_DB_REAL_V11.parquet
+  - SLE_DB\REAL\V11_Database_Final.parquet
+  - ticker_map.parquet
+  - V25_Hoj_DB.parquet
+  - zip\new_Hoj_DB_V25_FULL.parquet
+
+3. 핵심 모델 파일 (Core Models)
+-------------------------
+  - champion_model_60_5.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251105.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_1.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_2.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_3.pkl
+  - HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25.pkl
+  - HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl
+  - HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V25.pkl
+  - HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V25.pkl
+  - REAL_CHAMPION_MODEL_V25.pkl
+  - SLE_ENGINE\REAL\SLE_ENGINE_REAL_V32.pkl
+
+4. HOJ 관련 코드
+------------
+  - backup_auto_patch\build_REAL_HOJ_V25.py  ← 주석: # build_REAL_HOJ_V25.py | 주석: # ------------------------------------------------------------- | 주석: # 1) 연구용 FULL DB -> 실전용 DB 생성 (불필요 컬럼 제거)
+  - backup_auto_patch\organize_HOJ_V25.py  ← 의존 모듈: import os | 의존 모듈: import shutil | 의존 모듈: from datetime import datetime
+  - backup_auto_patch\test_REAL_Hoj_ENGINE_V25.py  ← 주석: # test_REAL_Hoj_ENGINE_V25.py | 주석: # REAL_Hoj_MODELENGINE_V25 실전 엔진 동작 테스트 스크립트 | 의존 모듈: import os
+  - backup_auto_patch\test_REAL_HOJ_V25.py  ← 주석: # test_REAL_HOJ_V25.py | 주석: # ------------------------------------------------------------- | 주석: # REAL_HOJ_ENGINE_V25 실전 엔진 동작 테스트 스크립트
+  - backup_auto_patch_detect\build_full_Hoj_DB_V25.py  ← 의존 모듈: import pandas as pd | 주석: # ------------------------------------------- | 주석: # 1) 원본 시세 데이터 로드
+  - backup_auto_patch_detect\build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py  ← 주석: # ============================================================= | 주석: # FULL DB 정리 + REAL 엔진 재학습 통합 자동 스크립트 (날짜 컬럼 자동 탐지) | 주석: # =============================================================
+  - backup_auto_patch_detect\build_REAL_HOJ_V25.py  ← 주석: # build_REAL_HOJ_V25.py | 주석: # ------------------------------------------------------------- | 주석: # 1) 연구용 FULL DB -> 실전용 DB 생성 (불필요 컬럼 제거)
+  - backup_auto_patch_detect\Hoj_V25_FinalValidation.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: import pickle
+  - backup_auto_patch_detect\Hoj_V25_Predict_Top10.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pickle | 주석: # ==========================================================
+  - backup_auto_patch_detect\organize_HOJ_V25.py  ← 의존 모듈: import os | 의존 모듈: import shutil | 의존 모듈: from datetime import datetime
+  - backup_auto_patch_detect\run_hoj_grid_search_V20.py  ← 주석: # --- 코드 버전: V21 (Hoj Engine Grid Search Fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\test_REAL_Hoj_ENGINE_V25.py  ← 주석: # test_REAL_Hoj_ENGINE_V25.py | 주석: # REAL_Hoj_MODELENGINE_V25 실전 엔진 동작 테스트 스크립트 | 의존 모듈: import os
+  - backup_auto_patch_detect\test_REAL_HOJ_V25.py  ← 주석: # test_REAL_HOJ_V25.py | 주석: # ------------------------------------------------------------- | 주석: # REAL_HOJ_ENGINE_V25 실전 엔진 동작 테스트 스크립트
+  - backup_auto_patch_detect\test_runner_hoj_gridsearch.py  ← 주석: # --- test_runner_hoj_gridsearch.py --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\train_REAL_Hoj_ENGINE_V25.py  ← HOJ 실전 엔진 학습 코드 (핵심).
+  - build_full_Hoj_DB_V25.py  ← 의존 모듈: import pandas as pd | 주석: # ------------------------------------------- | 주석: # 1) 원본 시세 데이터 로드
+  - build_REAL_Hoj_ENGINE_V25_FULL_AUTO.py  ← 주석: # ============================================================= | 주석: # FULL DB 정리 + REAL 엔진 재학습 통합 자동 스크립트 (날짜 컬럼 자동 탐지) | 주석: # =============================================================
+  - build_REAL_HOJ_V25.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 주석: # build_REAL_HOJ_V25.py | 주석: # -------------------------------------------------------------
+  - Hoj_V25_FinalValidation.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: import pickle
+  - Hoj_V25_Predict_Top10.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pickle | 주석: # ==========================================================
+  - organize_HOJ_V25.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 의존 모듈: import os | 의존 모듈: import shutil
+  - run_hoj_grid_search_V20.py  ← 주석: # --- 코드 버전: V21 (Hoj Engine Grid Search Fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - test_REAL_Hoj_ENGINE_V25.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import joblib | 의존 모듈: from config_paths import (
+  - test_REAL_HOJ_V25.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 주석: # test_REAL_HOJ_V25.py | 주석: # -------------------------------------------------------------
+  - test_runner_hoj_gridsearch.py  ← 주석: # --- test_runner_hoj_gridsearch.py --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - train_REAL_Hoj_ENGINE_V25.py  ← HOJ 실전 엔진 학습 코드 (핵심).
+
+5. SLE 관련 코드
+------------
+  - backup_auto_patch_detect\rename_SLE_files.py  ← 의존 모듈: import os | 의존 모듈: import re | 함수 정의: def get_latest_versioned_file(folder, prefix):
+  - rename_SLE_files.py  ← 의존 모듈: import os | 의존 모듈: import re | 함수 정의: def get_latest_versioned_file(folder, prefix):
+  - SLE_DB\OLD\check_env_for_hosle_V2.py  ← 주석: # check_env_for_hosle_V3_auto.py | 주석: # ------------------------------- | 주석: # 위대하신호정님 전용 - 자동 환경 점검 매크로
+  - SLE_DB\OLD\merge_hoj_sle_V30.py  ← HOJ+SLE 하이브리드 병합기 (보조).
+  - SLE_DB\OLD\organize_SLE_standardize.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 의존 모듈: import os | 의존 모듈: import shutil
+  - SLE_DB\OLD\organize_SLE_V11.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 의존 모듈: import os | 의존 모듈: import shutil
+  - SLE_DB\OLD\sle_sample_runner_multithread.py  ← SLE 멀티스레드 러너 (보조).
+  - SLE_ENGINE\OLD\train_sle_engine_V30.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 주석: # --- 코드 버전: V30 (Train Sle Engine Only) --- | 의존 모듈: import pandas as pd
+  - SLE_ENGINE\OLD\train_sle_engine_V31.py  ← SLE 엔진 학습 코드 (보조).
+
+6. REST / 키움 연동 코드
+------------------
+  - backup_auto_patch_detect\check_restored_file.py  ← 주석: # check_restored_file.py | 주석: # [진단용 스크립트 3] | 주석: # 휴지통에서 '복원'한 all_stocks_cumulative.parquet 파일에
+  - backup_auto_patch_detect\check_restored_file_KOSPI.py  ← 주석: # check_restored_file_KOSPI.py | 주석: # [진단용 스크립트 4] | 주석: # '복원된' kospi_index_10y.parquet 파일이 '깨끗한'(영어) 상태인지 확인합니다.
+  - backup_auto_patch_detect\kakao_notifier.py  ← 주석: # kakao_notifier.py - 카카오톡 알림 전송 및 토큰 관리 모듈 (디버그 코드 통합) | 의존 모듈: import requests | 의존 모듈: import json
+  - backup_auto_patch_detect\kiwoom_api.fullbackup.py  ← 주석: # kiwoom_api.py - V34 프로젝트 마스터 API 클라이언트 (최종본 - 오류 수정 완료) | 의존 모듈: import json | 의존 모듈: import requests
+  - backup_auto_patch_detect\kiwoom_api.py  ← 주석: # kiwoom_api.py - V34 프로젝트 마스터 API 클라이언트 (최종 복구 버전) | 의존 모듈: import json | 의존 모듈: import requests
+  - backup_auto_patch_detect\restore_return5d.py  ← 의존 모듈: import pandas as pd | 주석: # 1) Expected_Return_5d가 존재하고 Return_5d가 없을 때 복원
+  - backup_auto_patch_detect\token_manager.py  ← 의존 모듈: import configparser | 의존 모듈: import os | 의존 모듈: import requests
+  - check_restored_file.py  ← 주석: # check_restored_file.py | 주석: # [진단용 스크립트 3] | 주석: # 휴지통에서 '복원'한 all_stocks_cumulative.parquet 파일에
+  - check_restored_file_KOSPI.py  ← 주석: # check_restored_file_KOSPI.py | 주석: # [진단용 스크립트 4] | 주석: # '복원된' kospi_index_10y.parquet 파일이 '깨끗한'(영어) 상태인지 확인합니다.
+  - kakao_notifier.py  ← 주석: # kakao_notifier.py - 카카오톡 알림 전송 및 토큰 관리 모듈 (디버그 코드 통합) | 의존 모듈: import requests | 의존 모듈: import json
+  - kiwoom_api.fullbackup.py  ← 주석: # kiwoom_api.py - V34 프로젝트 마스터 API 클라이언트 (최종본 - 오류 수정 완료) | 의존 모듈: import json | 의존 모듈: import requests
+  - kiwoom_api.py  ← 주석: # kiwoom_api.py - V34 프로젝트 마스터 API 클라이언트 (최종 복구 버전) | 의존 모듈: import json | 의존 모듈: import requests
+  - restore_return5d.py  ← 의존 모듈: import pandas as pd | 주석: # 1) Expected_Return_5d가 존재하고 Return_5d가 없을 때 복원
+  - token_manager.py  ← 의존 모듈: import configparser | 의존 모듈: import os | 의존 모듈: import requests
+
+7. 파이프라인 실행/생성 스크립트
+-------------------
+  - backup_auto_patch\run_hybrid_test_V33.py  ← 주석: # --- 코드 버전: V33 (Hoj/Sle Hybrid Test) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\build_database_V25.py  ← 주석: # ============================================================ | 주석: # [build_database_V25.py] V25 DB 병합 + 라벨(5d 수익률) 생성 | 주석: # ============================================================
+  - backup_auto_patch_detect\run_grid_search.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_hybrid_test_V33.py  ← 주석: # --- 코드 버전: V33 (Hoj/Sle Hybrid Test) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_market_filter_V22B.py  ← 주석: # --- 코드 버전: V22-B (Market Regime Filter) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\run_model_grid_search_V12.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_pipeline_v6.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_quantile_test_V23.py  ← 주석: # --- 코드 버전: V23 (Quantile Optimization Test) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\run_regression_60_5.py  ← 주석: # (이 스크립트는 run_regression_60_5.py의 수정본입니다) | 주석: # (pip install joblib) | 의존 모듈: import pandas as pd
+  - backup_auto_patch_detect\run_regression_pipeline.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_strategy_grid_search_V9.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_tuning_V22.py  ← 주석: # --- 코드 버전: V22-A (Hoj 챔피언 튜닝) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\run_ui_test.py  ← 의존 모듈: import sys | 의존 모듈: from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget | 주석: # --- 1. UI 창을 정의하는 클래스 ---
+  - backup_auto_patch_detect\run_v5_threshold_tuning.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\run_weekly_update.py  ← 주석: # run_weekly_update.py | 주석: # 'V34 (호슬) 프로젝트'의 '오프라인 연구소' 주간 자동 업데이트 마스터 스크립트 | 주석: # UI의 [업데이트] 버튼 클릭 시 이 파일을 실행합니다.
+  - backup_auto_patch_detect\train_champion_reg.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: import joblib # 모델 저장을 위해 사용
+  - backup_auto_patch_detect\train_model.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.model_selection import train_test_split
+  - backup_auto_patch_detect\train_real_engine_V25.py  ← 주석: # ================================================================ | 주석: #  train_real_engine_V25.py  (FINAL SAFE VERSION) | 주석: # ================================================================
+  - backup_auto_patch_detect\update_data_incrementally.py  ← 주석: # ============================================================ | 주석: # [update_data_incrementally.py] V36A8 자동저장 & 테스트 모드 | 주석: # ============================================================
+  - backup_auto_patch_detect\update_features_incrementally.py  ← 주석: # ============================================================ | 주석: # [update_features_incrementally.py] V21C-Final (15피처 완전판) | 주석: # ============================================================
+  - build_database_V25.py  ← 주석: # ============================================================ | 주석: # [build_database_V25.py] V25 DB 병합 + 라벨(5d 수익률) 생성 | 주석: # ============================================================
+  - run_grid_search.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - run_hybrid_test_V33.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import joblib | 의존 모듈: from config_paths import (
+  - run_hybrid_test_V34.py  ← 하이브리드 백테스트 실행기 (연구).
+  - run_market_filter_V22B.py  ← 주석: # --- 코드 버전: V22-B (Market Regime Filter) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - run_model_grid_search_V12.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - run_quantile_test_V23.py  ← 주석: # --- 코드 버전: V23 (Quantile Optimization Test) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - run_regression_60_5.py  ← 주석: # (이 스크립트는 run_regression_60_5.py의 수정본입니다) | 주석: # (pip install joblib) | 의존 모듈: import pandas as pd
+  - run_regression_pipeline.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - run_strategy_grid_search_V9.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - run_tuning_V22.py  ← 주석: # --- 코드 버전: V22-A (Hoj 챔피언 튜닝) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - run_ui_test.py  ← 의존 모듈: import sys | 의존 모듈: from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget | 주석: # --- 1. UI 창을 정의하는 클래스 ---
+  - run_v5_threshold_tuning.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - run_weekly_update.py  ← 주석: # run_weekly_update.py | 주석: # 'V34 (호슬) 프로젝트'의 '오프라인 연구소' 주간 자동 업데이트 마스터 스크립트 | 주석: # UI의 [업데이트] 버튼 클릭 시 이 파일을 실행합니다.
+  - train_champion_reg.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: import joblib # 모델 저장을 위해 사용
+  - train_model.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.model_selection import train_test_split
+  - train_real_engine_V25.py  ← 주석: # ================================================================ | 주석: #  train_real_engine_V25.py  (FINAL SAFE VERSION) | 주석: # ================================================================
+  - update_data_incrementally.py  ← 주석: # ============================================================ | 주석: # [update_data_incrementally.py] V36A8 자동저장 & 테스트 모드 | 주석: # ============================================================
+  - update_features_incrementally.py  ← 주석: # ============================================================ | 주석: # [update_features_incrementally.py] V21C-Final (15피처 완전판) | 주석: # ============================================================
+
+8. 테스트 / 백테스트 / 실험 코드
+---------------------
+  - backtest_model.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.metrics import classification_report, confusion_matrix
+  - backtest_model_readable.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.metrics import classification_report, confusion_matrix
+  - backup_auto_patch\check_db_columns_V32.py  ← 주석: # --- 코드 버전: V32 (Check Sle DB Columns) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\backtest_model.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.metrics import classification_report, confusion_matrix
+  - backup_auto_patch_detect\backtest_model_readable.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: from sklearn.metrics import classification_report, confusion_matrix
+  - backup_auto_patch_detect\check_db_columns_V32.py  ← 주석: # --- 코드 버전: V32 (Check Sle DB Columns) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\check_engine_structure.py  ← 의존 모듈: import joblib
+  - backup_auto_patch_detect\check_merge_keys.py  ← 주석: # check_merge_keys.py | 주석: # [진단용 스크립트] build_database_V25.py의 'KeyError: Code' 원인을 | 주석: # 1분 30초 기다림 없이 즉시 확인합니다.
+  - backup_auto_patch_detect\check_nulls_in_V25_DB.py  ← 주석: # =============================================== | 주석: #  check_nulls_in_V25_DB.py | 주석: #  Hoj 엔진 학습 전 전체 결측률 자동 분석 스크립트
+  - backup_auto_patch_detect\check_single_stock_V28.py  ← 주석: # --- 코드 버전: V28.1 (KeyError Fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\data_manager_test.py  ← 주석: # data_manager.py (전체 코드) | 의존 모듈: import json | 의존 모듈: import os
+  - backup_auto_patch_detect\finance_collector_test.py  ← 주석: # finance_collector.py (독립 실행 스크립트) | 의존 모듈: from kiwoom_api import KiwoomRestApi | 의존 모듈: from data_manager import DataManager
+  - backup_auto_patch_detect\test_single_date_fetch.py  ← 주석: # --- 코드 버전: V19.1 (안정적인 날짜 테스트) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pykrx
+  - backup_auto_patch_detect\V25_Backtest_DailyMDD.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: import pickle
+  - check_db_columns_V32.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 주석: # --- 코드 버전: V32 (Check Sle DB Columns) --- | 의존 모듈: import pandas as pd
+  - check_engine_structure.py  ← 의존 모듈: import joblib
+  - check_merge_keys.py  ← 주석: # check_merge_keys.py | 주석: # [진단용 스크립트] build_database_V25.py의 'KeyError: Code' 원인을 | 주석: # 1분 30초 기다림 없이 즉시 확인합니다.
+  - check_nulls_in_V25_DB.py  ← 주석: # =============================================== | 주석: #  check_nulls_in_V25_DB.py | 주석: #  Hoj 엔진 학습 전 전체 결측률 자동 분석 스크립트
+  - check_single_stock_V28.py  ← 주석: # --- 코드 버전: V28.1 (KeyError Fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - data_manager_test.py  ← 주석: # data_manager.py (전체 코드) | 의존 모듈: import json | 의존 모듈: import os
+  - finance_collector_test.py  ← 주석: # finance_collector.py (독립 실행 스크립트) | 의존 모듈: from kiwoom_api import KiwoomRestApi | 의존 모듈: from data_manager import DataManager
+  - test_single_date_fetch.py  ← 주석: # --- 코드 버전: V19.1 (안정적인 날짜 테스트) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pykrx
+  - V25_Backtest_DailyMDD.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: import pickle
+
+9. 유틸리티 / 보조 스크립트
+-----------------
+  - auto_generate_pipeline_doc.py  ← 주석: # ============================================================ | 주석: # (EOF PATCH) 파일 설명 매핑 기능 추가 | 주석: # ============================================================
+  - backup_auto_patch\rename_files_v25.py  ← 주석: # rename_files_v25.py | 주석: # --------------------------------------------- | 주석: # 기존 파일을 V25 표준 파일명으로 자동 변경하는 스크립트
+  - backup_auto_patch\scan_path_usage.py  ← 의존 모듈: import os | 주석: # 찾을 문자열 패턴들 (필요하면 여기 계속 추가 가능) | 주석: # HOJ DB/ENGINE 파일명
+  - backup_auto_patch_detect\collect_all_1y.py  ← 의존 모듈: import pandas as pd | 의존 모듈: from pykrx import stock | 의존 모듈: import time
+  - backup_auto_patch_detect\collect_kospi.py  ← 의존 모듈: import pandas as pd | 의존 모듈: from pykrx import stock | 의존 모듈: from datetime import datetime, timedelta
+  - backup_auto_patch_detect\combine_data.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import glob | 의존 모듈: import os
+  - backup_auto_patch_detect\config_paths.py  ← 의존 모듈: import os | 의존 모듈: import re | 주석: # ----------------------------------------------------
+  - backup_auto_patch_detect\convert_full_db.py  ← 의존 모듈: import pandas as pd
+  - backup_auto_patch_detect\create_target_and_split.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: from datetime import datetime, timedelta
+  - backup_auto_patch_detect\create_target_urls.py  ← 주석: # --- 코드 버전: V11-D (tqdm import fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\create_ticker_map.py  ← 주석: # --- 코드 버전: V29 (FinanceDataReader Ticker Map) --- | 의존 모듈: import pandas as pd | 의존 모듈: import FinanceDataReader as fdr
+  - backup_auto_patch_detect\daily_recommender.py  ← HOJ 종목 추천 엔진 (실전).
+  - backup_auto_patch_detect\daily_recommender_FAST.py  ← 주석: # --- 코드 버전: V10 (Naver Filter) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - backup_auto_patch_detect\data_manager.py  ← 주석: # data_manager.py (수정된 전체 코드) | 의존 모듈: import json | 의존 모듈: import os
+  - backup_auto_patch_detect\detect_locked_file.py  ← 의존 모듈: import os | 의존 모듈: import shutil | 함수 정의: def try_backup(file_path):
+  - backup_auto_patch_detect\download_data.py  ← 주석: # download_data.py - V34 프로젝트 장기 데이터 다운로드 실행 파일 | 의존 모듈: import sys | 의존 모듈: from datetime import datetime
+  - backup_auto_patch_detect\evaluate_engine_V25.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\excel_to_csv_batch.py  ← 의존 모듈: import os | 의존 모듈: import pandas as pd | 의존 모듈: from datetime import datetime
+  - backup_auto_patch_detect\extract_excel.py  ← 의존 모듈: import openpyxl | 의존 모듈: import os | 함수 정의: def extract_text_from_excel(excel_file_path, output_txt_path):
+  - backup_auto_patch_detect\finance_collector.py  ← 주석: # finance_collector.py (1일 목표로 최종 수정) | 의존 모듈: from kiwoom_api import KiwoomRestApi | 의존 모듈: from data_manager import DataManager
+  - backup_auto_patch_detect\fix_corrupted_data_v1.py  ← 주석: # fix_corrupted_data_v1.py | 주석: # [1회용 복구 스크립트] | 주석: # '한글/영어'로 쪼개진 1단계 원본 재료 2개를 '영어'로 강제 통일합니다.
+  - backup_auto_patch_detect\fix_corrupted_KOSPI_v2.py  ← 주석: # fix_corrupted_KOSPI_v2.py | 주석: # [1회용 복구 스크립트 2탄] | 주석: # '한/영 혼용' 상태인 'kospi_index_10y.parquet' 파일만 '영어'로 통일합니다.
+  - backup_auto_patch_detect\main_trading.py  ← 주석: # main_trading.py - V34 호엔진 프로젝트 최종 버전 (카카오 알림 통합 및 오류 수정) | 의존 모듈: import configparser | 의존 모듈: import sys
+  - backup_auto_patch_detect\make_kospi_index_10y.py  ← 주석: # KOSPI 지수 10년 저장 (KS11) | 의존 모듈: import FinanceDataReader as fdr | 의존 모듈: import pandas as pd
+  - backup_auto_patch_detect\merge_pbr_per_V17.py  ← PER/PBR 병합기 (보조). SLE DB 생성 파이프라인 중간 단계.
+  - backup_auto_patch_detect\naver_pbr_per_crawler_V16.py  ← 네이버 PBR/PER 크롤러 (보조).
+  - backup_auto_patch_detect\naver_pbr_per_crawler_V17R.py  ← 주석: # --- 코드 버전: V17R2 (id/url 컬럼 구조 대응 + 병렬처리 + 중단복구 완벽) --- | 의존 모듈: import pandas as pd | 의존 모듈: import requests
+  - backup_auto_patch_detect\patch_engine.py  ← 의존 모듈: import os | 의존 모듈: import re | 의존 모듈: import shutil
+  - backup_auto_patch_detect\process_data.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\process_data_v2.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\process_data_v4.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - backup_auto_patch_detect\rename_files_v25.py  ← 주석: # rename_files_v25.py | 주석: # --------------------------------------------- | 주석: # 기존 파일을 V25 표준 파일명으로 자동 변경하는 스크립트
+  - backup_auto_patch_detect\rename_return5d.py  ← 의존 모듈: import pandas as pd
+  - backup_auto_patch_detect\scan_path_usage.py  ← 의존 모듈: import os | 주석: # 찾을 문자열 패턴들 (필요하면 여기 계속 추가 가능) | 주석: # HOJ DB/ENGINE 파일명
+  - backup_auto_patch_detect\verify_data_integrity.py  ← 주석: # verify_data_integrity.py | 주석: # [진단용 스크립트 2] | 주석: # 1단계(원본 재료)와 2단계(가공 피처) 파일들의 '무결성'을 검증합니다.
+  - collect_all_1y.py  ← 의존 모듈: import pandas as pd | 의존 모듈: from pykrx import stock | 의존 모듈: import time
+  - collect_kospi.py  ← 의존 모듈: import pandas as pd | 의존 모듈: from pykrx import stock | 의존 모듈: from datetime import datetime, timedelta
+  - combine_data.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import glob | 의존 모듈: import os
+  - convert_full_db.py  ← 의존 모듈: import pandas as pd
+  - create_target_and_split.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np | 의존 모듈: from datetime import datetime, timedelta
+  - create_target_urls.py  ← 주석: # --- 코드 버전: V11-D (tqdm import fix) --- | 의존 모듈: import pandas as pd | 의존 모듈: import numpy as np
+  - create_ticker_map.py  ← 주석: # --- 코드 버전: V29 (FinanceDataReader Ticker Map) --- | 의존 모듈: import pandas as pd | 의존 모듈: import FinanceDataReader as fdr
+  - daily_recommender.py  ← HOJ 종목 추천 엔진 (실전).
+  - daily_recommender_FAST.py  ← 주석: # --- 코드 버전: V10 (Naver Filter) --- | 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta
+  - data_manager.py  ← 주석: # data_manager.py (수정된 전체 코드) | 의존 모듈: import json | 의존 모듈: import os
+  - download_data.py  ← 주석: # download_data.py - V34 프로젝트 장기 데이터 다운로드 실행 파일 | 의존 모듈: import sys | 의존 모듈: from datetime import datetime
+  - evaluate_engine_V25.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import lightgbm as lgb | 의존 모듈: import numpy as np
+  - excel_to_csv_batch.py  ← 의존 모듈: import os | 의존 모듈: import pandas as pd | 의존 모듈: from datetime import datetime
+  - extract_excel.py  ← 의존 모듈: import openpyxl | 의존 모듈: import os | 함수 정의: def extract_text_from_excel(excel_file_path, output_txt_path):
+  - finance_collector.py  ← 주석: # finance_collector.py (1일 목표로 최종 수정) | 의존 모듈: from kiwoom_api import KiwoomRestApi | 의존 모듈: from data_manager import DataManager
+  - fix_corrupted_data_v1.py  ← 주석: # fix_corrupted_data_v1.py | 주석: # [1회용 복구 스크립트] | 주석: # '한글/영어'로 쪼개진 1단계 원본 재료 2개를 '영어'로 강제 통일합니다.
+  - fix_corrupted_KOSPI_v2.py  ← 주석: # fix_corrupted_KOSPI_v2.py | 주석: # [1회용 복구 스크립트 2탄] | 주석: # '한/영 혼용' 상태인 'kospi_index_10y.parquet' 파일만 '영어'로 통일합니다.
+  - main_trading.py  ← 주석: # main_trading.py - V34 호엔진 프로젝트 최종 버전 (카카오 알림 통합 및 오류 수정) | 의존 모듈: import configparser | 의존 모듈: import sys
+  - make_kospi_index_10y.py  ← 주석: # KOSPI 지수 10년 저장 (KS11) | 의존 모듈: import FinanceDataReader as fdr | 의존 모듈: import pandas as pd
+  - merge_pbr_per_V17.py  ← PER/PBR 병합기 (보조). SLE DB 생성 파이프라인 중간 단계.
+  - naver_pbr_per_crawler_V16.py  ← 네이버 PBR/PER 크롤러 (보조).
+  - naver_pbr_per_crawler_V17R.py  ← 주석: # --- 코드 버전: V17R2 (id/url 컬럼 구조 대응 + 병렬처리 + 중단복구 완벽) --- | 의존 모듈: import pandas as pd | 의존 모듈: import requests
+  - pipeline_graph_builder.py  ← 의존 모듈: import os | 의존 모듈: import json | 의존 모듈: import re
+  - pipeline_viewer\pipelineview.py  ← 주석: # --- 코드 버전: V_PIPEMAP_FINAL_R2 (독립 실행 + 그룹 색상 + 텍스트 요약) --- | 의존 모듈: import os | 의존 모듈: import re
+  - process_data.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - process_data_v2.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - process_data_v4.py  ← 의존 모듈: import pandas as pd | 의존 모듈: import pandas_ta as ta | 의존 모듈: import numpy as np
+  - rename_files_v25.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 주석: # rename_files_v25.py | 주석: # ---------------------------------------------
+  - rename_return5d.py  ← 의존 모듈: import pandas as pd
+  - ui\ui_app.py  ← 의존 모듈: import sys, os | 의존 모듈: import streamlit as st | 주석: # ============================================================
+  - ui\ui_pages\__init__.py  ← 요약 없음 (주석/함수/class 정보 부족)
+  - ui\ui_pages\dashboard.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 의존 모듈: import streamlit as st | 의존 모듈: import pandas as pd
+  - ui\ui_pages\data_update.py  ← 의존 모듈: import streamlit as st | 의존 모듈: import subprocess | 함수 정의: def run_script(name):
+  - ui\ui_pages\engine_manager.py  ← 의존 모듈: import streamlit as st | 의존 모듈: import os | 의존 모듈: import subprocess
+  - ui\ui_pages\init.py  ← 요약 없음 (주석/함수/class 정보 부족)
+  - ui\ui_pages\predict_stock.py  ← 의존 모듈: from config_paths import HOJ_DB_RESEARCH, HOJ_DB_REAL, HOJ_ENGINE_RESEARCH, HOJ_ENGINE_REAL, SLE_DB_REAL, SLE_ENGINE_REAL | 의존 모듈: import streamlit as st | 함수 정의: def render():
+  - ui\ui_pages\settings.py  ← 의존 모듈: import streamlit as st | 함수 정의: def render():
+  - ui\ui_pages\today_top10.py  ← 의존 모듈: import streamlit as st | 의존 모듈: import subprocess | 함수 정의: def render():
+  - verify_data_integrity.py  ← 주석: # verify_data_integrity.py | 주석: # [진단용 스크립트 2] | 주석: # 1단계(원본 재료)와 2단계(가공 피처) 파일들의 '무결성'을 검증합니다.
+
+10. 데이터 파일 목록 (.parquet)
+------------------------
+  - all_features_cumulative.parquet
+  - all_features_cumulative_V21_Hoj.parquet
+  - all_stocks_cumulative.parquet
+  - all_stocks_cumulative_backup_20251113_2308.parquet
+  - backup\DB_REAL\V25_251113.parquet
+  - backup\DB_REAL\V25_251114.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_1.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_2.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_3.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_4.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_5.parquet
+  - Hoj_DB\OLD\Hoj_DB_V25_251112_6.parquet
+  - Hoj_DB\REAL\HOJ_DB_REAL_V25.parquet
+  - Hoj_DB\RESEARCH\HOJ_DB_RESEARCH_V25.parquet
+  - kospi_index_10y.parquet
+  - new_Hoj_DB_V25.parquet
+  - SLE_DB\OLD\V11_partial_backup.parquet
+  - SLE_DB\REAL\SLE_DB_REAL_V11.parquet
+  - SLE_DB\REAL\V11_Database_Final.parquet
+  - stock_data_10y_combined.parquet
+  - stock_data_10y_processed.parquet
+  - stock_data_10y_processed_v2.parquet
+  - stock_data_10y_processed_v4.parquet
+  - test_data.parquet
+  - ticker_map.parquet
+  - train_data.parquet
+  - V25_Hoj_DB.parquet
+  - zip\new_Hoj_DB_V25_FULL.parquet
+
+11. 모델 파일 목록 (.pkl)
+-------------------
+  - backup\ENGINE_REAL\V25_251114.pkl
+  - champion_model_60_5.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251105.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_1.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_2.pkl
+  - HOJ_ENGINE\OLD\Hoj_MODELENGINE_V25_251112_3.pkl
+  - HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25.pkl
+  - HOJ_ENGINE\OLD\REAL_Hoj_MODELENGINE_V25_backup_20251113_213433.pkl
+  - HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V25.pkl
+  - HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V25.pkl
+  - REAL_CHAMPION_MODEL_V25.pkl
+  - SLE_ENGINE\REAL\SLE_ENGINE_REAL_V32.pkl
+
+끝.
+이 파일은 F:\autostockG\pipeline 내에서 언제든 다시 생성할 수 있습니다.
+
+- 생성 스크립트 : auto_generate_pipeline_doc.py
+- 위치          : F:\autostockG\pipeline\auto_generate_pipeline_doc.py

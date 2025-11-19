@@ -1,0 +1,205 @@
+==========================================
+[FULL UPDATE START] 251118
+==========================================
+
+[STEP 0] RAW 업데이트 검사
+[STEP 0] RAW 금지 구간 → 건너뜀
+[BACKUP] F:\autostockG\MODELENGINE\RAW\all_stocks_cumulative.parquet → F:\autostockG\MODELENGINE\RAW\all_stocks_cumulative_251114.parquet
+[BACKUP] F:\autostockG\MODELENGINE\RAW\kospi_index_10y.parquet → F:\autostockG\MODELENGINE\RAW\kospi_index_10y_251117.parquet
+[STEP 1] FEATURE 생성
+[STEP 1] FEATURE 완료
+[BACKUP] F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet → F:\autostockG\MODELENGINE\FEATURE\features_V31_251112.parquet
+[STEP 2] HOJ_DB_RESEARCH 생성
+[STEP 2] 완료
+[BACKUP] F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet → F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31_251105.parquet
+[STEP 3] HOJ_DB_REAL 생성
+[STEP 3] 완료
+[BACKUP] F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet → F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31_251105.parquet
+[STEP 4] 연구 엔진 학습
+[RUN] F:\autostockG\MODELENGINE\util\train_HOJ_ENGINE_RESEARCH.py
+[STDOUT] === [RESEARCH] HOJ 엔진 학습 시작 ===
+[STDOUT]   📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+[STDOUT]   💾 출력 엔진: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+[STDOUT]   📅 DB 기간: 2015-03-31 ~ 2025-11-05
+[STDOUT]   📊 전체 행 수: 5,867,250  / 종목 수: 2,852
+[STDOUT]   🔧 검증 시작일(자동): 2024-11-05 (max_date 기준 -365일)
+[STDOUT]   🔧 학습 구간: 2015-03-31 ~ 2024-11-04
+[STDOUT]   🔧 검증 구간: 2024-11-05 ~ 2025-11-05
+[STDOUT]   📚 학습 샘플 수: 5,187,295
+[STDOUT]   🧪 검증 샘플 수: 679,955
+[STDOUT]   🧬 피처 개수: 17
+[STDOUT]   🧬 피처 예시: ['Change', 'Name', 'Market', 'SMA_5', 'SMA_20', 'SMA_60', 'VOL_SMA_20', 'MOM_10', 'ROC_20', 'MACD_12_26']
+[STDOUT]   ✅ NaN 제거 후 학습 샘플: 5,187,295
+[STDOUT]   ✅ NaN 제거 후 검증 샘플: 679,955
+[STDOUT] 
+[STDOUT] [1] 회귀 모델 학습 (Return_5d)
+[STDERR] Traceback (most recent call last):
+[STDERR]   File "F:\autostockG\MODELENGINE\util\train_HOJ_ENGINE_RESEARCH.py", line 162, in <module>
+[STDERR]     model_reg.fit(
+[STDERR]     ~~~~~~~~~~~~~^
+[STDERR]         X_train, y_train_reg,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     ...<4 lines>...
+[STDERR]         ],
+[STDERR]         ^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\sklearn.py", line 1398, in fit
+[STDERR]     super().fit(
+[STDERR]     ~~~~~~~~~~~^
+[STDERR]         X,
+[STDERR]         ^^
+[STDERR]     ...<11 lines>...
+[STDERR]         init_model=init_model,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\sklearn.py", line 1049, in fit
+[STDERR]     self._Booster = train(
+[STDERR]                     ~~~~~^
+[STDERR]         params=params,
+[STDERR]         ^^^^^^^^^^^^^^
+[STDERR]     ...<6 lines>...
+[STDERR]         callbacks=callbacks,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\engine.py", line 297, in train
+[STDERR]     booster = Booster(params=params, train_set=train_set)
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 3656, in __init__
+[STDERR]     train_set.construct()
+[STDERR]     ~~~~~~~~~~~~~~~~~~~^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 2590, in construct
+[STDERR]     self._lazy_init(
+[STDERR]     ~~~~~~~~~~~~~~~^
+[STDERR]         data=self.data,
+[STDERR]         ^^^^^^^^^^^^^^^
+[STDERR]     ...<9 lines>...
+[STDERR]         position=self.position,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 2123, in _lazy_init
+[STDERR]     data, feature_name, categorical_feature, self.pandas_categorical = _data_from_pandas(
+[STDERR]                                                                        ~~~~~~~~~~~~~~~~~^
+[STDERR]         data=data,
+[STDERR]         ^^^^^^^^^^
+[STDERR]     ...<2 lines>...
+[STDERR]         pandas_categorical=self.pandas_categorical,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 868, in _data_from_pandas
+[STDERR]     _pandas_to_numpy(data, target_dtype=target_dtype),
+[STDERR]     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 814, in _pandas_to_numpy
+[STDERR]     _check_for_bad_pandas_dtypes(data.dtypes)
+[STDERR]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 805, in _check_for_bad_pandas_dtypes
+[STDERR]     raise ValueError(
+[STDERR]         f"pandas dtypes must be int, float or bool.\nFields with bad pandas dtypes: {', '.join(bad_pandas_dtypes)}"
+[STDERR]     )
+[STDERR] ValueError: pandas dtypes must be int, float or bool.
+[STDERR] Fields with bad pandas dtypes: Name: object, Market: object
+[ERROR] 실패: train_HOJ_ENGINE_RESEARCH.py
+[ERROR] 연구 엔진 실패
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 258, in main
+    run_subprocess("train_HOJ_ENGINE_RESEARCH.py", lg)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 149, in run_subprocess
+    raise RuntimeError(f"{script_name} failed")
+RuntimeError: train_HOJ_ENGINE_RESEARCH.py failed
+
+[BACKUP] F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl → F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_251118_2.pkl
+[STEP 5] 실전 엔진 학습
+[RUN] F:\autostockG\MODELENGINE\util\train_HOJ_ENGINE_REAL.py
+[STDOUT] === [REAL] HOJ 엔진 학습 시작 ===
+[STDOUT]   📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+[STDOUT]   💾 출력 엔진: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+[STDOUT]   📅 DB 기간(REAL): 2015-03-31 ~ 2025-11-05
+[STDOUT]   📊 전체 행 수: 5,867,250  / 종목 수: 2,852
+[STDOUT]   🧬 피처 개수: 17
+[STDOUT]   🧬 피처 예시: ['Change', 'Name', 'Market', 'SMA_5', 'SMA_20', 'SMA_60', 'VOL_SMA_20', 'MOM_10', 'ROC_20', 'MACD_12_26']
+[STDOUT]   ✅ NaN 제거 후 학습 샘플 수: 5,867,250
+[STDOUT] 
+[STDOUT] [1] 회귀 모델 학습 (FULL DATA)
+[STDERR] Traceback (most recent call last):
+[STDERR]   File "F:\autostockG\MODELENGINE\util\train_HOJ_ENGINE_REAL.py", line 120, in <module>
+[STDERR]     model_reg.fit(X, y_reg)
+[STDERR]     ~~~~~~~~~~~~~^^^^^^^^^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\sklearn.py", line 1398, in fit
+[STDERR]     super().fit(
+[STDERR]     ~~~~~~~~~~~^
+[STDERR]         X,
+[STDERR]         ^^
+[STDERR]     ...<11 lines>...
+[STDERR]         init_model=init_model,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\sklearn.py", line 1049, in fit
+[STDERR]     self._Booster = train(
+[STDERR]                     ~~~~~^
+[STDERR]         params=params,
+[STDERR]         ^^^^^^^^^^^^^^
+[STDERR]     ...<6 lines>...
+[STDERR]         callbacks=callbacks,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\engine.py", line 297, in train
+[STDERR]     booster = Booster(params=params, train_set=train_set)
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 3656, in __init__
+[STDERR]     train_set.construct()
+[STDERR]     ~~~~~~~~~~~~~~~~~~~^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 2590, in construct
+[STDERR]     self._lazy_init(
+[STDERR]     ~~~~~~~~~~~~~~~^
+[STDERR]         data=self.data,
+[STDERR]         ^^^^^^^^^^^^^^^
+[STDERR]     ...<9 lines>...
+[STDERR]         position=self.position,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 2123, in _lazy_init
+[STDERR]     data, feature_name, categorical_feature, self.pandas_categorical = _data_from_pandas(
+[STDERR]                                                                        ~~~~~~~~~~~~~~~~~^
+[STDERR]         data=data,
+[STDERR]         ^^^^^^^^^^
+[STDERR]     ...<2 lines>...
+[STDERR]         pandas_categorical=self.pandas_categorical,
+[STDERR]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]     )
+[STDERR]     ^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 868, in _data_from_pandas
+[STDERR]     _pandas_to_numpy(data, target_dtype=target_dtype),
+[STDERR]     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 814, in _pandas_to_numpy
+[STDERR]     _check_for_bad_pandas_dtypes(data.dtypes)
+[STDERR]     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+[STDERR]   File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\lightgbm\basic.py", line 805, in _check_for_bad_pandas_dtypes
+[STDERR]     raise ValueError(
+[STDERR]         f"pandas dtypes must be int, float or bool.\nFields with bad pandas dtypes: {', '.join(bad_pandas_dtypes)}"
+[STDERR]     )
+[STDERR] ValueError: pandas dtypes must be int, float or bool.
+[STDERR] Fields with bad pandas dtypes: Name: object, Market: object
+[ERROR] 실패: train_HOJ_ENGINE_REAL.py
+[ERROR] REAL 엔진 실패
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 273, in main
+    run_subprocess("train_HOJ_ENGINE_REAL.py", lg)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\autostockG\MODELENGINE\util\full_update_pipeline.py", line 149, in run_subprocess
+    raise RuntimeError(f"{script_name} failed")
+RuntimeError: train_HOJ_ENGINE_REAL.py failed
+
+[BACKUP] F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl → F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_251118_2.pkl
+[BACKUP] F:\autostockG\MODELENGINE\SLE_DB\REAL\SLE_DB_REAL_V21.parquet → F:\autostockG\MODELENGINE\SLE_DB\REAL\SLE_DB_REAL_V21_251031.parquet
+[BACKUP] F:\autostockG\MODELENGINE\SLE_ENGINE\REAL\SLE_ENGINE_REAL_V21.pkl → F:\autostockG\MODELENGINE\SLE_ENGINE\REAL\SLE_ENGINE_REAL_V21_251118_1.pkl
+
+==========================================
+[FULL UPDATE END]
+==========================================
+📄 로그: F:\autostockG\MODELENGINE\LOG\full_update_251118.log

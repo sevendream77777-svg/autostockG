@@ -1,0 +1,9 @@
+2025-11-09 06:06:09,476 [INFO] Total targets loaded: 511245
+2025-11-09 06:06:09,479 [WARNING] Output directory 'output_chunks' already exists. Clearing old chunks...
+2025-11-09 06:10:16,902 [INFO] Total targets loaded: 511245
+2025-11-09 06:10:16,944 [WARNING] Output directory 'output_chunks' already exists. Clearing old chunks...
+2025-11-09 06:48:34,061 [ERROR] [20150415_060280] 서버 차단(CAPTCHA/403) 의심: HTML 길이 186625
+2025-11-09 06:52:21,484 [ERROR] [20150624_060280] 서버 차단(CAPTCHA/403) 의심: HTML 길이 186625
+2025-11-09 07:08:02,124 [ERROR] [20150617_060280] 서버 차단(CAPTCHA/403) 의심: HTML 길이 186630
+2025-11-09 07:08:26,941 [ERROR] [20150410_060280] 서버 차단(CAPTCHA/403) 의심: HTML 길이 186630
+2025-11-09 15:07:48,579 [INFO] Total targets loaded: 511245

@@ -1,0 +1,69 @@
+# ============================================================
+# make_kospi_index_10y.py (모듈 경로 문제 해결 버전)
+# ============================================================
+import sys, os
+from datetime import datetime, timedelta
+
+# --- 모듈 경로 문제 해결 시작 ---
+# 1. 스크립트가 포함된 MODELENGINE 폴더를 시스템 경로에 추가하여,
+#    하위의 UTIL 폴더(config_paths.py 위치)를 찾도록 강제합니다.
+#    BASE_DIR = F:\autostockG\MODELENGINE
+current_script_path = os.path.abspath(__file__)
+raw_dir_path = os.path.dirname(current_script_path)  # F:\autostockG\MODELENGINE\raw
+modelengine_dir_path = os.path.dirname(raw_dir_path) # F:\autostockG\MODELENGINE
+
+if modelengine_dir_path not in sys.path:
+    sys.path.append(modelengine_dir_path)
+
+# 2. 이제 UTIL 폴더의 모듈을 찾을 수 있습니다.
+#    (UTIL 폴더는 MODELENGINE 폴더 아래에 있으므로 sys.path에 추가된 상태입니다.)
+from UTIL.config_paths import get_path, versioned_filename # 경로를 명시적으로 지정
+
+import pandas as pd
+import FinanceDataReader as fdr
+
+
+def main():
+    raw_dir = get_path("RAW")
+    os.makedirs(raw_dir, exist_ok=True)
+
+    # 오늘 기준 어제 날짜까지 데이터 수집
+    end_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    start_date = "2015-01-01"
+
+    print("[KOSPI] KS11 지수 수집 시작")
+    print(f"  기간: {start_date} ~ {end_date}")
+
+    kospi = fdr.DataReader("KS11", start_date, end_date).reset_index()
+
+    # 표준 컬럼명 정리 및 필요한 컬럼만 선택
+    kospi = kospi.rename(columns={"Date": "Date", "Close": "KOSPI_종가"})
+    kospi = kospi[["Date", "KOSPI_종가"]].copy()
+
+    # Date 타입 보정
+    kospi["Date"] = pd.to_datetime(kospi["Date"])
+
+    # KOSPI 수익률 계산
+    kospi = kospi.sort_values("Date").reset_index(drop=True)
+    kospi["KOSPI_수익률"] = kospi["KOSPI_종가"].pct_change()
+
+    min_date = kospi["Date"].min().date()
+    max_date = kospi["Date"].max().date()
+    n_rows = len(kospi)
+
+    target_file = get_path("RAW", "kospi_index_10y.parquet")
+    os.makedirs(os.path.dirname(target_file), exist_ok=True)
+
+    # 파일 저장 (인덱스 없이)
+    kospi.to_parquet(target_file, index=False)
+    print(f"[KOSPI] 메인 파일 저장 완료: {target_file} ({n_rows:,}행)")
+    print(f"[KOSPI] 기간: {min_date} ~ {max_date}")
+
+    # 날짜 버전 백업 저장
+    backup_path = versioned_filename(target_file)
+    kospi.to_parquet(backup_path, index=False)
+    print(f"[KOSPI] 날짜 버전 백업 생성: {backup_path}")
+
+
+if __name__ == "__main__":
+    main()

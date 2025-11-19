@@ -1,0 +1,83 @@
+vs code 빌드업
+
+확인사항
+update_raw_data.py
+→ 지금은 외부에서 이미 만들어둔 10년 RAW(F:\autostockG\all_stocks_cumulative.parquet)를
+MODELENGINE\RAW로 복사하는 역할만 하고 있어서
+RAW 자체 품질/오염 로직은 safe_raw_builder_v2.py, safe_raw_validator.py 쪽에 그대로 두었어.
+
+safe_raw_* 계열 (전체 재구축, 패치, 검증)
+→ 이미 “Option A (전체 종목 수집)” 설계가 반영된 상태로 보이고,
+여기까지 한 번에 갈아엎으면 위험하니
+우선 엔진 날짜 문제부터 확실하게 해결하는 방향으로 정리했어.
+
+python make_kospi_index_10y.py
+
+
+"F:\autostockG\MODELENGINE\RAW\DAILY\20251117.parquet"
+
+import pandas as pd
+import pyarrow # 설치되어 있지 않다면 'pip install pyarrow'가 필요합니다.
+
+file_path = r"F:\autostockG\MODELENGINE\RAW\DAILY\20251117.parquet"
+
+# 파일 읽기 및 상위 100줄 출력
+df = pd.read_parquet(file_path)
+
+# 결과를 바로 출력
+print(df.head(100))
+
+
+get_next_bizdate 함수가 주말만 건너뛰고 휴장일은 고려하지 않는데 main에서는 무조건 다음 영업일 데이터를 pykrx로 받으려 하고 있어요. 휴장일이나 주말에 돌리면 pykrx 호출이 실패하면서 전체 패치가 중단됩니다. 실제 거래 달력을 확인하거나 pykrx의 휴일 정보를 사용해 휴장일에는 바로 종료하도록 손봐야 합니다 (MODELENGINE/RAW/raw_patch.py (lines 309-349)).
+지침에서는 자동화 시 input()을 쓰지 말라고 했는데 (docs/agent-guidelines.md (lines 14-40)), 코드가 여전히 ask_yes_no를 통해 interactive 입력을 요구합니다 (MODELENGINE/RAW/raw_patch.py (lines 48-55), 328-333). 현재 파이프라인(non-interactive)에서는 여기서 멈추거나 EOF 오류가 나므로, 설정 값이나 옵션으로 대체하도록 바꿔야 합니다.
+결측 탐지는 NaN만 검사하고 있어서 (MODELENGINE/RAW/raw_patch.py (lines 226-235)), pykrx가 정지 종목 등에 대해 0 값을 주는 경우를 잡아내지 못합니다. 0 이하 OHLCV도 의심 값으로 분류해 네이버 보정 로직을 타게 해야 RAW에 0 가격이 남지 않아요.
+RAW parquet을 load_raw_main과 backup_raw_main에서 연달아 두 번 통째로 읽습니다 (MODELENGINE/RAW/raw_patch.py (lines 138-161)). 문서에서는 대용량 parquet을 한 번에 읽지 말라 했는데 (docs/agent-guidelines.md (lines 27-40)), 이중 로딩은 메모리 부족을 유발할 수 있어요. 이미 읽어 둔 raw_df를 백업에 재사용하거나 파일 복사를 사용하도록 조정하는 게 안전합니다.
+필요하면 위 문제 중 원하는 부분부터 같이 고쳐보죠.
+
+내가 알기로는 휴장일은 데이터가 나오지 않는 걸 확인하고 휴장일로 판정짓는다로 알고 있는데 그부분에 문제가 있다는 얘기지?
+ㅇㅋ 수정
+0값과 nan값의 차이는?
+load_raw_main 이건 내가 방금 테스트 한다고 backup_raw_main 임의로 all_stocks_cumulative.parquet파일을 수정했는데 이거 말하는건가?
+
+네, 지금 로직은 pykrx 호출이 실패하면 비정상으로 끝나 버리기 때문에 “휴장일이라 안 나오는 줄 알고 종료”가 아니라 그냥 오류로 터지면서 종료돼요. 휴장 여부를 pykrx 결과나 공휴일 캘린더로 먼저 판별하고, 휴장일이면 정상 종료 메시지를 남기고 끝내야 안전합니다.
+(수정하기로 한 것 확인!)
+NaN은 “값이 아예 없음”이고, 0은 “값은 있는데 숫자 0”. pykrx는 정지 종목·거래 없음 상황에 OHLCV를 0으로 돌려주는 경우가 있어서, 현재처럼 NaN만 의심으로 보면 0값이 그대로 RAW에 남아요. 실제 주가가 0일 수는 없으니 0 이하 값도 이상치로 간주해 네이버 보정이나 로그를 타게 해야 합니다.
+제가 말한 건 load_raw_main에서 이미 parquet을 메모리에 올렸는데, 백업할 때 다시 pd.read_parquet(RAW_MAIN)으로 전체 파일을 또 읽고 있는 부분이에요 (MODELENGINE/RAW/raw_patch.py (lines 138-161)). 테스트 때문에 수동으로 파일을 바꾼 건 별개이고, 구조적으로 동일 파일을 두 번 읽는 게 메모리적으로 비효율이라는 뜻입니다. 이미 메모리에 있는 raw_df를 그대로 to_parquet 해서 백업하면 한 번만 읽어도 돼요.
+1 휴장 여부를 pykrx 결과나 공휴일 캘린더로 먼저 판별 하는 가장 효율적인 방법 추천해주고
+3 ㅇㅋ 이것도 수정 그리고 nan값이랑 0값은 추후 자료 재수집이 가능하게 코드를 만들 수 있는지... 빈셀만 찾아서
+4 지금 말하는게 all_stocks_cumulative.parquet을 로드를 하고 다시 백업을 한다는 과정이 새로운 데이터를 all_stocks_cumulative.parquet에 병합시키는 과정 말하는거야? 그때 한번 읽고 백업할때는 데이터 날짜확인하느라 읽는건데 이걸 두번이나 읽으니까 비효율 적이다?
+맞으면 바로 작업시작하고 아니면 한번더 얘기해줘
+
+
+휴장 판별은 pykrx가 제공하는 거래일 캘린더를 쓰는 게 가장 간단해요. stock.get_nearest_business_day_in_a_week(date_str) 혹은 stock.get_market_ticker_list(date_str)를 먼저 호출했을 때 공휴일이면 직전 거래일로 보정돼서 옵니다. 이걸 이용해 “요청 날짜 == pykrx가 돌려준 실제 거래일”인지 비교하면 휴일 여부를 즉시 알 수 있고, 휴일이면 바로 종료하거나 안내 메시지만 남기면 됩니다. 혹은 pykrx.calendar 모듈의 KrxHoliday 클래스로 연간 휴장표를 캐시해 두고 사전 체크하는 방법도 있습니다.
+0/NaN 처리: NaN은 완전히 비어 있는 셀이고, 0은 값은 있지만 숫자 0입니다. 두 경우 모두 재수집 대상이니 mask = df[cols].isna() | (df[cols] <= 0)처럼 묶어서 의심 리스트를 만들고, 네이버 보정이 실패하면 missing_{date}.txt에 남기면 돼요. 추후 자료 재수집을 위해서는 그 로그 파일을 그대로 재시도 입력으로 사용하는 헬퍼(예: retry_missing_codes(date) 함수)를 두면 “빈 셀 목록 → 수동 재시도” 흐름을 구현할 수 있습니다.
+네, 제가 말한 이중 로딩이 바로 그 부분입니다. load_raw_main()에서 이미 all_stocks_cumulative.parquet를 읽어 raw_df를 만들었는데, 백업할 때 다시 pd.read_parquet(RAW_MAIN)으로 전체 파일을 한 번 더 읽고 있거든요. 대용량 파일을 두 번 메모리에 올리는 건 지침에도 어긋나니, 이미 가지고 있는 raw_df를 그대로 raw_df.to_parquet(backup_path)로 쓰면 백업과 병합 모두 한 번 로드한 데이터로 처리할 수 있습니다.
+이 방향이 맞으면 바로 수정 작업을 시작할게요.
+
+1 가장 안정적이고 효율적인 방법으로 진행 ㄱ
+2 지금 세팅해놓은게 1서버 2서버 3서버를 놓고 1서버 실패시 2서버 이런식으로 설정 되어 있는거 확인돼? 이걸 바꿔서 nan이나 0처리 부분은 교차검증 하면 어때? 빈부분은 나머지 2 3서버도 바로 시도 이러고도 없으면 얘는 원래 없는데이터가 될 수 있잖아
+3 ㅇㅋ 이것도 바로 ㄱ
+
+
+휴장 판정: pykrx.stock.get_nearest_business_day_in_a_week()의 반환값과 요청 일자를 비교하면 됩니다. target_ymd = to_ymd(target_date) 후 real_ymd = stock.get_nearest_business_day_in_a_week(target_ymd)을 구해 두 값이 다르면 휴장일이므로 [INFO] target_ymd 는 휴장일이어서 스킵 로그만 남기고 sys.exit(0) 하면 안전합니다. 추가로 KrxHoliday()를 한 번 초기화해 연간 휴장표를 캐시해 두면(공휴일 리스트를 dict로 저장) 여러 번 호출해도 속도가 빠르고 네트워크도 쓰지 않아서 가장 안정적입니다 (MODELENGINE/RAW/raw_patch.py (lines 309-350)附近에 삽입).
+
+다중 소스/교차검증: 현재 스크립트엔 pykrx 1차(build_daily_from_pykrx)와 Naver 2차(fill_missing_with_naver)만 있고 “3서버”는 없습니다 (MODELENGINE/RAW/raw_patch.py (lines 172-289)). 1→2→3 체인을 원한다면 DATA_SOURCES = [krx_fetch, naver_fetch, my_third_fetch] 같은 목록을 만들어 의심 코드마다 순차적으로 조회하는 함수를 두세요. 동시에 0/NaN을 동일하게 의심 처리해야 하므로 mask_bad = df[ohlcv_cols].isna() | (df[ohlcv_cols] <= 0)로 바꾸고, 첫 번째 소스에서 걸러진 티커는 곧바로 두 번째, 세 번째 소스로 전달합니다. 그래도 못 찾으면 missing_{date}.txt에 “세 소스 실패” 플래그를 남겨두면 “원래 데이터 없음” 케이스를 재수집 큐로 넘길 수 있습니다. 추후 retry_missing_codes(date, provider_idx) 같은 재시도 도구를 추가하면 빈셀만 모아서 다시 돌리기 쉬워요.
+
+RAW 이중 로딩 제거: load_raw_main()에서 이미 all_stocks_cumulative.parquet를 메모리로 읽으므로 (MODELENGINE/RAW/raw_patch.py (lines 138-145)), backup_raw_main 호출 시 pd.read_parquet(RAW_MAIN)를 다시 할 필요가 없습니다 (MODELENGINE/RAW/raw_patch.py (lines 151-161)). 시그니처를 def backup_raw_main(raw_df: pd.DataFrame, today: dt.date)로 바꾸고 raw_df.to_parquet(final_path)를 쓰면 한 번 로드한 데이터로 백업과 날짜 확인을 모두 처리할 수 있어 지침(대용량 Parquet 반복 적재 금지)에 맞습니다.
+
+현재 환경이 읽기 전용이라 코드를 직접 바꿔드릴 수는 없지만, 위 구조로 수정하면 요청하신 1·2·3 요구사항을 바로 반영할 수 있을 거예요.
+
+아~ 코드를 안줘? 그냥 읽고 분석만 해주는거야?
+
+
+지금 세션은 파일 쓰기 권한이 막힌 읽기 전용 모드라서, 코드나 파일을 직접 수정해서 보여줄 수는 없어요. 대신 현재 코드 구조를 분석하거나, 어떤 식으로 고치면 되는지 접근 방법과 예시 로직을 설명해 드릴 순 있습니다. 쓰기 권한이 있는 환경이라면 제가 설명한 방법대로 바로 고쳐 드릴 수도 있어요. 원하시면 구체적인 수정 가이드나 의사코드 형태로 더 자세히 정리해볼게요.
+
+쓰기권한은 무슨 키 그거 발급받는거지? 지금 내가 plus 요금제 쓰고 있는데 그거랑은 상관없고?
+
+
+Codex CLI에서 쓰기 권한이 있는지 여부는 요금제가 아니라 이 세션의 실행 권한 설정에 따라 달라요. 지금은 프로젝트 폴더가 읽기 전용(sandbox read-only)로 열려 있어서 제가 파일을 바꾸지 못하는 상태고, 이를 바꾸려면 세션을 쓰기 허용 모드(workspace-write 등)로 다시 시작해 주셔야 합니다. 일반적인 Plus 구독 여부와는 무관해요. 쓰기 모드로 재시작해 주시면 그때는 바로 코드 수정까지 도와드릴 수 있어요.
+
+재시작하면 너 없어지는거 아냐? 첨부터 다시하는거 아니지?
+
+
+세션을 종료하고 새로 열면 지금까지의 대화 내용과 컨텍스트는 사라지지만, 다시 불러 주시면 같은 프로젝트를 이어서 도와드릴 수 있어요. 재시작 후 “쓰기 권한 허용해 달라”고만 알려 주시면, 방금 이야기한 내용도 금방 다시 살펴보고 이어서 작업할 수 있습니다.
