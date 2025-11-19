@@ -5,6 +5,8 @@
 
 ====================[특정 데이터 폴더 무시]역슬래시()는 슬래시(/)로 변경해야 인식됩니다.=============
 
+new_Hoj_DB_V25.csv
+new_Hoj_DB_V25_FULL.csv
 
 MODELENGINE/HOJ_ENGINE/RESEARCH/MODELENGINE/RAW/stocks/kospi_data/
 MODELENGINE/old"
