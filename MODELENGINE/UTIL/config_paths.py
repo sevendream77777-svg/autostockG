@@ -5,6 +5,7 @@
 # ================================================================
 
 import os
+from datetime import datetime
 
 # MODELENGINE 루트 경로 (절대경로 고정)
 BASE = r"F:\autostockG\MODELENGINE"
@@ -38,10 +39,46 @@ def get_path(*parts):
 # 예: "file.parquet" → "file_250117.parquet"
 # ---------------------------------------------------------------
 def versioned_filename(path):
+    """
+    기존 파일 내용에 기반해 날짜 태그(YYMMDD)를 추출하고,
+    동일한 이름이 존재하면 _1, _2 를 붙여 유일한 백업 경로를 반환한다.
+    """
     base, ext = os.path.splitext(path)
-    from datetime import datetime
-    today = datetime.now().strftime("%y%m%d")
-    return f"{base}_{today}{ext}"
+    date_tag = _infer_data_tag(path, ext)
+    candidate = f"{base}_{date_tag}{ext}"
+    counter = 1
+
+    while os.path.exists(candidate):
+        candidate = f"{base}_{date_tag}_{counter}{ext}"
+        counter += 1
+
+    return candidate
+
+
+def _infer_data_tag(path: str, ext: str) -> str:
+    """
+    파일 내 Date 컬럼(Parquet)을 우선 사용하고, 실패하면 수정 시각이나 현재 날짜를 반환.
+    """
+    if os.path.exists(path):
+        if ext.lower() == ".parquet":
+            try:
+                import pandas as pd
+
+                df = pd.read_parquet(path, columns=["Date"])
+                if "Date" in df.columns:
+                    latest = pd.to_datetime(df["Date"], errors="coerce").max()
+                    if pd.notnull(latest):
+                        return latest.strftime("%y%m%d")
+            except Exception:
+                pass
+
+        try:
+            ts = datetime.fromtimestamp(os.path.getmtime(path))
+            return ts.strftime("%y%m%d")
+        except Exception:
+            pass
+
+    return datetime.now().strftime("%y%m%d")
 
 
 # ---------------------------------------------------------------

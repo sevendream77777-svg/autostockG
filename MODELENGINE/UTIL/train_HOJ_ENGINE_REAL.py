@@ -65,7 +65,23 @@ for col in ["Return_5d", "Label_5d"]:
     if col not in df.columns:
         raise KeyError(f"필수 컬럼이 DB에 존재하지 않습니다: {col}")
 
-feature_cols = [c for c in df.columns if c not in meta_cols]
+raw_feature_cols = [c for c in df.columns if c not in meta_cols]
+
+# LightGBM은 수치/불리언형만 허용하므로 숫자/불리언 컬럼만 사용
+feature_cols = (
+    df[raw_feature_cols]
+    .select_dtypes(include=["number", "bool"])
+    .columns
+    .tolist()
+)
+
+if not feature_cols:
+    raise ValueError("학습 가능한 수치형 피처가 없습니다. HOJ_DB 구성을 확인하세요.")
+
+removed_cols = sorted(set(raw_feature_cols) - set(feature_cols))
+if removed_cols:
+    print(f"  ⚠ 제외된 비수치 컬럼: {removed_cols[:5]}{'...' if len(removed_cols) > 5 else ''}")
+
 
 print(f"  🧬 피처 개수: {len(feature_cols)}")
 print("  🧬 피처 예시:", feature_cols[:10])

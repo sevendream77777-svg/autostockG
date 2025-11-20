@@ -21,32 +21,20 @@ from UTIL.config_paths import get_path, versioned_filename # 경로를 명시적
 
 import pandas as pd
 import FinanceDataReader as fdr
-import time
 
 
 def main():
     raw_dir = get_path("RAW")
     os.makedirs(raw_dir, exist_ok=True)
 
-    legacy_target = get_path("RAW", "kospi_index_10y.parquet")
-    synced_target = get_path("RAW", "kospi_data", "kospi_data.parquet")
-
     # 오늘 기준 어제 날짜까지 데이터 수집
     end_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     start_date = "2015-01-01"
 
-    latest_existing = _get_latest_date([legacy_target, synced_target])
-    if latest_existing and latest_existing.strftime("%Y-%m-%d") >= end_date:
-        print(f"[KOSPI] 기존 데이터({latest_existing.date()})가 이미 최신입니다. 다운로드를 건너뜁니다.")
-        return
-
     print("[KOSPI] KS11 지수 수집 시작")
     print(f"  기간: {start_date} ~ {end_date}")
 
-    kospi = _fetch_with_retry("KS11", start_date, end_date)
-    if kospi is None:
-        print("[KOSPI] 경고: 다운로드 실패 - 기존 파일로 진행합니다.")
-        return
+    kospi = fdr.DataReader("KS11", start_date, end_date).reset_index()
 
     # 표준 컬럼명 정리 및 필요한 컬럼만 선택
     kospi = kospi.rename(columns={"Date": "Date", "Close": "KOSPI_종가"})
@@ -63,47 +51,18 @@ def main():
     max_date = kospi["Date"].max().date()
     n_rows = len(kospi)
 
-    os.makedirs(os.path.dirname(legacy_target), exist_ok=True)
+    target_file = get_path("RAW", "kospi_index_10y.parquet")
+    os.makedirs(os.path.dirname(target_file), exist_ok=True)
 
-    # 파일 저장 (인덱스 없이) - 기존 경로 유지
-    kospi.to_parquet(legacy_target, index=False)
-    print(f"[KOSPI] 메인 파일 저장 완료: {legacy_target} ({n_rows:,}행)")
+    # 파일 저장 (인덱스 없이)
+    kospi.to_parquet(target_file, index=False)
+    print(f"[KOSPI] 메인 파일 저장 완료: {target_file} ({n_rows:,}행)")
     print(f"[KOSPI] 기간: {min_date} ~ {max_date}")
 
-    # full_update_pipeline이 참조하는 kospi_data 경로와 동기화
-    os.makedirs(os.path.dirname(synced_target), exist_ok=True)
-    kospi.to_parquet(synced_target, index=False)
-    print(f"[KOSPI] FEATURE 경로 동기화: {synced_target}")
-
-    # 날짜 버전 백업 저장 (기존 경로 기준)
-    backup_path = versioned_filename(legacy_target)
+    # 날짜 버전 백업 저장
+    backup_path = versioned_filename(target_file)
     kospi.to_parquet(backup_path, index=False)
     print(f"[KOSPI] 날짜 버전 백업 생성: {backup_path}")
-
-
-def _fetch_with_retry(symbol, start, end, max_attempts=3, delay=5):
-    for attempt in range(1, max_attempts + 1):
-        try:
-            return fdr.DataReader(symbol, start, end).reset_index()
-        except Exception as exc:
-            print(f"[KOSPI] 경고: FinanceDataReader 실패 ({attempt}/{max_attempts}) - {exc}")
-            if attempt < max_attempts:
-                time.sleep(delay)
-    return None
-
-
-def _get_latest_date(paths):
-    for p in paths:
-        if p and os.path.exists(p):
-            try:
-                df = pd.read_parquet(p, columns=["Date"])
-                if "Date" in df.columns:
-                    latest = pd.to_datetime(df["Date"], errors="coerce").max()
-                    if pd.notnull(latest):
-                        return latest
-            except Exception:
-                continue
-    return None
 
 
 if __name__ == "__main__":
