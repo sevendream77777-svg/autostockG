@@ -26,6 +26,11 @@ engine_manager.py,[엔진 매니저] 데이터 업데이트(0단계) → 학습(
 config_paths.py: 모든 파일이 서로의 위치를 절대 잃어버리지 않게 교통정리 해주는 나침반 파일.
 version_utils.py: 주 임무는 **"덮어쓰기 방지"**. 중요 사용처: train_engine_unified.py (엔진 저장 전), build_features.py (피처 저장 전) 등, 핵심 함수: backup_existing_file(filepath, date_tag)
 
+그외
+-5d (예측 목표 / Horizon) 바꾸는 곳
+MODELENGINE/UTIL/train_engine_unified.py
+60일 (SMA_60, 이평선 등 피처 계산) 바꾸는 곳
+MODELENGINE/UTIL/build_features.py
 -------------------------------------------------------------------------------------
 
 파이프라인 흐름(MODELENGINE/run_modelengine_top10.py):

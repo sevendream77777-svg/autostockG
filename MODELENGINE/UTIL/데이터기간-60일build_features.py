@@ -1,7 +1,5 @@
 # ============================================================
-# build_features.py (V32 - Full Date Range / NaN Allowed)
-#   - 앞부분 데이터(SMA_60 등 계산 불가 구간)를 삭제하지 않음
-#   - 1월 2일부터의 모든 날짜를 DB에 포함시킴
+# build_features.py (V31/15, patched — correct backup order)
 # ============================================================
 
 import sys
@@ -10,12 +8,8 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 
-# 프로젝트 경로 설정 (기존 유지)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-try:
-    from UTIL.config_paths import get_path, versioned_filename
-except ImportError:
-    from config_paths import get_path, versioned_filename
+from config_paths import get_path, versioned_filename
 
 def get_latest_date_from_parquet(path: str, date_cols: Optional[List[str]] = None):
     if date_cols is None:
@@ -44,7 +38,7 @@ def _compute_features(group: pd.DataFrame) -> pd.DataFrame:
 
     g["SMA_5"] = c.rolling(5).mean()
     g["SMA_20"] = c.rolling(20).mean()
-    g["SMA_60"] = c.rolling(60).mean() # 앞쪽 59일은 NaN이 됨 (삭제 안 함)
+    g["SMA_60"] = c.rolling(60).mean()
 
     g["VOL_SMA_20"] = v.rolling(20).mean()
 
@@ -112,17 +106,63 @@ def normalize_kospi(df_kospi: pd.DataFrame) -> pd.DataFrame:
     return df_kospi[["Date", "KOSPI_종가", "KOSPI_수익률"]]
 
 def build_features():
-    # 경로 설정 (기존 유지)
     raw_file = get_path("RAW", "stocks", "all_stocks_cumulative.parquet")
     kospi_file = get_path("RAW", "kospi_data", "kospi_data.parquet")
     feature_file = get_path("FEATURE", "features_V31.parquet")
 
     print("==============================================")
-    print("[FEATURE V32] 피처 생성 (NaN 유지 모드)")
-    
-    # 날짜 체크 로직은 유지하되, 사용자 요청으로 강제 실행될 수 있음
-    # (여기서는 build_features() 직접 호출 시 로직 그대로 사용)
-    
+    print("[FEATURE V31/15] 피처 생성 여부 판단 중...")
+    print(f"  RAW   경로: {raw_file}")
+    print(f"  KOSPI 경로: {kospi_file}")
+
+    # ----------------------------------------------
+    # FM RULE: RAW/KOSPI 날짜 기반 데이터 기준일 계산
+    # ----------------------------------------------
+    raw_latest = get_latest_date_from_parquet(raw_file)
+    if raw_latest is None:
+        print("❌ RAW 파일을 읽을 수 없습니다."); return
+    print(f"  RAW 최신 날짜: {raw_latest}")
+
+    kospi_latest = get_latest_date_from_parquet(kospi_file)
+    if kospi_latest is None:
+        print("❌ KOSPI 파일을 읽을 수 없습니다."); return
+    print(f"  KOSPI 최신 날짜: {kospi_latest}")
+
+    # 데이터 기준일 = RAW/KOSPI 중 더 과거(min)
+    data_date = min(raw_latest, kospi_latest)
+    print(f"  ➜ 데이터 기준 날짜(DATA_DATE): {data_date}")
+
+    # ----------------------------------------------
+    # FEATURE 날짜 확인 및 업데이트 여부 판단
+    # ----------------------------------------------
+    feat_latest = get_latest_date_from_parquet(feature_file)
+    run_generate = False
+
+    if feat_latest is None:
+        print("  FEATURE 파일이 없습니다. → 생성 필요")
+        run_generate = True
+
+    else:
+        print(f"  FEATURE 최신 날짜: {feat_latest}")
+
+        if feat_latest < data_date:
+            print("  ➜ FEATURE 날짜가 DATA_DATE보다 과거 → 재생성")
+            run_generate = True
+
+        elif feat_latest == data_date:
+            print("  ➜ FEATURE 최신 → 생성 스킵")
+            return
+
+        else:   # feat_latest > data_date
+            print("  ⚠ FEATURE 날짜가 RAW/KOSPI보다 미래입니다. 데이터 오류 → 중단")
+            return
+
+
+    if not run_generate:
+        print("⚠ run_generate=False 상태입니다. 작업을 종료합니다."); return
+
+    print("[FEATURE V31/15] 피처 생성 시작")
+
     if not os.path.exists(kospi_file):
         print(f"❌ [CRITICAL] KOSPI 데이터가 없습니다: {kospi_file}"); return
 
@@ -134,6 +174,10 @@ def build_features():
 
     df_raw["Date"] = pd.to_datetime(df_raw["Date"], errors="coerce")
     df_raw = df_raw.dropna(subset=["Date"]).sort_values(["Date", "Code"]).reset_index(drop=True)
+
+    required_raw = {"Date", "Open", "High", "Low", "Close", "Volume", "Code"}
+    if missing := (required_raw - set(df_raw.columns)):
+        print(f"❌ RAW 필수 컬럼 누락: {missing}"); return
 
     try:
         df_kospi = normalize_kospi(df_kospi)
@@ -149,31 +193,33 @@ def build_features():
     print("  ... 기술적 지표 계산 중")
     df_feat = df.groupby("Code", group_keys=False).apply(_compute_features)
 
-    # [수정된 부분] dropna를 하지 않음!
-    # essential_cols = ["SMA_5", ... ] 리스트는 있지만 사용하지 않음
-    # df_feat = df_feat.dropna(subset=essential_cols)  <-- 이 줄 삭제/주석
-
+    essential_cols = ["SMA_5","SMA_20","SMA_60","VOL_SMA_20","MOM_10",
+                      "ROC_20","MACD_12_26","MACD_SIGNAL_9","BBP_20",
+                      "ATR_14","STOCH_K","STOCH_D","CCI_20",
+                      "ALPHA_SMA_20","KOSPI_수익률"]
+    df_feat = df_feat.dropna(subset=essential_cols)
     after_rows = len(df_feat)
-    print(f"  - 생성 결과: {before_rows:,} → {after_rows:,} 행 (삭제 없음, NaN 유지)")
+    print(f"  - 결측 제거: {before_rows:,} → {after_rows:,} 행")
     print("  - 최종 피처 개수: 15개")
 
     os.makedirs(os.path.dirname(feature_file), exist_ok=True)
 
+    # 올바른 백업 순서: 기존 파일이 있으면 먼저 백업(이동)한 뒤 새 파일 저장
     if os.path.exists(feature_file):
         try:
-            backup_path = versioned_filename(feature_file)
-            os.rename(feature_file, backup_path)
-            print(f"[FEATURE] 기존 파일 백업: {backup_path}")
+            backup_path = versioned_filename(feature_file)  # 기존 파일의 날짜로 태그
+            os.rename(feature_file, backup_path)            # 기존 파일 이동(백업)
+            print(f"[FEATURE V31/15] 기존 파일 백업: {backup_path}")
         except Exception as e:
-            print(f"⚠ 기존 파일 백업 실패: {e}")
+            print(f"⚠ 기존 파일 백업 실패: {e} (새 파일만 저장됩니다)")
 
     try:
         df_feat.to_parquet(feature_file, index=False)
-        print(f"[FEATURE] 저장 완료: {feature_file}")
+        print(f"[FEATURE V31/15] 저장 완료: {feature_file}")
     except Exception as e:
         print(f"❌ 저장 실패: {e}"); return
 
-    print("[FEATURE] 작업 완료")
+    print("[FEATURE V31/15] 작업 완료")
 
 def main():
     build_features()
