@@ -1,0 +1,181 @@
+PS F:\autostockG\MODELENGINE> python run_modelengine_top10.py
+
+=== MODELENGINE Top10 Pipeline (FM) 시작 ===
+
+[상태] 시작 시점 스냅샷:
+  - FEATURE 마지막 날짜: 2025-11-21
+  - HOJ_DB REAL 마지막 날짜: 2025-11-12
+  - HOJ_DB RESEARCH 마지막 날짜: 2025-11-12
+  - ENGINE REAL 파일 존재: True
+  - ENGINE RESEARCH 파일 존재: True
+
+[RAW] 업데이트 시도
+============================================================
+[RAW 시세 패치] 실행 시작 - F:\autostockG\MODELENGINE\RAW\raw_patch.py
+============================================================
+┌──────────────────────────────────────────────┐
+│ 🎉 흰둥이 원본데이터 업데이트 (V6)           │
+└──────────────────────────────────────────────┘
+[PATH] RAW_MAIN : F:\autostockG\MODELENGINE\RAW\stocks\all_stocks_cumulative.parquet
+
+[2025-11-22 16:44:54] [STEP 1] RAW 최신 날짜: 2025-11-21
+[2025-11-22 16:44:54] [WARN] 16~18시는 오염 방지로 수집 중단
+[DONE] RAW 시세 패치 완료 (소요시간: 0:00:22.354189)
+
+[KOSPI] 업데이트 시도
+============================================================
+[KOSPI 지수 업데이트] 실행 시작 - F:\autostockG\MODELENGINE\RAW\make_kospi_index_10y.py
+============================================================
+
+============================================================
+[KOSPI] 10년치 지수 수집 (kospi_data 폴더 저장)
+============================================================
+🕒 현재 16:45 (장마감 후) -> '금일(2025-11-22)' 마감 데이터 업데이트
+   [1순위] FinanceDataReader (Naver) 시도...
+----------------------------------------
+✅ 데이터 수집 완료 (최신: 2025-11-21)
+✅ 확정 데이터이므로 기존 파일을 백업합니다.
+----------------------------------------
+📦 [백업] kospi_data.parquet -> kospi_data_251121_2.parquet
+💾 [저장 완료] kospi_data.parquet (경로: RAW/kospi_data/)
+[DONE] KOSPI 지수 업데이트 완료 (소요시간: 0:00:07.245483)
+
+[FEATURE] 생성 시도 (정석: RAW/KOSPI 공통 최신일까지)
+============================================================
+[피처 생성] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\build_features.py
+============================================================
+==============================================
+[FEATURE V31/15] 피처 생성 여부 판단 중...
+  RAW   경로: F:\autostockG\MODELENGINE\RAW\stocks\all_stocks_cumulative.parquet
+  KOSPI 경로: F:\autostockG\MODELENGINE\RAW\kospi_data\kospi_data.parquet
+  RAW 최신 날짜: 2025-11-21
+  FEATURE 최신 날짜: 2025-11-21
+  ➜ RAW와 FEATURE 날짜가 동일합니다. 피처 생성을 건너뜁니다 (SKIP).
+[DONE] 피처 생성 완료 (소요시간: 0:00:16.252682)
+
+[판단] FEATURE 업데이트 여부: False (before=2025-11-21, after=2025-11-21)
+[DB/RESEARCH] FEATURE가 더 최신 → DB(Research) 재생성
+============================================================
+[HOJ DB (RESEARCH)] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\build_HOJ_DB_RESEARCH.py
+============================================================
+=== [RESEARCH] HOJ_DB V31 생성 시작 ===
+📥 FEATURE 로드: F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet
+  - 로드 완료: (5895785, 26)
+  - 라벨 생성 후 NaN 제거: 5895785 → 5881509
+💾 저장: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+📑 백업 저장(원본 rename): F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31_251112_1.parquet
+💾 저장 완료: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+=== [RESEARCH] HOJ_DB V31 생성 완료 ===
+[DONE] HOJ DB (RESEARCH) 완료 (소요시간: 0:00:42.796887)
+
+[결과] HOJ_DB_RESEARCH 마지막 날짜: 2025-11-12
+[DB/REAL] FEATURE가 더 최신 → DB(Real) 재생성
+============================================================
+[HOJ DB (REAL)] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\build_HOJ_DB_REAL.py
+============================================================
+=== [REAL] HOJ_DB V31 생성 시작 ===
+📥 FEATURE 로드: F:\autostockG\MODELENGINE\FEATURE\features_V31.parquet
+  - 로드 완료: (5895785, 26)
+  - 라벨 생성 후 NaN 제거: 5895785 → 5881509
+💾 저장: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+📑 백업 저장(원본 rename): F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31_251112_1.parquet
+💾 저장 완료: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+=== [REAL] HOJ_DB V31 생성 완료 ===
+[DONE] HOJ DB (REAL) 완료 (소요시간: 0:00:43.016063)
+
+[결과] HOJ_DB_REAL 마지막 날짜: 2025-11-12
+[ENGINE/RESEARCH] DB(Research) 최신 반영 → 재학습
+============================================================
+[HOJ ENGINE RESEARCH 학습] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\train_HOJ_ENGINE_RESEARCH.py
+============================================================
+=== [RESEARCH] HOJ 엔진 학습 시작 ===
+  📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\RESEARCH\HOJ_DB_RESEARCH_V31.parquet
+  💾 출력 엔진: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+  📅 DB 기간: 2015-03-31 ~ 2025-11-12
+  📊 전체 행 수: 5,881,509  / 종목 수: 2,853
+  🔧 검증 시작일(자동): 2024-11-12 (max_date 기준 -365일)
+  🔧 학습 구간: 2015-03-31 ~ 2024-11-11
+  🔧 검증 구간: 2024-11-12 ~ 2025-11-12
+  📚 학습 샘플 수: 5,200,934
+  🧪 검증 샘플 수: 680,575
+  ⚠ 제외된 비수치 컬럼: ['Market', 'Name']
+  🧬 피처 개수: 15
+  🧬 피처 예시: ['Change', 'SMA_5', 'SMA_20', 'SMA_60', 'VOL_SMA_20', 'MOM_10', 'ROC_20', 'MACD_12_26', 'MACD_SIGNAL_9', 'BBP_20']
+  ✅ NaN 제거 후 학습 샘플: 5,200,934
+  ✅ NaN 제거 후 검증 샘플: 680,575
+
+[1] 회귀 모델 학습 (Return_5d)
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[6]     valid_0's rmse: 0.0870029
+   ✅ 회귀 RMSE (valid): 0.087003
+
+[2] 분류 모델 학습 (Label_5d)
+Training until validation scores don't improve for 100 rounds
+Did not meet early stopping. Best iteration is:
+[1000]  valid_0's binary_logloss: 0.662577
+   ✅ 분류 정확도 (valid): 0.5659
+
+[3] 엔진 저장
+  🔄 기존파일 백업됨 → F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_251112.pkl
+💾 연구용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31.pkl
+=== [RESEARCH] HOJ 엔진 학습 종료 ===
+[DONE] HOJ ENGINE RESEARCH 학습 완료 (소요시간: 0:02:36.988708)
+
+[ENGINE/REAL] DB(Real) 최신 반영 → 재학습
+============================================================
+[HOJ ENGINE REAL 학습] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\train_HOJ_ENGINE_REAL.py
+============================================================
+=== [REAL] HOJ 엔진 학습 시작 ===
+  📥 입력 DB: F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet
+  💾 출력 엔진: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+  📅 DB 기간(REAL): 2015-03-31 ~ 2025-11-12
+  📊 전체 행 수: 5,881,509  / 종목 수: 2,853
+  ⚠ 제외된 비수치 컬럼: ['Market', 'Name']
+  🧬 피처 개수: 15
+  🧬 피처 예시: ['Change', 'SMA_5', 'SMA_20', 'SMA_60', 'VOL_SMA_20', 'MOM_10', 'ROC_20', 'MACD_12_26', 'MACD_SIGNAL_9', 'BBP_20']
+  ✅ NaN 제거 후 학습 샘플 수: 5,881,509
+
+[1] 회귀 모델 학습 (FULL DATA)
+   ℹ 학습 RMSE (train, 참고): 0.079890
+
+[2] 분류 모델 학습 (FULL DATA)
+   ℹ 학습 정확도 (train, 참고): 0.5770
+
+[3] 엔진 저장
+  🔄 기존파일 백업됨 → F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_251112.pkl
+💾 실전용 엔진 저장 완료 → F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl
+=== [REAL] HOJ 엔진 학습 종료 ===
+[DONE] HOJ ENGINE REAL 학습 완료 (소요시간: 0:04:31.069524)
+
+[Top10] 예측/추천 실행
+============================================================
+[Top10 추천] 실행 시작 - F:\autostockG\MODELENGINE\UTIL\daily_recommender.py
+============================================================
+[0] HOJ 실전 엔진('F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31.pkl') 로드 중...
+✅ 모델 로드 완료.
+[1] 'F:\autostockG\MODELENGINE\HOJ_DB\REAL\HOJ_DB_REAL_V31.parquet' (HOJ REAL DB) 로드 중...
+✅ 로드 완료. (총 5881509 행, 5초)
+  > 'Date' 기준 '2025-11-12' 데이터로 '예상 수익률' 예측 중...
+✅ 사용할 15개 피처 준비...
+
+================================================================================
+★★★ '2025-11-12' HOJ 실전 추천 Top 10 ★★★
+================================================================================
+         종목명   Code       종가  예측확률(%)
+마이크로엔엑스      448780     1910    74.70
+펨토바이오메드      327610     1522    73.34
+에스알바이오텍      270210    12000    71.65
+한국미라클피플사     331660     7770    68.15
+판도라티비        202960      577    66.79
+켈스           402420     1240    66.41
+코셋           189350     1200    66.05
+한화플러스제5호스팩   498390     1997    63.08
+유안타제15호스팩    473050     2025    62.64
+태양3C         052960     3115    62.51
+================================================================================
+✅ 추천 결과가 'recommendation_HOJ_V31_2025-11-12_2025-11-22_165411.csv' 파일로 저장되었습니다.
+[DONE] Top10 추천 완료 (소요시간: 0:00:15.088478)
+
+
+=== MODELENGINE Top10 Pipeline (FM) 완료 ===

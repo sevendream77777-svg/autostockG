@@ -11,14 +11,15 @@ def get_timestamp():
     """날짜 기반 타임스탬프 (예: 251116)"""
     return datetime.datetime.now().strftime("%y%m%d")
 
-def backup_existing_file(file_path):
+def backup_existing_file(file_path, date_tag: str | None = None):
     """파일이 존재하면 백업본 생성"""
     if not os.path.exists(file_path):
         return None  # 백업할 필요 없음
 
     dirname, filename = os.path.split(file_path)
     name, ext = os.path.splitext(filename)
-    ts = get_timestamp()
+    # prefer provided date_tag; else infer from existing parquet; else today
+    ts = (date_tag or _infer_parquet_date_tag(file_path) or get_timestamp())
 
     # 새 백업 파일 이름
     backup_name = f"{name}_{ts}{ext}"
@@ -44,3 +45,16 @@ def save_new_file(df, save_path):
 
     df.to_parquet(save_path, index=False)
     print(f"  💾 새 파일 저장됨 → {save_path}")
+
+def _infer_parquet_date_tag(file_path: str) -> str | None:
+    try:
+        import pandas as pd
+        if os.path.exists(file_path) and file_path.lower().endswith((".parquet",".pq")):
+            df = pd.read_parquet(file_path, columns=["Date"])
+            if "Date" in df.columns and len(df) > 0:
+                dt = pd.to_datetime(df["Date"], errors="coerce").max()
+                if pd.notnull(dt):
+                    return dt.strftime("%y%m%d")
+    except Exception:
+        pass
+    return None

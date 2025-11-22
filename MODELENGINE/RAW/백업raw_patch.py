@@ -123,12 +123,9 @@ def load_raw_main() -> pd.DataFrame:
     return df
 
 def backup_raw_main(raw_df: pd.DataFrame, today: dt.date) -> str:
-    """Rename existing RAW_MAIN to Date.max()-tagged backup. Do NOT write new data into backup."""
-    if os.path.exists(RAW_MAIN):
-        backup_path = versioned_filename(RAW_MAIN)  # Date.max() of EXISTING file
-        os.rename(RAW_MAIN, backup_path)
-        return backup_path
-    return 
+    backup_path = versioned_filename(RAW_MAIN)
+    raw_df.to_parquet(backup_path)
+    return backup_path
 
 def merge_daily_into_raw(raw_df: pd.DataFrame, daily_df: pd.DataFrame) -> pd.DataFrame:
     merged = pd.concat([raw_df, daily_df], ignore_index=True)

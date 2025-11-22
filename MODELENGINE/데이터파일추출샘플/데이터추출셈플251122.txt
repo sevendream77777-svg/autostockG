@@ -1,0 +1,70 @@
+>>> import pandas as pd
+...
+... df = pd.read_parquet("F:/autostockG/MODELENGINE/RAW/kospi_data/kospi_data.parquet")
+... print(df.columns)
+... print(df.head())
+...
+Index(['Date', 'Close'], dtype='object')
+        Date    Close
+0 2014-11-24  1978.54
+1 2014-11-25  1980.21
+2 2014-11-26  1980.84
+3 2014-11-27  1982.09
+4 2014-11-28  1980.78
+>>> import pandas as pd
+...
+... df = pd.read_parquet("F:/autostockG/MODELENGINE/RAW/all_stocks_cumulative.parquet")
+... print(df.columns)
+... print(df.head())
+
+
+
+>>> import pandas as pd
+...
+... df = pd.read_parquet("F:/autostockG/MODELENGINE/RAW/stocks/all_stocks_cumulative.parquet")
+... print(df.columns)
+... print(df.head())
+...
+... import pandas as pd
+...
+... df = pd.read_parquet("F:/autostockG/MODELENGINE/RAW/stocks/daily/daily_20251121.parquet")
+... print(df.columns)
+... print(df.head())
+...
+... import pandas as pd
+...
+... df = pd.read_parquet("F:/autostockG/MODELENGINE/feature/features_V31.parquet")
+... print(df.columns)
+... print(df.head())
+...
+Index(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Change', 'Code',
+       'Name', 'Market'],
+      dtype='object')
+         Date     Open     High      Low    Close    Volume    Change    Code   Name Market
+0  2015-01-02   5450.0   5570.0   5450.0   5530.0   48783.0 -0.007181  000020   동화약품  KOSPI
+1  2015-01-02  18061.0  18941.0  17885.0  18417.0   56930.0  0.009649  000040  KR모터스  KOSPI
+2  2015-01-02  18300.0  19000.0  17800.0  18750.0    2755.0  0.030220  000050     경방  KOSPI
+3  2015-01-02  87800.0  90300.0  87500.0  89800.0    6173.0  0.001115  000070  삼양홀딩스  KOSPI
+4  2015-01-02  23100.0  23100.0  22350.0  22600.0  184419.0 -0.027957  000080  하이트진로  KOSPI
+Index(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Change', 'Code',
+       'Name', 'Market'],
+      dtype='object')
+         Date     Open     High      Low     Close   Volume  Change    Code   Name Market
+0  2025-11-21   6110.0   6180.0   6080.0    6110.0  61917.0 -0.0113  000020   동화약품   None
+1  2025-11-21    473.0    480.0    465.0     471.0  42512.0 -0.0042  000040  KR모터스   None
+2  2025-11-21   6910.0   7030.0   6890.0    6910.0  15533.0 -0.0129  000050     경방   None
+3  2025-11-21      0.0      0.0      0.0  104600.0      0.0  0.0000  000070
+4  2025-11-21  18840.0  19000.0  18780.0   18840.0  92483.0 -0.0026  000080  하이트진로   None
+Index(['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Change', 'Code',
+       'Name', 'Market', 'KOSPI_종가', 'KOSPI_수익률', 'SMA_5', 'SMA_20', 'SMA_60',
+       'VOL_SMA_20', 'MOM_10', 'ROC_20', 'MACD_12_26', 'MACD_SIGNAL_9',
+       'BBP_20', 'ATR_14', 'STOCH_K', 'STOCH_D', 'CCI_20', 'ALPHA_SMA_20'],
+      dtype='object')
+        Date   Open   High    Low  Close  Volume    Change    Code   Name Market  KOSPI_종가  ...  VOL_SMA_20    MOM_10    ROC_20  MACD_12_26  MACD_SIGNAL_9    BBP_20       ATR_14   STOCH_K   STOCH_D      CCI_20  ALPHA_SMA_20
+0 2015-03-31   7540   7550   7450   7510  108081  0.001333  000020   동화약품  KOSPI   2041.03  ...   177505.15  0.088406  0.182677  379.533217     359.976965  0.732714   252.142857  0.688406  0.700436   73.161340      0.007605
+1 2015-03-31  25114  25114  24401  25118   80533  0.014664  000040  KR모터스  KOSPI   2041.03  ...   103663.20  0.032728 -0.006958  764.379649     877.602444  0.755246   958.357143  0.893838  0.763164   60.523642     -0.001056
+2 2015-03-31  20000  20000  18950  19400    2458  0.000000  000050     경방  KOSPI   2041.03  ...     2912.35  0.108571  0.158209  592.579825     396.427672  0.821395   942.857143  0.814815  0.781645  102.593316      0.006874
+3 2015-03-31  92000  93000  90900  92000    6960 -0.009688  000070  삼양홀딩스  KOSPI   2041.03  ...     7774.35  0.051429  0.040724  909.610606     160.741736  0.777326  2507.142857  0.776000  0.816000   94.096494      0.001136
+4 2015-03-31  22150  22200  21900  22200  205434  0.006803  000080  하이트진로  KOSPI   2041.03  ...   218550.85 -0.011136 -0.030568 -201.825386    -202.516476  0.443614   439.285714  0.470588  0.392157  -41.196813     -0.002466
+
+[5 rows x 26 columns]

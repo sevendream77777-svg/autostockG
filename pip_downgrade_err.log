@@ -1,0 +1,2 @@
+ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory: 'C:\\Users\\slk\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\numpy-2.3.5.dist-info\\INSTALLER2q8w1o6x.tmp'
+

@@ -5,7 +5,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
-from kiwoom_api import KiwoomRestApi 
+from kiwoom.kiwoom_api import KiwoomRestApi
 from kakao_notifier import KakaoNotifier 
 
 # ... (read_config_for_api, calculate_moving_average 함수는 이전과 동일) ...

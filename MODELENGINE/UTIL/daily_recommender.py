@@ -73,7 +73,10 @@ def predict_top10(model, latest_df, features):
 
         output_column_name = '종목명' if '종목명' in top_10.columns else 'Name'
 
-        return top_10[[output_column_name, 'Code', '종가', '예측확률(%)', '예측확률']]
+        # 출력 정리: 예측확률(%)만 노출, 컬럼명 통일
+        result = top_10[[output_column_name, 'Code', '종가', '예측확률(%)']].copy()
+        result = result.rename(columns={output_column_name: '종목명'})
+        return result
 
     except Exception as e:
         print(f"경고: Top 10 생성 실패. {e}")
@@ -118,10 +121,14 @@ if __name__ == "__main__":
     print("\n" + "=" * 80)
     print(f"★★★ '{date_str}' HOJ 실전 추천 Top 10 ★★★")
     print("=" * 80)
-    if 'Name' in top_10_df.columns and '종목명' not in top_10_df.columns:
-        top_10_df = top_10_df.rename(columns={'Name': '종목명'})
-
-    print(top_10_df.to_string(index=False))
+    # 고정 폭 포맷으로 정렬 출력
+    formatters = {
+        '종목명': lambda x: f"{str(x):<12}",
+        'Code': lambda x: f"{str(x):<6}",
+        '종가': lambda x: f"{int(x):>8}",
+        '예측확률(%)': lambda x: f"{x:>8.2f}",
+    }
+    print(top_10_df.to_string(index=False, formatters=formatters))
     print("=" * 80)
 
     now_str = datetime.now().strftime('%Y-%m-%d_%H%M%S')

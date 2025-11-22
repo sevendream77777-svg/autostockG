@@ -123,12 +123,9 @@ def load_raw_main() -> pd.DataFrame:
     return df
 
 def backup_raw_main(raw_df: pd.DataFrame, today: dt.date) -> str:
-    """Rename existing RAW_MAIN to Date.max()-tagged backup. Do NOT write new data into backup."""
-    if os.path.exists(RAW_MAIN):
-        backup_path = versioned_filename(RAW_MAIN)  # Date.max() of EXISTING file
-        os.rename(RAW_MAIN, backup_path)
-        return backup_path
-    return 
+    backup_path = versioned_filename(RAW_MAIN)
+    raw_df.to_parquet(backup_path)
+    return backup_path
 
 def merge_daily_into_raw(raw_df: pd.DataFrame, daily_df: pd.DataFrame) -> pd.DataFrame:
     merged = pd.concat([raw_df, daily_df], ignore_index=True)
@@ -502,33 +499,26 @@ if __name__ == "__main__":
     # ===========================
     # ⭐⭐ 부족분 보조 수집: KIWOOM → FDR/Yahoo/Naver
     # ===========================
-    
     if bad_codes:
-        # 사용자 선택에 따라 '의심 코드' 추가 데이터 검증 여부 결정
+        # 먼저 Kiwoom으로 의심 코드 보완 시도
         try:
-            ans = input(f"[QUERY] KRX 의심 {len(bad_codes)}개 추가 데이터 검증을 진행할까요? (y/n): ").strip().lower()
-        except Exception:
-            ans = "y"  # 비대화형 환경 보호: 기본 y
+            kiw_df, _ = build_daily_from_kiwoom(date, tickers=bad_codes)
+            if kiw_df is not None and not kiw_df.empty:
+                kiw_sub = kiw_df[kiw_df["Code"].isin(bad_codes)]
+                if not kiw_sub.empty:
+                    daily_df = merge_daily_into_raw(daily_df, kiw_sub)
+                    log(f"[KIWOOM] 보조 수집으로 {len(kiw_sub)}개 덮어씀")
+        except Exception as e:
+            log(f"[WARN] KIWOOM 보조 수집 실패 → {e}")
 
-        if ans.startswith("y"):
-            # (1) Kiwoom으로 의심 코드 보완 시도
-            try:
-                kiw_df, _ = build_daily_from_kiwoom(date, tickers=bad_codes)
-                if kiw_df is not None and not kiw_df.empty:
-                    kiw_sub = kiw_df[kiw_df["Code"].isin(bad_codes)]
-                    if not kiw_sub.empty:
-                        daily_df = merge_daily_into_raw(daily_df, kiw_sub)
-                        log(f"[KIWOOM] 보조 수집으로 {len(kiw_sub)}개 덮어씀")
-            except Exception as e:
-                log(f"[WARN] KIWOOM 보조 수집 실패 → {e}")
+        # Kiwoom 보정 후 여전히 의심/빈 값인 코드만 다시 계산
+        mask_bad = _invalid_ohlcv_mask(daily_df)
+        bad_codes = daily_df.loc[mask_bad, "Code"].tolist()
 
-            # (2) 보완 후 남은 의심 코드 안내 (FDR 검증 단계 제거)
-            mask_bad = _invalid_ohlcv_mask(daily_df)
-            still_bad = daily_df.loc[mask_bad, "Code"].tolist()
-            if still_bad:
-                log(f"[INFO] 추가 검증 이후 여전히 의심/결측 종목 {len(still_bad)}개 (검증 단계 종료)")
-        else:
-            log("[SKIP] 사용자 선택에 따라 의심 코드 추가 검증을 건너뜁니다.")
+        # 남은 코드만 FDR/Yahoo/Naver로 채움
+        daily_df, still = fill_missing_with_sources(daily_df, date, bad_codes)
+        if still:
+            log(f"[WARN] 여전히 수집 실패 종목 {len(still)}개: {still[:10]} ...")
 
     # ===========================
     # SAVE

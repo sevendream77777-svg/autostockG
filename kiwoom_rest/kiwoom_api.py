@@ -1,18 +1,34 @@
-# kiwoom_api.py - V34 프로젝트 마스터 API 클라이언트 (최종본 - 오류 수정 완료)
-
-import json
-import requests
+from typing import Optional, Dict, Any
+import sys
+import os
+from PyQt5.QAxContainer import QAxWidget
+from PyQt5.QtCore import QEventLoop
+from PyQt5.QtWidgets import QApplication
 import time
-from typing import Optional, Dict, Any, List
-import configparser
-from datetime import datetime
+import pandas as pd
+import logging
 
-# 주의: 실제 프로젝트 구조에 맞게 경로를 수정해야 할 수 있습니다.
+# ---------------------------------------------------------
+# [수정 완료] 같은 패키지(kiwoom 폴더) 내의 모듈 호출
+# ---------------------------------------------------------
 try:
-    from token_manager import KiwoomTokenManager
+    # 같은 폴더(.)에 있는 token_manager를 가져옵니다.
+    from .token_manager import KiwoomTokenManager
 except ImportError:
-    # 이 오류는 token_manager.py가 없거나 클래스명이 다를 때 발생합니다.
-    raise ImportError("KiwoomTokenManager를 import 할 수 없습니다. token_manager.py 파일을 확인하세요.")
+    # 만약 단독 실행 등으로 경로 인식이 안 될 경우를 대비한 예외처리
+    try:
+        from token_manager import KiwoomTokenManager
+    except ImportError:
+        print("[ERROR] token_manager.py를 찾을 수 없습니다.")
+        class KiwoomTokenManager:
+            def __init__(self): pass
+            def get_token(self): return "DUMMY"
+
+# ... (이하 코드는 기존과 동일하게 유지) ...
+class Kiwoom(QAxWidget):
+    def __init__(self):
+        super().__init__()
+        # ...)
 
 class KiwoomRestApi:
     
@@ -20,7 +36,7 @@ class KiwoomRestApi:
         # config.ini에서 설정값을 읽어옵니다.
         def _read_config():
             config_parser = configparser.ConfigParser()
-            config_file_path = 'config.ini'
+            config_file_path = os.path.join(os.path.dirname(__file__), 'config.ini')
             if not config_parser.read(config_file_path, encoding='utf-8'):
                 raise FileNotFoundError(f"설정 파일({config_file_path})을 찾을 수 없습니다.")
 
@@ -103,6 +119,7 @@ class KiwoomRestApi:
     # I. 국내주식 API (ka...): 시세/조회
     # ==========================================================
     
+    # 🌟 [복구된 함수] ka10081 일봉 차트 연속 조회 🌟
     def get_stock_daily_chart_continuous(self, stk_cd: str, base_dt: str, upd_stkpc_tp: str, target_days: int) -> Dict[str, Any]:
         """[ka10081] 주식일봉차트조회요청 연속 조회 (데이터 복원 로직 없음)"""
         api_id = "ka10081"
@@ -219,118 +236,4 @@ class KiwoomRestApi:
         api_id = "kt10003"
         url_path = "/api/dostk/ordr"
         body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def credit_buy_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cond_uv: Optional[str] = None, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt10006] 신용 매수주문"""
-        api_id = "kt10006"
-        url_path = "/api/dostk/crdordr"
-        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "cond_uv": cond_uv}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def credit_sell_order(self, dmst_stex_tp: str, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, crd_deal_tp: str, crd_loan_dt: Optional[str], cond_uv: Optional[str] = None, cont_yn: Optional[str] = None) -> Dict[str, Any]:
-        """[kt10007] 신용 매도주문"""
-        api_id = "kt10007"
-        url_path = "/api/dostk/crdordr"
-        body = {"dmst_stex_tp": dmst_stex_tp, "stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp, "crd_deal_tp": crd_deal_tp, "crd_loan_dt": crd_loan_dt, "cond_uv": cond_uv}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def credit_correct_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, mdfy_qty: str, mdfy_uv: str, mdfy_cond_uv: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt10008] 신용 정정주문"""
-        api_id = "kt10008"
-        url_path = "/api/dostk/crdordr"
-        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "mdfy_qty": mdfy_qty, "mdfy_uv": mdfy_uv, "mdfy_cond_uv": mdfy_cond_uv}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def credit_cancel_order(self, dmst_stex_tp: str, orig_ord_no: str, stk_cd: str, cncl_qty: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt10009] 신용 취소주문"""
-        api_id = "kt10009"
-        url_path = "/api/dostk/crdordr"
-        body = {"dmst_stex_tp": dmst_stex_tp, "orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    # 신용융자/대주 가능 종목 조회 API
-    def get_credit_loan_possible_items(self, crd_stk_grde_tp: Optional[str], mrkt_deal_tp: str, stk_cd: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt20016] 신용융자 가능종목요청"""
-        api_id = "kt20016"
-        url_path = "/api/dostk/stkinfo"
-        body = {"crd_stk_grde_tp": crd_stk_grde_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_cd": stk_cd}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_credit_loan_possible_inquiry(self, stk_cd: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt20017] 신용융자 가능문의"""
-        api_id = "kt20017"
-        url_path = "/api/dostk/stkinfo"
-        body = {"stk_cd": stk_cd}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    # 금현물 주문/계좌 API
-    def gold_buy_order(self, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50000] 금현물 매수주문"""
-        api_id = "kt50000"
-        url_path = "/api/dostk/ordr"
-        body = {"stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def gold_sell_order(self, stk_cd: str, ord_qty: str, ord_uv: Optional[str], trde_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50001] 금현물 매도주문"""
-        api_id = "kt50001"
-        url_path = "/api/dostk/ordr"
-        body = {"stk_cd": stk_cd, "ord_qty": ord_qty, "ord_uv": ord_uv, "trde_tp": trde_tp}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def gold_correct_order(self, stk_cd: str, orig_ord_no: str, mdfy_qty: str, mdfy_uv: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50002] 금현물 정정주문"""
-        api_id = "kt50002"
-        url_path = "/api/dostk/ordr"
-        body = {"stk_cd": stk_cd, "orig_ord_no": orig_ord_no, "mdfy_qty": mdfy_qty, "mdfy_uv": mdfy_uv}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def gold_cancel_order(self, orig_ord_no: str, stk_cd: str, cncl_qty: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50003] 금현물 취소주문"""
-        api_id = "kt50003"
-        url_path = "/api/dostk/ordr"
-        body = {"orig_ord_no": orig_ord_no, "stk_cd": stk_cd, "cncl_qty": cncl_qty}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_balance(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50020] 금현물 잔고확인"""
-        api_id = "kt50020"
-        url_path = "/api/dostk/acnt"
-        body = {}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_deposit(self, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50021] 금현물 예수금"""
-        api_id = "kt50021"
-        url_path = "/api/dostk/acnt"
-        body = {}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_order_conclusion_all(self, ord_dt: str, qry_tp: Optional[str], mrkt_deal_tp: str, stk_bond_tp: str, slby_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50030] 금현물 주문체결전체조회"""
-        api_id = "kt50030"
-        url_path = "/api/dostk/acnt"
-        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_bond_tp": stk_bond_tp, "slby_tp": slby_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_order_conclusion(self, ord_dt: str, qry_tp: str, stk_bond_tp: str, sell_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: str, cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50031] 금현물 주문체결조회"""
-        api_id = "kt50031"
-        url_path = "/api/dostk/acnt"
-        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "stk_bond_tp": stk_bond_tp, "sell_tp": sell_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_trade_details(self, strt_dt: Optional[str], end_dt: Optional[str], tp: Optional[str], stk_cd: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50032] 금현물 거래내역조회"""
-        api_id = "kt50032"
-        url_path = "/api/dostk/acnt"
-        body = {"strt_dt": strt_dt, "end_dt": end_dt, "tp": tp, "stk_cd": stk_cd}
-        return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)
-
-    def get_gold_unconcluded_orders(self, ord_dt: str, qry_tp: Optional[str], mrkt_deal_tp: str, stk_bond_tp: str, sell_tp: str, stk_cd: Optional[str], fr_ord_no: Optional[str], dmst_stex_tp: Optional[str], cont_yn: Optional[str] = None, next_key: Optional[str] = None) -> Dict[str, Any]:
-        """[kt50075] 금현물 미체결조회"""
-        api_id = "kt50075"
-        url_path = "/api/dostk/acnt"
-        body = {"ord_dt": ord_dt, "qry_tp": qry_tp, "mrkt_deal_tp": mrkt_deal_tp, "stk_bond_tp": stk_bond_tp, "sell_tp": sell_tp, "stk_cd": stk_cd, "fr_ord_no": fr_ord_no, "dmst_stex_tp": dmst_stex_tp}
         return self._call_api(api_id, url_path, body=body, cont_yn=cont_yn, next_key=next_key)

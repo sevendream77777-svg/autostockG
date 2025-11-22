@@ -141,22 +141,6 @@ def _load_custom_descriptions() -> dict[str, str]:
     return descriptions
 
 
-def _build_fs_pipeline_catalog(entries: Iterable[RepoEntry]) -> list[dict[str, object]]:
-    """Build pipeline catalog by scanning all .py files."""
-    catalog: list[dict[str, object]] = []
-    py_entries = [e for e in entries if e.rel_lower.endswith(".py")]
-    py_entries.sort(key=lambda e: e.rel_lower)
-    for idx, entry in enumerate(py_entries, start=1):
-        summary = _summary_for_entry(entry)
-        catalog.append(
-            {
-                "id": entry.rel,  # use relative path as id for stability
-                "name": entry.rel,
-                "summary": summary,
-                "candidates": [entry.rel],
-            }
-        )
-    return catalog
 def _guess_inline_summary(content: str) -> str:
     for raw in content.splitlines():
         stripped = raw.strip()
@@ -416,11 +400,6 @@ def _build_indexes() -> None:
     DEPENDENCY_GRAPH = _build_dependency_graph(FILE_ENTRIES, MODULE_MAP)
     REVERSE_DEPENDENCIES = _invert_graph(DEPENDENCY_GRAPH)
     RECENT_FILES = sorted(FILE_ENTRIES, key=lambda entry: entry.mtime, reverse=True)[:8]
-
-
-_build_indexes()
-
-
 def _search_files(query: str, limit: int = SEARCH_LIMIT) -> tuple[list[RepoEntry], int]:
     needle = query.lower()
     matches = [entry for entry in FILE_ENTRIES if needle in entry.rel_lower]
@@ -457,6 +436,27 @@ def _summary_for_entry(entry: RepoEntry) -> str:
         or _read_summary_from_path(entry.path)
         or "설명 없음 - 파일 상단 주석/문자열로 역할을 추가하거나 custom_descriptions.json에 기록하세요."
     )
+
+
+def _build_fs_pipeline_catalog(entries: Iterable[RepoEntry]) -> list[dict[str, object]]:
+    """Build pipeline catalog by scanning all .py files."""
+    catalog: list[dict[str, object]] = []
+    py_entries = [e for e in entries if e.rel_lower.endswith(".py")]
+    py_entries.sort(key=lambda e: e.rel_lower)
+    for entry in py_entries:
+        summary = _summary_for_entry(entry)
+        catalog.append(
+            {
+                "id": entry.rel,  # relative path as id
+                "name": entry.rel,
+                "summary": summary,
+                "candidates": [entry.rel],
+            }
+        )
+    return catalog
+
+
+_build_indexes()
 
 
 def _resolve_literal_to_rel(literal: str) -> str | None:

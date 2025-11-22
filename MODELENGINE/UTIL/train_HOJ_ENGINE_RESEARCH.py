@@ -214,7 +214,19 @@ print(f"   ✅ 분류 정확도 (valid): {acc:.4f}")
 # ------------------------------------------------------------
 print("\n[3] 엔진 저장")
 
-backup_existing_file(ENGINE_PATH)
+
+# FM: compute data-based date_tag from corresponding HOJ_DB RESEARCH
+_db_path = get_path("HOJ_DB","RESEARCH","HOJ_DB_V31.parquet") if os.path.exists(get_path("HOJ_DB","RESEARCH","HOJ_DB_V31.parquet")) else get_path("HOJ_DB","RESEARCH","HOJ_DB_RESEARCH_V31.parquet")
+date_tag = None
+try:
+    df__ = pd.read_parquet(_db_path, columns=["Date"])
+    if "Date" in df__.columns and len(df__)>0:
+        _dt = pd.to_datetime(df__["Date"], errors="coerce").max()
+        if pd.notnull(_dt):
+            date_tag = _dt.strftime("%y%m%d")
+except Exception:
+    date_tag = None
+backup_existing_file(ENGINE_PATH, date_tag=date_tag)
 
 with open(ENGINE_PATH, "wb") as f:
     pickle.dump(

@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # build_HOJ_DB_REAL.py  (V31 - 15피처 기반 HOJ 실전용 DB)
 # ============================================================
 
@@ -9,7 +9,6 @@ from config_paths import get_path, versioned_filename
 import pandas as pd
 import numpy as np
 from datetime import timedelta
-from config_paths import get_path, versioned_filename
 
 # ------------------------------------
 # 설정
@@ -56,12 +55,16 @@ def build_hoj_real_db():
 
     # 저장
     print(f"💾 저장: {SAVE_FILE}")
-    df.to_parquet(SAVE_FILE, index=False)
 
-    # 백업본 저장
-    backup = versioned_filename(SAVE_FILE)
-    df.to_parquet(backup, index=False)
-    print(f"📑 백업 저장: {backup}")
+    # FM: backup first (rename existing), then write new
+    if os.path.exists(SAVE_FILE):
+        backup = versioned_filename(SAVE_FILE)  # uses EXISTING file's Date.max()
+        os.rename(SAVE_FILE, backup)
+        print(f"📑 백업 저장(원본 rename): {backup}")
+
+    # write new
+    df.to_parquet(SAVE_FILE, index=False)
+    print(f"💾 저장 완료: {SAVE_FILE}")
 
     print("=== [REAL] HOJ_DB V31 생성 완료 ===")
 

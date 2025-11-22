@@ -1,5 +1,30 @@
 v31 버전까지
 
+① RAW 원본 (6개)
+Date
+Open
+High
+Low
+Close
+Volume
+KOSPI_종가 (병합 후)
+
+② KOSPI 파일 원본 (2개)
+Date
+Close   → rename → KOSPI_종가
+
+③ KOSPI 계산 후 추가
+KOSPI_수익률 = KOSPI_종가.pct_change()
+
+④ Feature 15개 생성
+(6개 원본 데이터 + KOSPI 수익률 기반)
+
+⑤ DB (RESEARCH/REAL)
+→ 원시 컬럼 + 피처 컬럼 + 종목명 등 조합된 20~25개 컬럼
+
+⑥ Engine
+→ 오직 15개 피처만 사용
+
 오늘의 데이터 (6가지)
 데이터 항목설명역할 (계산에 사용)
 종가 (Close)당일 15:30에 확정된 최종 가격
