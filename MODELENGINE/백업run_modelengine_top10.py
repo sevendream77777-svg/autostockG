@@ -51,6 +51,7 @@ ENGINE_RESEARCH_TRAIN = os.path.join(BASE_DIR, "UTIL", "train_HOJ_ENGINE_RESEARC
 ENGINE_REAL_TRAIN = os.path.join(BASE_DIR, "UTIL", "train_HOJ_ENGINE_REAL.py")
 TOP10_RECOMMENDER = os.path.join(BASE_DIR, "UTIL", "daily_recommender.py")
 
+GEMINI_FILTER = os.path.join(BASE_DIR, "UTIL", "gemini_filter.py")
 
 # ------------------------------
 # [UPDATED-FM] 유틸: parquet Date.max() 읽기
@@ -258,6 +259,15 @@ def main() -> None:
     if not run_step("Top10 추천", TOP10_RECOMMENDER):
         print("[STOP] Top10 단계 실패로 파이프라인을 중단합니다.")
         return
+
+# (▼ 여기서부터 추가하세요) -----------------------------------------
+    # 7) Gemini AI 필터링 (최종 검증)
+    # ----------------------
+    print("[Gemini] Top10 종목 뉴스/악재 정밀 타격 분석")
+    # API 키가 있는지 확인하는 로직은 gemini_filter.py 내부에 있음
+    if not run_step("Gemini AI 전략가", GEMINI_FILTER):
+        print("[WARNING] Gemini 분석 실패 (API 키 확인 필요), 하지만 기본 추천은 완료됨.")
+    # -----------------------------------------------------------------
 
     print("\n=== MODELENGINE Top10 Pipeline (FM) 완료 ===\n")
 

@@ -14,6 +14,7 @@ import pandas as pd
 from pykrx import stock
 import requests
 import FinanceDataReader as fdr
+import glob
 import os as _os
 import yfinance as yf
 import os.path as _path
@@ -117,8 +118,14 @@ def get_next_bizdate(last_date: dt.date) -> dt.date:
 # ======================
 def load_raw_main() -> pd.DataFrame:
     if not os.path.exists(RAW_MAIN):
-        raise FileNotFoundError(f"RAW 메인 파일 없음: {RAW_MAIN}")
-    df = pd.read_parquet(RAW_MAIN)
+        candidates = sorted(glob.glob(os.path.join(STOCKS_DIR, "all_stocks_cumulative_*.parquet")))
+        if not candidates:
+            raise FileNotFoundError(f"RAW 메인 파일 없음: {RAW_MAIN}")
+        latest = candidates[-1]
+        log(f"[INFO] 기본 RAW 없음. 최신 태그 파일 사용: {os.path.basename(latest)}")
+        df = pd.read_parquet(latest)
+    else:
+        df = pd.read_parquet(RAW_MAIN)
     df["Date"] = pd.to_datetime(df["Date"]).dt.date
     return df
 
@@ -537,11 +544,23 @@ if __name__ == "__main__":
     daily_df.to_parquet(out_path)
     log(f"[SAVE] DAILY 저장 완료: {out_path}")
 
+    merged = merge_daily_into_raw(raw_df, daily_df)
+    last_before = raw_df["Date"].max()
+    last_after = merged["Date"].max()
+    if last_after == last_before and len(merged) == len(raw_df):
+        log(f"[SKIP] RAW 저장/백업 생략 (마지막 날짜 동일: {last_after})")
+        sys.exit(0)
+
     backup_path = backup_raw_main(raw_df, today)
     log(f"[BACKUP] RAW 백업 생성: {backup_path}")
 
-    merged = merge_daily_into_raw(raw_df, daily_df)
+    latest_tag = merged["Date"].max().strftime("%y%m%d")
+    new_raw_path = os.path.join(STOCKS_DIR, f"all_stocks_cumulative_{latest_tag}.parquet")
+    merged.to_parquet(new_raw_path)
+    log(f"[SAVE] RAW 최신본 저장: {new_raw_path}")
+
+    # 기존 파일명도 계속 유지하려면 다음 두 줄 유지
     merged.to_parquet(RAW_MAIN)
-    log(f"[SAVE] RAW 메인 업데이트 완료: {RAW_MAIN}")
+    log(f"[SAVE] RAW 메인 갱신: {RAW_MAIN}")
 
     log("[DONE] RAW 업데이트 끝.")

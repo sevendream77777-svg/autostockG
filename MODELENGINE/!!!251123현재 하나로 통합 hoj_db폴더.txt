@@ -1,0 +1,302 @@
+!!!251123현재 하나로 통합 hoj_db폴더
+
+!!!251123train파일 기존 real, research 통합
+
+
+
+현재 이과정은 완성이 됐으나
+
+검증이 필요함 데이터가 이상하게 나오는중
+
+
+
+피처를 디비로 넘기는거까진 문제가 없는거 같은데 이것도 데이터 체크해봐야되고
+
+트레인 파일도 통합 후 제대로 임무수행을 하고 있는지 확인 해야하고
+
+
+
+현재가장 큰문제는 데이터파일 생성 생성규칙 변경으로 인한 데이터 누락문제
+
+이것먼저 해결하고 가자
+
+
+
+기존 데이터파일들은 원본데이터가 새로생성된데이터가 나오면 바로 파일명_날짜(기준은 해당파일 마지막데이터 날짜)로 바뀌고 새로운데이터가 원본으로 들어가는식이었는데 이미 여기서도 문제가 좀 있는상황 확인된건 피처파일 그냥 엎어쓰는거 같음
+
+
+
+이파일 규칙을 이제부터 바꿀껀데 원본은 날짜가 안붙는데 이제부터는 원본도 형식에 맞춰서 날짜가 붙게 하고 대신 파일명이 바뀌니까 기존코드들은 최신파일을 인식하게 해야함
+
+
+
+여기부터 시작할껀데 절대 기존코드는 다른곳은 건들지 말고 꼭 수정할부분만 수정
+
+이것땜에 개난리난적 몇번 있음. 또 필요한 파일은 꼭 요청을 해야 돼.
+
+물론 깃서버에 다 있긴 하지만
+
+그리고 불분명하면 혼자 판단하지 말고 나한테 꼭 물어보고 진행해
+
+
+
+"F:\autostockG\MODELENGINE\15피처구성v31.txt"
+
+"F:\autostockG\MODELENGINE\ui & file 통합 파이프라인.txt"
+
+"F:\autostockG\MODELENGINE\🎨 UI 구성 트레인 구조 변경.txt"
+
+"F:\autostockG\MODELENGINE\UTIL\config_paths.py"
+
+"F:\autostockG\MODELENGINE\UTIL\version_utils.py"
+
+두개파일 꼭확인
+
+HOJ_ENGINE_RESEARCH_V31_d251105_h5_n1000_t251122.pkl
+
+HOJ_ENGINE_REAL_V31_d251105_h5_n1000_t251122.pkl
+
+엔진은 이게 기준이야 v31-버전 d데이터날짜 h5 추천기간... 이런식인데
+
+이거 만든게 train_engine_unified.py 이파일인가? 내용확인해보고
+
+build_features.py
+version_utils.py
+-----------------
+
+build_unified_db.py
+build_features.py에서 날짜 태그가 붙은 최신 피처 파일(features_V31_YYMMDD.parquet)이 생성되었으므로, 이제 build_unified_db.py는 이 최신 피처 파일을 찾아 읽고, DB 파일도 날짜 태그를 붙여서 저장하도록 수정
+
+train_engine_unified.py
+코드가 고정된 경로 대신, get_latest_db_path 함수 (또는 유사 로직) 내에서 find_latest_file 유틸리티를 사용하여 가장 날짜 태그가 최신인 HOJ_DB_V31_*.parquet 파일을 찾아야 합니다.
+이 파일의 출력 (HOJ_ENGINE_{MODE}_{VER}_d{DATA}_h{HOR}_n{TREES}_t{TRAIN}.pkl)은 이미 정해진 규칙을 잘 따르고 있으므로, 학습이 완료된 후 저장 경로가 올바른지 (예: HOJ_ENGINE/RESEARCH 폴더)만 확인합니다.
+
+predict_daily_top10.py 또는 daily_recommender.py
+예측을 수행할 때, find_latest_file을 사용하여 HOJ_ENGINE_REAL_V31_d*.pkl 형태의 가장 최신 엔진 파일을 자동으로 찾아 로드해야 합니다.
+예측 대상 시점의 입력 데이터(X 데이터)를 만들기 위해, find_latest_file을 사용하여 가장 최신 피처 파일(features_V31_*.parquet)을 로드해야 합니다.
+
+MODELENGINE/run_modelengine_top10.py 및 ui/ui_pages/engine_manager.py
+기존 파이프라인은 '파일이 존재하는가'를 확인하거나 고정 파일의 수정 날짜를 비교했습니다. 이제는 find_latest_file을 사용해 **'최신 피처 파일의 데이터 날짜'**와 '최신 DB 파일의 데이터 날짜' 등을 비교하여 다음 단계를 실행할지 결정해야 합니다.
+기존 파이프라인에 남아있을 수 있는 build_HOJ_DB_RESEARCH.py 및 build_HOJ_DB_REAL.py 등 단일 DB로 통합된 이후 불필요해진 구형 DB 생성 로직을 호출하지 않도록 삭제하거나 주석 처리하여 파이프라인을 깔끔하게 정리해야 합니다.
+
+MODELENGINE/UTIL/config_paths.py
+
+HOJ_DB 폴더가 REAL 및 RESEARCH 폴더 없이 단일 폴더로 통합됨에 따라, get_path("HOJ_DB", "RESEARCH", ...) 와 같이 하위 폴더를 참조하는 부분이 있다면, 통합된 경로를 참조하도록 해당 함수 내 로직 또는 해당 함수를 호출하는 코드를 확인하여 수정하는 검토가 필요합니다. (다만, build_unified_db.py에서 DB 경로를 수정하면서 이 부분은 이미 간접적으로 반영되었을 가능성이 높습니다.)
+
+①RAW → ②KOSPI → ③FEATURE → ④DB(unified) → ⑤ENGINE(unified) → ⑥Top10 → ⑦Gemini 가 “추천 프로그램”의 완성 체인이다(7단계). 
+
+run_modelengine_top10
+
+ 
+
+daily_recommender
+
+각 파일을 “완전 독립 실행”으로 돌리면 날짜 불일치·재실행 순서 문제로 데이터가 꼬일 수 있다. 그래서 오케스트레이터가 필요하다. 현재 구형 오케스트레이터들은 REAL/RESEARCH 분기와 고정파일 가정 때문에 최신 구조와 충돌한다. 
+
+full_update_pipeline
+
+ 
+
+pipeline_date_manager
+
+베스트는 “통합 오케스트레이터 1개(run_top10_unified.py)” + “모든 스텝은 개별 실행 가능하되, 실행 전/후 가드(최신판 탐색·날짜 비교·원자적 저장)로 안전하게 만드는 구조.”
+
+1) RAW 패치(raw_patch.py)
+2) KOSPI 패치(make_kospi_index_10y.py 또는 update_kospi.py)
+3) FEATURE 생성(build_features.py)
+4) DB 생성(build_unified_db.py)
+5) 엔진 학습(train_engine_unified.py)
+6) Top10 생성(daily_recommender.py)
+7) Gemini 분석(optional)
+
+
+1 RAW 패치: MODELENGINE/RAW/raw_patch.py (pykrx→kiwoom→FDR/Yahoo/Naver fallback, all_stocks_cumulative.parquet 갱신+백업).
+2 KOSPI 패치: MODELENGINE/RAW/make_kospi_index_10y.py (KOSPI 지수 parquet).
+3 FEATURE 생성: MODELENGINE/UTIL/build_features.py (find_latest_file로 최신 RAW/KOSPI 읽어 features_V31_YYMMDD[_n].parquet 저장).
+4 DB 생성: MODELENGINE/UTIL/build_unified_db.py (최신 feature 찾아 HOJ_DB_V31_YYMMDD[_n].parquet 저장).
+5 엔진 학습: MODELENGINE/UTIL/train_engine_unified.py (find_latest HOJ_DB 읽어 REAL/RESEARCH 모드 학습, HOJ_ENGINE_{MODE}_V31_d{data}_h{hor}_w{win}_n{trees}_t{train}.pkl).
+6 Top10 생성: MODELENGINE/UTIL/daily_recommender.py (find_latest HOJ_ENGINE_REAL_V31*.pkl + HOJ_DB_V31*.parquet 로드, Top10 CSV+Gemini 옵션).
+7 Gemini 분석: 위 daily_recommender 안의 optional block.
+스텝 묶는 러너들
+
+MODELENGINE/final_top10simple.py: RAW(safe_raw_builder_v2만 호출) → KOSPI → FEATURE → DB → ENGINE → TOP10 → GEMINI 순으로 일괄 실행. RAW 단계가 raw_patch.py가 아니라 RAW/safe_raw_builder_v2.py만 후보라 최신 RAW 규칙과 다름.
+MODELENGINE/UTIL/run_data_pipeline.py: update_raw_data(백업/버전만) → build_features → build_unified_db 를 한 번에 실행.
+MODELENGINE/UTIL/full_update_pipeline.py: pipeline_date_manager로 날짜 비교 후 build_features → build_HOJ_DB_REAL/RESEARCH → train_HOJ_ENGINE_REAL/RESEARCH 호출(구식 분리 로직).
+MODELENGINE/run_modelengine_top10.py: RAW → KOSPI → build_features → build_HOJ_DB_REAL/RESEARCH → train_HOJ_ENGINE_* → daily_recommender 순서이나 고정 파일명을 전제로 함(통합 DB/엔진 최신 찾기 적용 안 됨).
+단일 스텝 실행용 보조: MODELENGINE/UTIL/update_raw_data.py(RAW 파일 백업/버전만), MODELENGINE/UTIL/predict_daily_top10.py(엔진 경로 인자로 받아 특정 날짜 Top10 예측).
+발견한 문제/주의점
+
+orchestrator 불일치: 최신 규칙(find_latest 기반, 통합 DB/엔진)을 쓰는 건 build_features.pytrain_engine_unified.pydaily_recommender.py 라인인데, final_top10simple.py는 RAW를 safe_raw_builder_v2로만 돌리고 run_modelengine_top10.py/full_update_pipeline.py는 여전히 분리된 DB/엔진 스크립트와 고정 파일명을 사용. 실제 통합 파이프라인은 위 1→7 스텝 스크립트를 직접 돌리거나 final_top10simple의 RAW 후보를 교체해야 함.
+추론 스크립트 UTIL/predict_daily_top10.py는 통합 DB라도 HOJ_DB_V31.parquet 고정 경로를 사용(find_latest 미적용)이라 날짜 태그 붙은 최신 DB를 못 읽음.
+HOJ_DB 폴더 내 REAL/RESEARCH 서브폴더와 구형 build_HOJ_DB_REAL/RESEARCH, train_HOJ_ENGINE_* 스크립트는 남아 있지만 통합 흐름과는 별개이므로 혼용 주의.
+
+패치 끝
+
+현재문제 
+MODELENGINE/UTIL/train_engine_unified.py
+ ✂️ [Filter] Input Window (60일) 적용 중...
+     ❌ 제외됨 (2개): ['SMA_120', 'SMA_90']
+전체 데이터를 쓰고
+sma_120은 -120d sma_90은 -90d 이런식으로 세팅 가능?
+
+
+MODELENGINE/UTIL/build_unified_db.py입니다. 
+최신 features_V31_*.parquet를 찾아 읽어 HOJ_DB_V31_*.parquet
+
+
+
+kospi_data.parquet 신규파일이 바뀐규칙 파일명_날짜가 적용안되고 예전처럼 파일명만 나옴 & 데이터 가장 최근 데이터 확인하고 업데이트하게 수정
+
+all_stocks_cumulative.parquet 마찬가지로  바뀐규칙 파일명_날짜가 적용안되고 예전처럼 파일명만 나옴 & 데이터 가장 최근 데이터 확인하고 업데이트하게 수정
+
+엔진 현재 한개만 나오는데 2개 나오게 세팅 real search
+
+
+
+  📥 최신 RAW 로드: all_stocks_cumulative_251121_9.parquet
+  📥 최신 KOSPI 로드: kospi_data_251121_9.parquet
+  ... 기술적 지표 계산 중
+  - 생성 결과: 6,064,688 → 6,064,688 행 (삭제 없음, NaN 유지)
+  - 최종 피처 개수: 15개 이상 
+
+PS F:\autostockG\MODELENGINE> python final_top10simple.py
+=== MODELENGINE 통합 실행기 (SIMPLE) 시작 ===
+※ 순서 고정 실행: 1→2→3→4→5→6 (지능형 로직 없음)
+
+================================================================
+[RUN-RAW] F:\autostockG\MODELENGINE\RAW\raw_patch.py
+================================================================
+┌──────────────────────────────────────────────┐
+│ 🎉 흰둥이 원본데이터 업데이트 (V6)           │
+└──────────────────────────────────────────────┘
+[PATH] RAW_MAIN : F:\autostockG\MODELENGINE\RAW\stocks\all_stocks_cumulative.parquet
+
+[2025-11-23 20:28:19] [STEP 1] RAW 최신 날짜: 2025-11-21
+[2025-11-23 20:28:19] [STEP 2] 수집 기간: 2025-11-21 ~ 2025-11-21
+[2025-11-23 20:28:19] [STEP] KRX 일괄 수집 시작: 20251121
+[2025-11-23 20:28:25] [KRX] 2883개 종목 수집, 의심 131개
+[2025-11-23 20:28:25] [OK] KRX(pykrx) 데이터 사용
+[QUERY] KRX 의심 131개 추가 데이터 검증을 진행할까요? (y/n): n
+[2025-11-23 20:29:16] [SKIP] 사용자 선택에 따라 의심 코드 추가 검증을 건너뜁니다.
+[2025-11-23 20:29:16] [SAVE] DAILY 저장 완료: F:\autostockG\MODELENGINE\RAW\stocks\DAILY\daily_20251121.parquet
+[2025-11-23 20:29:34] [SKIP] RAW 저장/백업 생략 (마지막 날짜 동일: 2025-11-21)
+[RAW] 완료 ✔ 98.55s
+
+================================================================
+[RUN-KOSPI] F:\autostockG\MODELENGINE\RAW\make_kospi_index_10y.py
+================================================================
+
+============================================================
+[KOSPI] 10년치 지수 수집 (kospi_data 폴더 저장)
+============================================================
+🕒 현재 20:29 (장마감 후) -> '금일(2025-11-23)' 마감 데이터 업데이트
+   [1순위] FinanceDataReader (Naver) 시도...
+----------------------------------------
+✅ 데이터 수집 완료 (최신: 2025-11-21)
+✅ 확정 데이터이므로 기존 파일을 백업합니다.
+----------------------------------------
+📦 [백업] kospi_data.parquet -> kospi_data_251121_15.parquet
+💾 [저장 완료] kospi_data.parquet (경로: RAW/kospi_data/)
+[KOSPI] 완료 ✔ 7.11s
+
+================================================================
+[RUN-FEATURE] F:\autostockG\MODELENGINE\UTIL\build_features.py
+================================================================
+==============================================
+[FEATURE V32] 피처 생성 (NaN 유지 모드)
+  📥 최신 RAW 로드: all_stocks_cumulative_251121_9.parquet
+  📥 최신 KOSPI 로드: kospi_data_251121_9.parquet
+  ... 기술적 지표 계산 중
+  - 생성 결과: 6,064,688 → 6,064,688 행 (삭제 없음, NaN 유지)
+  - 최종 피처 개수: 15개 이상 (확장됨)
+  ▶ [SKIP] 동일 날짜(251121) 파일 존재: features_V31_251121_4.parquet
+[FEATURE] 작업 완료
+[FEATURE] 완료 ✔ 506.06s
+
+================================================================
+[RUN-DB] F:\autostockG\MODELENGINE\UTIL\build_unified_db.py
+================================================================
+============================================================
+[DB BUILDER] 통합 DB 생성 시작 (HOJ_DB_V31)
+  📥 입력: F:\autostockG\MODELENGINE\FEATURE\features_V31_251121_4.parquet
+  💾 출력: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31.parquet
+  ✅ 피처 로드 성공: 6,064,688 rows
+  📅 데이터 기간: 2015-01-02 ~ 2025-11-21
+  ▶ [SKIP] 동일 날짜(251121) 파일 존재: HOJ_DB_V31_251121_5.parquet
+  🎉 [완료] 통합 DB 저장 성공 (날짜 태그 파일)
+[DB] 완료 ✔ 16.90s
+
+================================================================
+[RUN-ENGINE] F:\autostockG\MODELENGINE\UTIL\train_engine_unified.py
+================================================================
+
+=== [HOJ Engine Factory V33] 시작 =========================
+[Config] Mode=RESEARCH | Horizon=5d | InputWindow=60d | Valid=365d
+[Load] DB: HOJ_DB_V31_251121_5.parquet
+[Info] 데이터 기간: 2015-01-02 ~ 2025-11-21 | Rows=6,064,688
+[Target] 'Return_5d' 생성 중 (Horizon=5)...
+[Filter] InputWindow=60 적용 중 (기간이 더 긴 지표 제외)...
+         제외(2): ['SMA_120', 'SMA_90']
+[Feat] 최종 학습 피처 수: 17
+[Data] NaN 제거 후 학습 데이터: 5,881,509 rows (From 2015-03-31)
+[Split] Research 모드 검증 분리: split=2024-11-21
+[Size] Train=5,220,055 | Valid=661,454
+[Train] 회귀(Reg) & 분류(Cls) 학습...
+[Eval] RMSE=0.08748 | ACC=56.77%
+[Save] 엔진 저장 완료: HOJ_ENGINE_RESEARCH_V31_d251121_h5_w60_n1000_t251123.pkl
+=== [HOJ Engine Factory V33] 완료 =========================
+
+[ENGINE] 완료 ✔ 175.67s
+
+================================================================
+[RUN-TOP10] F:\autostockG\MODELENGINE\UTIL\daily_recommender.py
+================================================================
+[0] HOJ 엔진 로드 중... (F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_d251105_h5_n1000_t251122.pkl)
+[OK] 모델 로드 완료.
+[1] HOJ REAL DB 로드 중... (F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31_251121_5.parquet)
+[OK] DB 로드 완료. (총 6064688행, 2.6초)
+  > 'Date' 컬럼 기준 최신 날짜: 2025-11-21 데이터를 사용합니다.
+[INFO] 총 15개 피처로 예측 실행...
+
+================================================================================
+📈  '2025-11-21' HOJ 예측 Top 10
+================================================================================
+      종목명   Code  ClosePrice  Pred_Prob(%)
+인바이츠바이오코아 216400      2495.0         70.37
+      JTC 950170      3800.0         67.89
+     에이럭스 475580      8170.0         67.55
+  뉴파워프라즈마 144960      4850.0         67.36
+    판도라티비 202960       611.0         66.87
+  하나30호스팩 469880      2060.0         66.69
+     럭스피아 092590       469.0         66.56
+     메디쎄이 200580     10030.0         66.40
+ 엑시큐어하이트론 019490       541.0         65.96
+     지니너스 389030      1634.0         64.22
+================================================================================
+[SAVE] 결과 저장 완료: recommendation_HOJ_V31_2025-11-21_2025-11-23_204127.csv
+
+============================================================
+[Gemini AI] Top10 종목에 대한 AI 분석 시작
+============================================================
+[INFO] Flash 모델 자동선택: models/gemini-2.5-flash
+[Gemini] 모델 'models/gemini-2.5-flash' 분석 실행 중...
+
+============================================================
+   [Gemini AI 결과]
+============================================================
+
+=== Gemini's Pick ===
+1. 종목명: 인바이츠바이오코아
+   사유: 제시된 HOJ Top10 종목 중 70.37%로 가장 높은 상승 예측 확률을 보입니다.
+2. 종목명: JTC
+   사유: 67.89%로 두 번째로 높은 상승 예측 확률을 기록하여 긍정적인 흐름이 예상됩니다.
+3. 종목명: 에이럭스
+   사유: 67.55%의 높은 예측 확률을 바탕으로 상승 기대감이 높습니다.
+
+------------------------------------------------------------
+[TOP10] 완료 ✔ 16.89s
+
+=== MODELENGINE 통합 실행기 (SIMPLE) 종료 ===
+PS F:\autostockG\MODELENGINE>
+
+방금 프로그램 돌리고 나온 결과

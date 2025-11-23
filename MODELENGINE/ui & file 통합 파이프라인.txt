@@ -42,11 +42,15 @@ DB 생성:
 RESEARCH DB: UTIL/build_HOJ_DB_RESEARCH.py → HOJ_DB/RESEARCH/HOJ_DB_RESEARCH_V31.parquet
 REAL DB: UTIL/build_HOJ_DB_REAL.py → HOJ_DB/REAL/HOJ_DB_REAL_V31.parquet
 (피처가 새로 갱신된 경우에만 실행)
+!!!251123현재 수정중 디비 하나로 통합 hoj_db폴더
+!!!251123train파일 기존 real, research 통합
+
 엔진 학습:
 RESEARCH 엔진: UTIL/train_HOJ_ENGINE_RESEARCH.py → HOJ_ENGINE/RESEARCH/HOJ_ENGINE_RESEARCH_V31.pkl
 REAL 엔진: UTIL/train_HOJ_ENGINE_REAL.py → HOJ_ENGINE/REAL/HOJ_ENGINE_REAL_V31.pkl
 (DB가 새로 만들어진 경우에만 실행)
 Top10 추천: UTIL/daily_recommender.py 실행 → 최종 추천 산출
+ai TOP10 추천내용: 더블체크 gemini_filter.py
 RAW만 업데이트하는 구간: 1) RAW/raw_patch.py, 2) RAW/make_kospi_index_10y.py
 
 피처까지 업데이트하는 구간: 3) UTIL/build_features.py (RAW·KOSPI 반영해 피처 생성)

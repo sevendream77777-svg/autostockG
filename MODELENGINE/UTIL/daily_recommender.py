@@ -1,12 +1,19 @@
 # daily_recommender.py
-# [V27-Fixed 4차] : '진짜 15개 피처' 커리큘럼 적용
+# [V27-Fixed 4 + Hybrid AI] : '15개 피처 호엔진 + Gemini 분석'
 
 import pandas as pd
 import joblib
 import os
 import sys
 from datetime import datetime
-import time 
+import time
+import google.generativeai as genai  # Gemini API
+
+# ==========================================
+# [필수 설정]    AI Studio API Key 입력
+# ==========================================
+GEMINI_API_KEY = "AIzaSyBG_Q5-c2H3JgLssHxot-iPM69AJ9kzXdU"
+# ==========================================
 
 # --- [MODELENGINE 경로 설정] ---
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -15,13 +22,23 @@ UTIL_DIR = os.path.join(MODELENGINE_DIR, "UTIL")
 if UTIL_DIR not in sys.path:
     sys.path.append(UTIL_DIR)
 
-from config_paths import get_path  # pylint: disable=wrong-import-position
+from config_paths import get_path
+from version_utils import find_latest_file
 
-MODEL_FILE = get_path("HOJ_ENGINE", "REAL", "HOJ_ENGINE_REAL_V31.pkl")
-DB_FILE = get_path("HOJ_DB", "REAL", "HOJ_DB_REAL_V31.parquet")
-# --------------------
 
-# --- 기본 피처 목록 (엔진 저장값이 우선) ---
+# 최신 모델 및 DB 파일 자동 검색
+MODEL_FILE = find_latest_file(
+    get_path("HOJ_ENGINE", "REAL"),
+    "HOJ_ENGINE_REAL_V31",
+    extension=".pkl"
+)
+DB_FILE = find_latest_file(
+    get_path("HOJ_DB"),
+    "HOJ_DB_V31",
+    extension=".parquet"
+)
+
+# --- 기본 사용 피처(그대로 유지) ---
 DEFAULT_FEATURES = [
     "Change",
     "SMA_5", "SMA_20", "SMA_60",
@@ -37,55 +54,136 @@ DEFAULT_FEATURES = [
 
 FEATURES = DEFAULT_FEATURES.copy()
 
+
 def get_latest_data(df):
+    """DB에서 최신 날짜만 분리"""
     try:
         df['Date'] = pd.to_datetime(df['Date'])
         latest_date = df['Date'].max()
-        print(f"  > 'Date' 기준 '{latest_date.strftime('%Y-%m-%d')}' 데이터로 '예상 수익률' 예측 중...")
+        print(f"  > 'Date' 컬럼 기준 최신 날짜: {latest_date.strftime('%Y-%m-%d')} 데이터를 사용합니다.")
         latest_df = df[df['Date'] == latest_date].copy()
         return latest_df, latest_date
     except Exception as e:
-        print(f"오류: V25 DB에서 최신 날짜 데이터를 필터링하는 중 실패. {e}")
+        print(f"    오류: DB 날짜 파싱 실패. {e}")
         return None, None
 
+
 def predict_top10(model, latest_df, features):
+    """HOJ 엔진 예측 Top10"""
     try:
         valid_features = [f for f in features if f in latest_df.columns]
-        if len(valid_features) != len(features):
-             print(f"⚠ 오류: '진짜 15개 피처' 중 일부가 DB에 없습니다. 2/3단계를 확인하세요.")
-             missing = [f for f in features if f not in latest_df.columns]
-             print(f"   > 누락된 피처: {missing}")
-             sys.exit(1)
 
-        print(f"✅ 사용할 {len(valid_features)}개 피처 준비...")
+        if len(valid_features) != len(features):
+            print(f"[경고] '15개 피처 체계' 일부가 DB에 없습니다. 반드시 점검 필요.")
+            missing = [f for f in features if f not in latest_df.columns]
+            print(f"   > 누락된 피처: {missing}")
+            sys.exit(1)
+
+        print(f"[INFO] 총 {len(valid_features)}개 피처로 예측 실행...")
         X_latest = latest_df[valid_features]
 
         probabilities = model.predict_proba(X_latest)
-        latest_df['예측확률'] = probabilities[:, 1]
+        latest_df['Pred_Prob'] = probabilities[:, 1]
 
-        final_df = latest_df
-        top_10 = final_df.sort_values(by='예측확률', ascending=False).head(10)
+        final_df = latest_df.sort_values(by='Pred_Prob', ascending=False).head(10)
 
-        if '종가' not in top_10.columns and 'Close' in top_10.columns:
-            top_10['종가'] = top_10['Close']
+        if 'Close' in final_df.columns:
+            final_df['ClosePrice'] = final_df['Close']
 
-        top_10['예측확률(%)'] = (top_10['예측확률'] * 100).round(2)
+        final_df['Pred_Prob(%)'] = (final_df['Pred_Prob'] * 100).round(2)
 
-        output_column_name = '종목명' if '종목명' in top_10.columns else 'Name'
+        output_column_name = 'Name' if 'Name' in final_df.columns else '종목명'
 
-        # 출력 정리: 예측확률(%)만 노출, 컬럼명 통일
-        result = top_10[[output_column_name, 'Code', '종가', '예측확률(%)']].copy()
+        result = final_df[[output_column_name, 'Code', 'ClosePrice', 'Pred_Prob(%)']].copy()
         result = result.rename(columns={output_column_name: '종목명'})
         return result
 
     except Exception as e:
-        print(f"경고: Top 10 생성 실패. {e}")
+        print(f"   오류: Top 10 생성 실패. {e}")
         return None
 
 
-if __name__ == "__main__":
+def analyze_with_gemini(df):
+    """Gemini를 이용한 AI 포트폴리오 분석"""
+    print("\n" + "="*60)
+    print("[Gemini AI] Top10 종목에 대한 AI 분석 시작")
+    print("="*60)
+
+    if not GEMINI_API_KEY:
+        print("[SKIP] API Key 없음.")
+        return
+
     try:
-        print(f"[0] HOJ 실전 엔진('{MODEL_FILE}') 로드 중...")
+        genai.configure(api_key=GEMINI_API_KEY)
+
+        # 가장 빠른 모델 자동 선택
+        all_models = list(genai.list_models())
+        valid_model_name = None
+
+        for m in all_models:
+            if 'generateContent' in m.supported_generation_methods:
+                if 'flash' in m.name:
+                    valid_model_name = m.name
+                    print(f"[INFO] Flash 모델 자동선택: {valid_model_name}")
+                    break
+
+        if valid_model_name is None:
+            for m in all_models:
+                if 'generateContent' in m.supported_generation_methods:
+                    if 'pro' in m.name:
+                        valid_model_name = m.name
+                        print(f"[INFO] Flash가 없어 Pro 모델 사용: {valid_model_name}")
+                        break
+
+        if valid_model_name is None:
+            valid_model_name = "models/gemini-1.5-flash"
+            print("[INFO] 기본 Flash 모델 사용")
+
+        model = genai.GenerativeModel(valid_model_name)
+
+        target_list_str = df.to_string(index=False)
+        prompt = f"""
+아래는 오늘의 HOJ Top10 종목 리스트입니다. 
+이 종목들을 기반으로 상승 가능성이 높은 종목을 3개 추천해 주세요.
+
+[Top10 종목 데이터]
+{target_list_str}
+
+[요구사항]
+- 추천 사유 1~2줄 포함
+- 상승 가능성이 높은 순서대로 3개만 제시
+
+[형식]
+=== Gemini's Pick ===
+1. 종목명: 사유
+2. 종목명: 사유
+3. 종목명: 사유
+"""
+
+        print(f"[Gemini] 모델 '{valid_model_name}' 분석 실행 중...")
+
+        response = model.generate_content(prompt)
+
+        print("\n" + "="*60)
+        print("   [Gemini AI 결과]")
+        print("="*60 + "\n")
+        print(response.text)
+        print("\n" + "-"*60)
+
+    except Exception as e:
+        print(f"⚠ Gemini 오류 발생: {e}")
+        print("사용 가능한 모델 목록:")
+        try:
+            for m in genai.list_models():
+                print(" -", m.name)
+        except:
+            pass
+
+
+if __name__ == "__main__":
+    # 1) 모델 불러오기
+    try:
+        print(f"[0] HOJ 엔진 로드 중... ({MODEL_FILE})")
         engine_data = joblib.load(MODEL_FILE)
 
         if isinstance(engine_data, dict) and "model_cls" in engine_data:
@@ -95,46 +193,51 @@ if __name__ == "__main__":
             model = engine_data
             features = DEFAULT_FEATURES
 
-        print("✅ 모델 로드 완료.")
+        print("[OK] 모델 로드 완료.")
     except Exception as e:
-        print(f"❌ 치명적 오류: {MODEL_FILE} 로드 실패. {e}")
+        print(f"[ERROR] 모델 로드 실패: {e}")
         sys.exit(1)
 
+    # 2) DB 불러오기
     try:
-        print(f"[1] '{DB_FILE}' (HOJ REAL DB) 로드 중...")
-        start_time = time.time()
+        print(f"[1] HOJ REAL DB 로드 중... ({DB_FILE})")
+        start = time.time()
         df = pd.read_parquet(DB_FILE)
-        print(f"✅ 로드 완료. (총 {len(df)} 행, {time.time() - start_time:.0f}초)")
+        print(f"[OK] DB 로드 완료. (총 {len(df)}행, {time.time() - start:.1f}초)")
     except Exception as e:
-        print(f"❌ 치명적 오류: {DB_FILE} 로드 실패. {e}")
+        print(f"[ERROR] DB 로드 실패: {e}")
         sys.exit(1)
 
+    # 3) 최신 날짜 필터링
     latest_df, latest_date = get_latest_data(df)
     if latest_df is None:
         sys.exit(1)
 
-    top_10_df = predict_top10(model, latest_df, features)
-    if top_10_df is None:
+    # 4) Top10 예측
+    top10_df = predict_top10(model, latest_df, features)
+    if top10_df is None:
         sys.exit(1)
 
     date_str = latest_date.strftime('%Y-%m-%d')
     print("\n" + "=" * 80)
-    print(f"★★★ '{date_str}' HOJ 실전 추천 Top 10 ★★★")
-    print("=" * 80)
-    # 고정 폭 포맷으로 정렬 출력
-    formatters = {
-        '종목명': lambda x: f"{str(x):<12}",
-        'Code': lambda x: f"{str(x):<6}",
-        '종가': lambda x: f"{int(x):>8}",
-        '예측확률(%)': lambda x: f"{x:>8.2f}",
-    }
-    print(top_10_df.to_string(index=False, formatters=formatters))
+    print(f"📈  '{date_str}' HOJ 예측 Top 10")
     print("=" * 80)
 
-    now_str = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    output_filename = f"recommendation_HOJ_V31_{date_str}_{now_str}.csv"
+    print(top10_df.to_string(index=False))
+    print("=" * 80)
+
+    # 5) CSV 저장
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+    outname = f"recommendation_HOJ_V31_{date_str}_{timestamp}.csv"
+
     try:
-        top_10_df.to_csv(output_filename, index=False, encoding='utf-8-sig')
-        print(f"✅ 추천 결과가 '{output_filename}' 파일로 저장되었습니다.")
+        top10_df.to_csv(outname, index=False, encoding='utf-8-sig')
+        print(f"[SAVE] 결과 저장 완료: {outname}")
     except Exception as e:
-        print(f"경고: CSV 저장 실패. {e}")
+        print(f"[ERROR] CSV 저장 실패: {e}")
+
+    # 6) Gemini 분석
+    try:
+        analyze_with_gemini(top10_df)
+    except Exception as e:
+        print(f"[WARN] Gemini 분석 스킵: {e}")

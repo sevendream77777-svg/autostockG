@@ -1,5 +1,37 @@
 v31 버전까지
 
+  - ALPHA_SMA_20
+  - ATR_14
+  - BBP_20
+  - CCI_20
+  - Change
+  - Close
+  - Code
+  - Date
+  - High
+  - KOSPI_수익률
+  - KOSPI_종가
+  - Low
+  - MACD_12_26
+  - MACD_SIGNAL_9
+  - MOM_10
+  - Market
+  - Name
+  - Open
+  - ROC_20
+  - RSI_14
+  - SMA_120
+  - SMA_20
+  - SMA_40
+  - SMA_5
+  - SMA_60
+  - SMA_90
+  - STOCH_D
+  - STOCH_K
+  - VOL_SMA_20
+  - Volume
+!!!필수!!! 현재 feature 항목 v31기준
+
 ① RAW 원본 (6개)
 Date
 Open

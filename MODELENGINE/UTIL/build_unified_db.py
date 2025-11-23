@@ -12,10 +12,12 @@ import numpy as np
 # 프로젝트 경로 설정
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config_paths import get_path, versioned_filename
+from version_utils import find_latest_file, save_dataframe_with_date
 
 def build_unified_db():
     # 1. 경로 설정
-    feat_path = get_path("FEATURE", "features_V31.parquet")
+    feat_dir = get_path("FEATURE")
+    feat_path = find_latest_file(feat_dir, "features_V31")
     db_dir = get_path("HOJ_DB")
     db_path = os.path.join(db_dir, "HOJ_DB_V31.parquet")
 
@@ -56,18 +58,10 @@ def build_unified_db():
 
     # 4. 저장 (기존 파일 백업 후 저장)
     os.makedirs(db_dir, exist_ok=True)
-
-    if os.path.exists(db_path):
-        try:
-            backup = versioned_filename(db_path)
-            os.rename(db_path, backup)
-            print(f"  📦 기존 DB 백업 완료: {os.path.basename(backup)}")
-        except Exception as e:
-            print(f"  ⚠ 백업 중 오류 (무시됨): {e}")
-
     try:
-        df.to_parquet(db_path, index=False)
-        print(f"  🎉 [완료] 통합 DB 저장 성공: {os.path.basename(db_path)}")
+        # Date 컬럼에서 마지막 날짜를 자동 추출하여 HOJ_DB_V3_YYMMDD.parquet 형태로 저장
+        save_dataframe_with_date(df, db_dir, "HOJ_DB_V31", date_col="Date")
+        print("  🎉 [완료] 통합 DB 저장 성공 (날짜 태그 파일)")
     except Exception as e:
         print(f"❌ DB 저장 실패: {e}")
 
