@@ -1,0 +1,80 @@
+📂 1. RAW 데이터 (수집 단계)
+가장 기초가 되는 원본 데이터입니다.
+
+A. 주식 시세 데이터 (RAW/stocks)
+파일: all_stocks_cumulative.parquet
+
+생성 코드: safe_raw_builder_v2.py
+
+컬럼 목록 (7개):
+
+Date: 날짜 (예: 2025-11-24)
+
+Code: 종목코드 (예: 005930)
+
+Open: 시가
+
+High: 고가
+
+Low: 저가
+
+Close: 종가
+
+Volume: 거래량
+
+B. KOSPI 지수 데이터 (RAW/kospi_data)
+파일: kospi_data.parquet
+
+생성 코드: make_kospi_index_10y.py
+
+컬럼 목록 (2개):
+
+Date: 날짜
+
+Close: KOSPI 종가
+
+🛠️ 2. FEATURE 데이터 (가공 단계)
+RAW 데이터를 합치고, AI가 학습할 수 있는 보조지표를 추가한 상태입니다.
+
+파일: features_V31_xxxx.parquet
+
+생성 코드: build_features.py
+
+컬럼 구성:
+
+기본 정보 (Raw 계승): Date, Code, Open, High, Low, Close, Volume
+
+시장 지표 (KOSPI 병합): KOSPI_종가, KOSPI_수익률
+
+기술적 지표 (AI 학습용 핵심 피처):
+
+이동평균: SMA_5, SMA_20, SMA_40, SMA_60, SMA_90, SMA_120
+
+거래량 이평: VOL_SMA_20
+
+추세/모멘텀: RSI_14, MOM_10 (Momentum), ROC_20 (Rate of Change)
+
+MACD: MACD_12_26 (MACD선), MACD_SIGNAL_9 (시그널선)
+
+볼린저밴드: BBP_20 (Bollinger Band Position)
+
+변동성: ATR_14 (Average True Range)
+
+스토캐스틱: STOCH_K, STOCH_D
+
+기타: CCI_20 (Commodity Channel Index), ALPHA_SMA_20 (시장 대비 초과 수익률)
+
+🧠 3. HOJ DB & ENGINE (학습 및 예측 단계)
+최종적으로 AI 엔진이 읽어들이는 형태입니다.
+
+파일: HOJ_DB_V31_xxxx.parquet / HOJ_ENGINE_REAL_V31.pkl
+
+사용 코드: daily_recommender.py (또는 train_engine_unified.py)
+
+입력 컬럼 (15개 핵심 피처): 모델은 위의 수많은 피처 중 가장 중요한 15개를 골라서 사용합니다. Change (등락률), SMA_5, SMA_20, SMA_60, VOL_SMA_20, MOM_10, ROC_20, MACD_12_26, MACD_SIGNAL_9, BBP_20, ATR_14, STOCH_K, STOCH_D, CCI_20, ALPHA_SMA_20
+
+출력 결과 (Prediction):
+
+Pred_Prob: 상승 확률 (분류 모델 결과)
+
+Pred_Return: 예상 수익률 (회귀 모델 결과, 듀얼 모델 사용 시)
