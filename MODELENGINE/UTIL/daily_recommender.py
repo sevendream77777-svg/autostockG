@@ -1,147 +1,170 @@
-# daily_recommender.py
-# [V27-Fixed 4 + Hybrid AI] : '15개 피처 호엔진 + Gemini 분석'
-
+# ============================================================
+# daily_recommender_V34_plus.py  (FINAL FULL VERSION)
+# [Update] AI 분석 후 결과 통합 저장 기능 추가
+# [Patch] 엑셀 자동 서식 및 통합 리포트 생성 기능 추가
+# ============================================================
+import os, sys, argparse, pickle, warnings
+import numpy as np
 import pandas as pd
-import joblib
-import os
-import sys
 from datetime import datetime
-import time
 import google.generativeai as genai  # Gemini API
 
+# [Patch] 엑셀 서식 관련 라이브러리 추가
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment, Font, PatternFill
+
+# 경로 설정
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir  = os.path.dirname(current_dir)   # MODELENGINE
+root_dir    = os.path.dirname(parent_dir)    # Root
+sys.path.append(root_dir)
+try:
+    from MODELENGINE.UTIL.config_paths import get_path
+    from MODELENGINE.UTIL.version_utils import find_latest_file
+except:
+    sys.path.append(parent_dir)
+    from UTIL.config_paths import get_path
+    from UTIL.version_utils import find_latest_file
+
+
 # ==========================================
-# [필수 설정]    AI Studio API Key 입력
+# [설정] AI Studio API Key 입력
 # ==========================================
-GEMINI_API_KEY = "AIzaSyBG_Q5-c2H3JgLssHxot-iPM69AJ9kzXdU"
-# ==========================================
-
-# --- [MODELENGINE 경로 설정] ---
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-MODELENGINE_DIR = os.path.join(PROJECT_ROOT, "MODELENGINE")
-UTIL_DIR = os.path.join(MODELENGINE_DIR, "UTIL")
-if UTIL_DIR not in sys.path:
-    sys.path.append(UTIL_DIR)
-
-from config_paths import get_path
-from version_utils import find_latest_file
-
-
-# 최신 모델 및 DB 파일 자동 검색
-MODEL_FILE = find_latest_file(
-    get_path("HOJ_ENGINE", "REAL"),
-    "HOJ_ENGINE_REAL_V31",
-    extension=".pkl"
-)
-DB_FILE = find_latest_file(
-    get_path("HOJ_DB"),
-    "HOJ_DB_V31",
-    extension=".parquet"
-)
-
-# --- 기본 사용 피처(그대로 유지) ---
-DEFAULT_FEATURES = [
-    "Change",
-    "SMA_5", "SMA_20", "SMA_60",
-    "VOL_SMA_20",
-    "MOM_10", "ROC_20",
-    "MACD_12_26", "MACD_SIGNAL_9",
-    "BBP_20",
-    "ATR_14",
-    "STOCH_K", "STOCH_D",
-    "CCI_20",
-    "ALPHA_SMA_20",
-]
-
-FEATURES = DEFAULT_FEATURES.copy()
-
-
-def get_latest_data(df):
-    """DB에서 최신 날짜만 분리"""
+def load_api_key():
+    """외부 텍스트 파일에서 API 키를 읽어옵니다."""
+    key_path = r"C:\공유주방\!개인폴더\!이호정이사\각종key_appkey_decret\googlegemini_api.txt"
     try:
-        df['Date'] = pd.to_datetime(df['Date'])
-        latest_date = df['Date'].max()
-        print(f"  > 'Date' 컬럼 기준 최신 날짜: {latest_date.strftime('%Y-%m-%d')} 데이터를 사용합니다.")
-        latest_df = df[df['Date'] == latest_date].copy()
-        return latest_df, latest_date
+        if os.path.exists(key_path):
+            with open(key_path, "r", encoding="utf-8") as f:
+                return f.read().strip()
+        else:
+            print(f"⚠ [Warning] 키 파일을 찾을 수 없습니다: {key_path}")
     except Exception as e:
-        print(f"    오류: DB 날짜 파싱 실패. {e}")
-        return None, None
+        print(f"⚠ [Error] 키 파일 읽기 실패: {e}")
+    return None
+
+GEMINI_API_KEY = load_api_key()
+# ==========================================
 
 
-def predict_top10(model, latest_df, features):
-    """HOJ 엔진 예측 Top10"""
-    try:
-        valid_features = [f for f in features if f in latest_df.columns]
-
-        if len(valid_features) != len(features):
-            print(f"[경고] '15개 피처 체계' 일부가 DB에 없습니다. 반드시 점검 필요.")
-            missing = [f for f in features if f not in latest_df.columns]
-            print(f"   > 누락된 피처: {missing}")
-            sys.exit(1)
-
-        print(f"[INFO] 총 {len(valid_features)}개 피처로 예측 실행...")
-        X_latest = latest_df[valid_features]
-
-        probabilities = model.predict_proba(X_latest)
-        latest_df['Pred_Prob'] = probabilities[:, 1]
-
-        final_df = latest_df.sort_values(by='Pred_Prob', ascending=False).head(10)
-
-        if 'Close' in final_df.columns:
-            final_df['ClosePrice'] = final_df['Close']
-
-        final_df['Pred_Prob(%)'] = (final_df['Pred_Prob'] * 100).round(2)
-
-        output_column_name = 'Name' if 'Name' in final_df.columns else '종목명'
-
-        result = final_df[[output_column_name, 'Code', 'ClosePrice', 'Pred_Prob(%)']].copy()
-        result = result.rename(columns={output_column_name: '종목명'})
-        return result
-
-    except Exception as e:
-        print(f"   오류: Top 10 생성 실패. {e}")
-        return None
+# ============================================================
+# 유틸 함수들
+# ============================================================
+def _hash_list(lst):
+    """피처 리스트 해시값 생성"""
+    s = "|".join(map(str, lst))
+    return str(abs(hash(s)))
 
 
-def analyze_with_gemini(df):
-    """Gemini를 이용한 AI 포트폴리오 분석"""
-    print("\n" + "="*60)
-    print("[Gemini AI] Top10 종목에 대한 AI 분석 시작")
-    print("="*60)
+def pick_close_col(df):
+    """Close/ClosePrice/종가/가격 자동 인식"""
+    cand = ["Close","close","ClosePrice","종가","가격","Adj Close","AdjClose"]
+    for c in cand:
+        if c in df.columns:
+            return c
+    nums = [c for c in df.columns if df[c].dtype.kind in ("i","f")]
+    if len(nums) == 1:
+        return nums[0]
+    raise KeyError("종가 컬럼 찾지 못함(Close/ClosePrice/종가/가격).")
 
+
+def find_engine_real():
+    """HOJ_ENGINE/REAL 폴더에서 최신 엔진 자동 찾기"""
+    base_root = get_path("HOJ_ENGINE")
+    if os.path.isfile(base_root):
+        base_root = os.path.dirname(base_root)
+
+    real_dir = os.path.join(base_root, "REAL")
+    if not os.path.isdir(real_dir):
+        raise FileNotFoundError("REAL 폴더 없음: " + real_dir)
+
+    # .pkl 확장자 지정
+    latest = find_latest_file(real_dir, "HOJ_ENGINE_REAL", extension=".pkl")
+    if not latest:
+        raise FileNotFoundError("REAL 폴더에 엔진이 없습니다.")
+
+    return latest
+
+
+def load_latest_db(version="V31"):
+    db_dir = get_path("HOJ_DB")
+    latest = find_latest_file(db_dir, f"HOJ_DB_{version}")
+    if not latest:
+        raise FileNotFoundError("DB를 찾지 못했습니다.")
+
+    df = pd.read_parquet(latest)
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    return df, latest
+
+
+# ============================================================
+# [패치 추가] 엑셀 서식 자동 조정 함수
+# ============================================================
+def auto_adjust_column_width(worksheet):
+    """ 엑셀 컬럼 너비 자동 맞춤 및 헤더 스타일링 """
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+    
+    for col in worksheet.columns:
+        max_length = 0
+        column = col[0].column_letter 
+        
+        # 헤더 스타일 적용
+        col[0].font = header_font
+        col[0].fill = header_fill
+        col[0].alignment = Alignment(horizontal='center')
+
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        
+        # 너비 조정
+        adjusted_width = (max_length + 2) * 1.1
+        adjusted_width = min(adjusted_width, 50) # 최대 50
+        adjusted_width = max(adjusted_width, 10) # 최소 10
+        worksheet.column_dimensions[column].width = adjusted_width
+
+
+# ============================================================
+# [수정] Gemini 분석 함수 (결과 텍스트 반환하도록 변경)
+# ============================================================
+def get_gemini_analysis(df):
+    """Gemini를 이용해 Top10 분석 텍스트를 생성하여 반환"""
+    
     if not GEMINI_API_KEY:
-        print("[SKIP] API Key 없음.")
-        return
+        return "\n[Gemini] API Key가 없어 분석을 생략합니다.\n"
 
     try:
         genai.configure(api_key=GEMINI_API_KEY)
 
-        # 가장 빠른 모델 자동 선택
+        # 모델 자동 선택 로직
         all_models = list(genai.list_models())
         valid_model_name = None
-
+        
+        # 1순위: Flash (빠름)
         for m in all_models:
-            if 'generateContent' in m.supported_generation_methods:
-                if 'flash' in m.name:
-                    valid_model_name = m.name
-                    print(f"[INFO] Flash 모델 자동선택: {valid_model_name}")
-                    break
-
+            if 'generateContent' in m.supported_generation_methods and 'flash' in m.name:
+                valid_model_name = m.name
+                break
+        
+        # 2순위: Pro
         if valid_model_name is None:
             for m in all_models:
-                if 'generateContent' in m.supported_generation_methods:
-                    if 'pro' in m.name:
-                        valid_model_name = m.name
-                        print(f"[INFO] Flash가 없어 Pro 모델 사용: {valid_model_name}")
-                        break
-
+                if 'generateContent' in m.supported_generation_methods and 'pro' in m.name:
+                    valid_model_name = m.name
+                    break
+        
+        # 기본값
         if valid_model_name is None:
             valid_model_name = "models/gemini-1.5-flash"
-            print("[INFO] 기본 Flash 모델 사용")
 
         model = genai.GenerativeModel(valid_model_name)
-
         target_list_str = df.to_string(index=False)
+        
         prompt = f"""
 아래는 오늘의 HOJ Top10 종목 리스트입니다. 
 이 종목들을 기반으로 상승 가능성이 높은 종목을 3개 추천해 주세요.
@@ -159,85 +182,166 @@ def analyze_with_gemini(df):
 2. 종목명: 사유
 3. 종목명: 사유
 """
-
-        print(f"[Gemini] 모델 '{valid_model_name}' 분석 실행 중...")
-
+        print(f"[Gemini] 모델 '{valid_model_name}' 분석 실행 중...", end="\r") # 진행중 표시
         response = model.generate_content(prompt)
+        print(f"[Gemini] 분석 완료.                                 ") # 지우기
 
-        print("\n" + "="*60)
-        print("   [Gemini AI 결과]")
-        print("="*60 + "\n")
-        print(response.text)
-        print("\n" + "-"*60)
+        return response.text
 
     except Exception as e:
-        print(f"⚠ Gemini 오류 발생: {e}")
-        print("사용 가능한 모델 목록:")
-        try:
-            for m in genai.list_models():
-                print(" -", m.name)
-        except:
-            pass
+        return f"\n⚠ Gemini 분석 중 오류 발생: {e}\n"
 
 
+# ============================================================
+# 메인 로직
+# ============================================================
+def main(rank_by="combo", topk=10, version="V31"):
+
+    # 1. 엔진 및 DB 로드
+    eng_path = find_engine_real()
+    with open(eng_path, "rb") as f:
+        payload = pickle.load(f)
+    model_cls = payload["model_cls"]
+    model_reg = payload["model_reg"]
+    features  = payload["features"]
+    
+    df, db_path = load_latest_db(version)
+    max_date = df["Date"].max()
+    df_d = df[df["Date"] == max_date].copy()
+    close_col = pick_close_col(df_d)
+
+    # 2. 피처 확인 및 예측
+    db_features = [c for c in features if c in df_d.columns]
+    X = df_d[db_features].copy()
+    mask = X.notnull().all(axis=1)
+    df_d = df_d.loc[mask].copy()
+    X = X.loc[mask]
+
+    prob = model_cls.predict_proba(X)[:,1]
+    ret  = model_reg.predict(X)
+    ret_clip = np.clip(ret, -0.10, None)
+    combo = prob * ret_clip
+
+    # 3. 결과 DataFrame 생성
+    df_out = pd.DataFrame({
+        "종목명": df_d.get("Name", df_d.get("name")),
+        "종목코드": df_d.get("Code", df_d.get("code")),
+        "현재가": df_d[close_col],
+        "상승확률(%)": (prob*100).round(2),
+        "예측수익률(%)": (ret*100).round(2),
+        "동시적용 기대수익(%)": (combo*100).round(2),
+    })
+
+    # 정렬
+    keymap = {"combo":"동시적용 기대수익(%)", "prob":"상승확률(%)", "ret":"예측수익률(%)"}
+    sort_key = keymap.get(rank_by, "동시적용 기대수익(%)")
+    df_out = df_out.sort_values(sort_key, ascending=False).head(topk)
+
+    # ------------------------------------------------------------
+    # 4. [변경] AI 분석 먼저 실행
+    # ------------------------------------------------------------
+    ai_result_text = get_gemini_analysis(df_out)
+
+    # ------------------------------------------------------------
+    # 5. [변경] 통합 리포트 생성 (출력 및 저장용)
+    # ------------------------------------------------------------
+    report_content = []
+    report_content.append("=" * 60)
+    report_content.append(f"📈 HOJ AI Daily Report [{max_date.date()}]")
+    report_content.append("=" * 60)
+    report_content.append(f"\n[1] 예측 Top {topk} (기준: {rank_by})")
+    report_content.append("-" * 60)
+    report_content.append(df_out.to_string(index=False))
+    report_content.append("-" * 60)
+    report_content.append("\n[2] Gemini AI Investment Opinion")
+    report_content.append("-" * 60)
+    report_content.append(ai_result_text.strip())
+    report_content.append("=" * 60)
+    
+    full_report_str = "\n".join(report_content)
+
+    # ------------------------------------------------------------
+    # 6. 화면 출력
+    # ------------------------------------------------------------
+    print(full_report_str)
+    print(f"\n[ENGINE] {os.path.basename(eng_path)}")
+    print(f"[DB]     {os.path.basename(db_path)}")
+
+    # ------------------------------------------------------------
+    # 7. 파일 저장 (CSV + TXT 리포트)
+    # ------------------------------------------------------------
+    out_dir = get_path("OUTPUT")
+    os.makedirs(out_dir, exist_ok=True)
+    
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    # (1) CSV 저장 (데이터용)
+    csv_name = f"recommendation_HOJ_V34_{max_date.date()}_{timestamp}_{rank_by}.csv"
+    csv_path = os.path.join(out_dir, csv_name)
+    df_out.to_csv(csv_path, index=False, encoding="utf-8-sig")
+
+    # (2) TXT 리포트 저장 (보기 편한 용도, AI의견 포함)
+    txt_name = f"Report_HOJ_V34_{max_date.date()}_{timestamp}.txt"
+    txt_path = os.path.join(out_dir, txt_name)
+    
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(full_report_str)
+        f.write(f"\n\n[File Info]\nCSV Data: {csv_name}\nEngine: {os.path.basename(eng_path)}")
+
+    print(f"[SAVE]   CSV: {csv_name}")
+    print(f"[SAVE]   TXT: {txt_name} (AI 분석 포함)")
+
+    # ------------------------------------------------------------
+    # 8. [패치] 엑셀 리포트 자동 생성 (Format + AI Text)
+    # ------------------------------------------------------------
+    excel_name = f"Final_Report_HOJ_{max_date.date()}_{timestamp}.xlsx"
+    excel_path = os.path.join(out_dir, excel_name)
+    
+    try:
+        print(f"\n[*] Generating Formatted Excel: {excel_name}...")
+        
+        # (1) Pandas로 데이터 쓰기
+        with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
+            # Sheet 1: Top 10 추천
+            df_out.to_excel(writer, sheet_name='Top 10 추천', index=False)
+            
+            # Sheet 2: AI 해석 (텍스트)
+            df_report = pd.DataFrame({'AI 분석 리포트': [full_report_str]})
+            df_report.to_excel(writer, sheet_name='AI 해석', index=False)
+
+        # (2) OpenPyXL로 서식 다듬기
+        wb = load_workbook(excel_path)
+        
+        # Sheet 1 서식 (컬럼 너비 자동, 헤더 스타일)
+        if 'Top 10 추천' in wb.sheetnames:
+            ws = wb['Top 10 추천']
+            auto_adjust_column_width(ws)
+            
+        # Sheet 2 서식 (줄바꿈, 너비 확장)
+        if 'AI 해석' in wb.sheetnames:
+            ws = wb['AI 해석']
+            cell = ws['A2'] # 본문 셀
+            cell.alignment = Alignment(wrap_text=True, vertical='top') # 줄바꿈 허용
+            ws.column_dimensions['A'].width = 100 # 넓게 잡기
+            
+            # 행 높이 늘리기 (내용 길이에 비례)
+            line_count = full_report_str.count('\n') + (len(full_report_str) // 100)
+            ws.row_dimensions[2].height = max(line_count * 15, 400)
+
+        wb.save(excel_path)
+        print(f"[SAVE]   Excel: {excel_name} (서식 적용 완료)")
+        
+    except Exception as e:
+        print(f"[Error] 엑셀 생성 실패: {e}")
+
+
+# ============================================================
+# CLI
+# ============================================================
 if __name__ == "__main__":
-    # 1) 모델 불러오기
-    try:
-        print(f"[0] HOJ 엔진 로드 중... ({MODEL_FILE})")
-        engine_data = joblib.load(MODEL_FILE)
-
-        if isinstance(engine_data, dict) and "model_cls" in engine_data:
-            model = engine_data["model_cls"]
-            features = engine_data.get("features", DEFAULT_FEATURES)
-        else:
-            model = engine_data
-            features = DEFAULT_FEATURES
-
-        print("[OK] 모델 로드 완료.")
-    except Exception as e:
-        print(f"[ERROR] 모델 로드 실패: {e}")
-        sys.exit(1)
-
-    # 2) DB 불러오기
-    try:
-        print(f"[1] HOJ REAL DB 로드 중... ({DB_FILE})")
-        start = time.time()
-        df = pd.read_parquet(DB_FILE)
-        print(f"[OK] DB 로드 완료. (총 {len(df)}행, {time.time() - start:.1f}초)")
-    except Exception as e:
-        print(f"[ERROR] DB 로드 실패: {e}")
-        sys.exit(1)
-
-    # 3) 최신 날짜 필터링
-    latest_df, latest_date = get_latest_data(df)
-    if latest_df is None:
-        sys.exit(1)
-
-    # 4) Top10 예측
-    top10_df = predict_top10(model, latest_df, features)
-    if top10_df is None:
-        sys.exit(1)
-
-    date_str = latest_date.strftime('%Y-%m-%d')
-    print("\n" + "=" * 80)
-    print(f"📈  '{date_str}' HOJ 예측 Top 10")
-    print("=" * 80)
-
-    print(top10_df.to_string(index=False))
-    print("=" * 80)
-
-    # 5) CSV 저장
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    outname = f"recommendation_HOJ_V31_{date_str}_{timestamp}.csv"
-
-    try:
-        top10_df.to_csv(outname, index=False, encoding='utf-8-sig')
-        print(f"[SAVE] 결과 저장 완료: {outname}")
-    except Exception as e:
-        print(f"[ERROR] CSV 저장 실패: {e}")
-
-    # 6) Gemini 분석
-    try:
-        analyze_with_gemini(top10_df)
-    except Exception as e:
-        print(f"[WARN] Gemini 분석 스킵: {e}")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--rank_by", default="combo", help="combo | prob | ret")
+    ap.add_argument("--topk", type=int, default=10)
+    ap.add_argument("--version", default="V31")
+    args = ap.parse_args()
+    main(rank_by=args.rank_by, topk=args.topk, version=args.version)

@@ -2,6 +2,9 @@
 # Engine Manager UI (Unified Workbench) - Final V32 - MODERNIZED
 #   - Refactored into a single file with Inner Classes for pages
 #   - Applied a Modern Dark Theme (QSS)
+#   - ADDED: "0단계: 데이터 파이프라인" 탭 안에 수동 선택 다운로드 UI
+#            (종목 직접 입력/파일선택 + 기간 선택 + 실행 + 실시간 로그)
+#   - Calls: RAW/pykrx_full_dump_resumable_v2.py (parameter mode)
 # ============================================================
 
 import os
@@ -10,27 +13,29 @@ import glob
 import re
 import pickle
 import time
+import subprocess
+import shlex
 import pandas as pd
 from datetime import datetime
 
-# 필수 PySide6 모듈
+# PySide6
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QTabWidget,
-    QLabel, QComboBox, QSpinBox, QPushButton, QTextEdit, 
+    QLabel, QComboBox, QSpinBox, QPushButton, QTextEdit, QLineEdit,
     QTableWidget, QTableWidgetItem, QHeaderView, QSplitter, QMessageBox, QDateEdit,
-    QProgressBar, QSizePolicy
+    QProgressBar, QFileDialog, QCheckBox
 )
-from PySide6.QtCore import Qt, QThread, Signal, QDate, QSize
+from PySide6.QtCore import Qt, QThread, Signal, QDate
 
 # ------------------------------------------------------------
-# 프로젝트 경로 설정 (기존 로직 유지)
+# 프로젝트 경로 설정
 # ------------------------------------------------------------
 current_dir = os.path.dirname(os.path.abspath(__file__))
 ui_dir = os.path.dirname(current_dir)
 root_dir = os.path.dirname(ui_dir)
 sys.path.append(root_dir)
 
-# Backend 스크립트 동적 임포트용 경로 설정
+# Backend path aliases
 model_engine_dir = os.path.join(root_dir, "MODELENGINE")
 util_dir = os.path.join(model_engine_dir, "UTIL")
 raw_dir = os.path.join(model_engine_dir, "RAW")
@@ -38,252 +43,131 @@ raw_dir = os.path.join(model_engine_dir, "RAW")
 sys.path.append(util_dir)
 sys.path.append(raw_dir)
 
-# Backend Import (Mock for external tool dependency)
+# Backend Import (guarded)
 try:
     from MODELENGINE.UTIL.train_engine_unified import run_unified_training
     from MODELENGINE.UTIL.predict_daily_top10 import run_prediction
     from MODELENGINE.UTIL.config_paths import get_path
-    
-    # 데이터 업데이트 모듈 (지연 임포트 또는 여기서 확인)
     import update_raw_data
     import build_features
     import build_unified_db
-    import make_kospi_index_10y # Assumed to be in raw_dir
+    import make_kospi_index_10y
     BACKEND_READY = True
-except ImportError as e:
-    # print(f"⚠️ Backend Import Warning: {e}")
+except Exception:
     BACKEND_READY = False
-    # Mock functions for UI display only
-    def run_unified_training(mode, horizon, valid_days, n_estimators, version): time.sleep(2); print("Mock Training Finished")
-    def run_prediction(engine_path, target_date, top_n): 
+    def run_unified_training(mode, horizon, valid_days, n_estimators, version): time.sleep(1)
+    def run_prediction(engine_path, target_date, top_n):
         time.sleep(1)
-        data = {'Code': ['005930', '035420', '005380'], 'Name': ['삼성전자', 'NAVER', '현대차'], 
-                'Close': [70000, 200000, 250000], 'Pred_Score': [0.95, 0.88, 0.79], 'Pred_Prob': [0.85, 0.75, 0.65]}
-        return pd.DataFrame(data)
-    def get_path(key): return os.path.join(os.path.dirname(os.path.abspath(__file__)), "MODELENGINE/HOJ_ENGINE/RESEARCH")
-
+        return pd.DataFrame({
+            'Code': ['005930','035420','005380'],
+            'Name': ['삼성전자','NAVER','현대차'],
+            'Close': [70000,200000,250000],
+            'Pred_Score': [0.95,0.88,0.79],
+            'Pred_Prob': [0.85,0.75,0.65]
+        })
+    def get_path(key):
+        return os.path.join(root_dir, 'MODELENGINE', 'HOJ_ENGINE', 'RESEARCH')
 
 # ------------------------------------------------------------
-# 공용 QSS 스타일 정의 (Dark Theme)
+# QSS (Nord-like)
 # ------------------------------------------------------------
+
 def get_modern_qss():
-    # Nord Theme Inspired Dark QSS
     return """
-        /* General Style */
-        QWidget {
-            background-color: #2e3440; /* Dark Slate Background */
-            color: #d8dee9; /* Light Text */
-            font-size: 10pt;
-            font-family: "Malgun Gothic", "Noto Sans KR", sans-serif;
-        }
-
-        /* QTabWidget - Tab Bar */
-        QTabWidget::pane { 
-            border: 1px solid #4c566a; /* Darker border */
-            border-top: 1px solid #3b4252;
-            background-color: #2e3440;
-        }
-        QTabBar::tab { 
-            background: #3b4252; /* Slightly Lighter Tab Background */
-            color: #eceff4;
-            padding: 12px 25px; /* Bigger Padding */
-            border: none;
-            margin-right: 1px;
-            min-width: 150px;
-            font-weight: 500;
-        }
-        QTabBar::tab:selected { 
-            background: #4c566a; /* Dark Accent for Selected */
-            color: #88c0d0; /* Bright Accent Text */
-            font-weight: bold;
-            border-bottom: 2px solid #88c0d0; /* Highlight line */
-        }
-        
-        /* QGroupBox */
-        QGroupBox {
-            font-size: 11pt;
-            font-weight: bold;
-            border: 1px solid #4c566a;
-            border-radius: 5px;
-            margin-top: 10px;
-            padding-top: 15px;
-            color: #a3be8c; /* Green Accent Title */
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            subcontrol-position: top center;
-            padding: 0 5px;
-            background-color: #2e3440;
-        }
-
-        /* QPushButton - General */
-        QPushButton {
-            background-color: #5e81ac; /* Primary Blue Accent */
-            color: #eceff4;
-            border-radius: 6px;
-            padding: 10px;
-            font-weight: bold;
-            border: 1px solid #4c566a;
-        }
-        QPushButton:hover {
-            background-color: #81a1c1; /* Lighter on hover */
-        }
-        QPushButton:pressed {
-            background-color: #5e81ac;
-        }
-        QPushButton:disabled {
-            background-color: #3b4252;
-            color: #4c566a;
-        }
-
-        /* Special Buttons for Data Tab */
-        #data_step_btn {
-            background-color: #4c566a;
-            font-size: 9pt;
-            min-height: 40px;
-        }
-        #data_step_btn:hover {
-            background-color: #5e81ac;
-        }
-        #data_all_btn {
-            background-color: #b48ead; /* Purple Accent for Critical Action */
-            font-size: 11pt;
-            min-height: 40px;
-        }
-        #data_all_btn:hover {
-            background-color: #d08770; 
-        }
-
-        /* QProgressBar */
-        QProgressBar { 
-            border: 1px solid #4c566a; 
-            border-radius: 5px; 
-            text-align: center; 
-            color: #eceff4;
-            background-color: #3b4252;
-        } 
-        QProgressBar::chunk { 
-            background-color: #a3be8c; /* Green Success Color */
-            border-radius: 5px; 
-        }
-
-        /* QTextEdit, QLineEdit, QComboBox, QSpinBox, QDateEdit */
-        QTextEdit, QLineEdit, QComboBox, QSpinBox, QDateEdit {
-            background-color: #3b4252; /* Dark Input Fields */
-            border: 1px solid #4c566a;
-            border-radius: 4px;
-            padding: 5px;
-            color: #eceff4;
-        }
-        QDateEdit::drop-down, QComboBox::drop-down {
-            border: none;
-            background-color: #4c566a;
-            width: 20px;
-        }
-        QComboBox:on {
-            padding-top: 2px;
-            padding-left: 4px;
-            border-image: url(":/icons/down_arrow.png"); /* Example: Custom arrow icon */
-        }
-
-        /* QTableWidget */
-        QTableWidget {
-            gridline-color: #4c566a;
-            background-color: #2e3440;
-            alternate-background-color: #3b4252;
-            border: 1px solid #4c566a;
-        }
-        QHeaderView::section {
-            background-color: #4c566a;
-            color: #88c0d0;
-            padding: 5px;
-            border: 1px solid #3b4252;
-            font-weight: bold;
-        }
-        QTableWidget QTableCornerButton::section {
-            background: #4c566a;
-        }
-        QTableWidget::item:selected {
-            background-color: #5e81ac; /* Accent for selection */
-            color: #eceff4;
-        }
-        
-        /* QLabel for Info/Status */
-        QLabel {
-            color: #d8dee9;
-        }
-        .info_label {
-            color: #a3be8c; /* Sub-info green */
-        }
+    QWidget { background-color: #2e3440; color: #d8dee9; font-size: 10pt; }
+    QTabWidget::pane { border: 1px solid #4c566a; border-top: 1px solid #3b4252; }
+    QTabBar::tab { background: #3b4252; color: #eceff4; padding: 12px 25px; border: none; min-width: 150px; }
+    QTabBar::tab:selected { background: #4c566a; color: #88c0d0; font-weight: bold; border-bottom: 2px solid #88c0d0; }
+    QGroupBox { font-size: 11pt; font-weight: bold; border: 1px solid #4c566a; border-radius: 5px; margin-top: 10px; padding-top: 15px; color: #a3be8c; }
+    QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top center; padding: 0 5px; background: #2e3440; }
+    QPushButton { background-color: #5e81ac; color: #eceff4; border-radius: 6px; padding: 10px; font-weight: bold; border: 1px solid #4c566a; }
+    QPushButton:hover { background-color: #81a1c1; }
+    QPushButton:disabled { background-color: #3b4252; color: #4c566a; }
+    #data_step_btn { background-color: #4c566a; min-height: 40px; }
+    #data_all_btn  { background-color: #b48ead; min-height: 40px; }
+    QProgressBar { border: 1px solid #4c566a; border-radius: 5px; text-align: center; background: #3b4252; }
+    QProgressBar::chunk { background-color: #a3be8c; border-radius: 5px; }
+    QTextEdit, QLineEdit, QComboBox, QSpinBox, QDateEdit { background: #3b4252; border: 1px solid #4c566a; border-radius: 4px; padding: 5px; color: #eceff4; }
+    QHeaderView::section { background: #4c566a; color: #88c0d0; padding: 5px; border: 1px solid #3b4252; font-weight: bold; }
+    QTableWidget::item:selected { background-color: #5e81ac; color: #eceff4; }
     """
 
 # ------------------------------------------------------------
-# [Worker 0] 데이터 업데이트 스레드 (순차 실행) - 기존 로직 유지
+# Workers
 # ------------------------------------------------------------
+
 class DataUpdateWorker(QThread):
     log_signal = Signal(str)
     progress_signal = Signal(int)
     finished_signal = Signal(str)
     error_signal = Signal(str)
-
     def __init__(self, tasks):
         super().__init__()
-        self.tasks = tasks # 실행할 작업 리스트 ['stock', 'kospi', 'feature', 'db']
-
+        self.tasks = tasks
     def run(self):
-        if not BACKEND_READY:
-            self.error_signal.emit("⚠️ Backend modules are not fully imported. Running Mock mode.")
-            time.sleep(1)
-            # Fallback for mock run
-            self.tasks = ['stock', 'kospi', 'feature', 'db']
-            
         try:
             total = len(self.tasks)
-            for idx, task in enumerate(self.tasks):
-                step_num = idx + 1
-                self.progress_signal.emit(int((idx / total) * 100))
-                
-                if task == 'stock':
-                    self.log_signal.emit(f"[{step_num}/{total}] 📈 개별 시세(RAW) 업데이트 중...")
-                    update_raw_data.main()
-                    
-                elif task == 'kospi':
-                    self.log_signal.emit(f"[{step_num}/{total}] 🇰🇷 KOSPI 지수 수집 중...")
-                    sys.path.append(raw_dir)
-                    make_kospi_index_10y.main()
-                    
-                elif task == 'feature':
-                    self.log_signal.emit(f"[{step_num}/{total}] 🧮 피처(Feature) 계산 중...")
-                    build_features.main()
-                    
-                elif task == 'db':
-                    self.log_signal.emit(f"[{step_num}/{total}] 📦 통합 DB(Unified) 생성 중...")
-                    build_unified_db.build_unified_db()
-                
-                self.log_signal.emit(f"   ✅ {task.upper()} 단계 완료.")
-                time.sleep(0.5) # UI 갱신 여유
-
+            for i, task in enumerate(self.tasks):
+                self.progress_signal.emit(int(i/total*100))
+                if not BACKEND_READY:
+                    time.sleep(0.5)
+                    self.log_signal.emit(f"[MOCK] {task} 단계 실행")
+                else:
+                    if task == 'stock':
+                        self.log_signal.emit("📈 개별 시세(RAW) 업데이트")
+                        update_raw_data.main()
+                    elif task == 'kospi':
+                        self.log_signal.emit("🇰🇷 KOSPI 지수 수집")
+                        make_kospi_index_10y.main()
+                    elif task == 'feature':
+                        self.log_signal.emit("🧮 피처(Feature) 계산")
+                        build_features.main()
+                    elif task == 'db':
+                        self.log_signal.emit("📦 통합 DB 생성")
+                        build_unified_db.build_unified_db()
+                self.log_signal.emit(f"✅ {task} 단계 완료")
             self.progress_signal.emit(100)
-            self.finished_signal.emit("모든 데이터 파이프라인 작업이 성공적으로 완료되었습니다!")
-            
+            self.finished_signal.emit("데이터 파이프라인 완료")
         except Exception as e:
             self.error_signal.emit(str(e))
 
-# ------------------------------------------------------------
-# [Worker 1] 학습용 스레드 - 기존 로직 유지
-# ------------------------------------------------------------
+class ManualDownloadWorker(QThread):
+    log_signal = Signal(str)
+    finished_signal = Signal(str)
+    error_signal = Signal(str)
+    def __init__(self, codes, start_yyyymmdd, end_yyyymmdd, out_dir, script_path):
+        super().__init__()
+        self.codes = codes
+        self.start = start_yyyymmdd
+        self.end = end_yyyymmdd
+        self.out_dir = out_dir
+        self.script_path = script_path
+    def run(self):
+        try:
+            if not os.path.exists(self.script_path):
+                raise FileNotFoundError(f"다운로드 스크립트 없음: {self.script_path}")
+            cmd = [sys.executable, self.script_path, "--out", self.out_dir, "--start", self.start, "--end", self.end, "--codes"] + self.codes
+            self.log_signal.emit("실행 명령:\n" + shlex.join(cmd))
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1) as p:
+                for line in p.stdout:
+                    self.log_signal.emit(line.rstrip())
+                p.wait()
+                if p.returncode != 0:
+                    raise RuntimeError(f"스크립트 종료 코드: {p.returncode}")
+            self.finished_signal.emit("선택 다운로드 완료")
+        except Exception as e:
+            self.error_signal.emit(str(e))
+
 class TrainingWorker(QThread):
     log_signal = Signal(str)
     finished_signal = Signal(str)
     error_signal = Signal(str)
-
     def __init__(self, params):
         super().__init__()
         self.params = params
-
     def run(self):
         try:
-            self.log_signal.emit(f"🚀 엔진 모델 학습 시작... (설정: {self.params})")
+            self.log_signal.emit(f"학습 시작: {self.params}")
             run_unified_training(
                 mode=self.params['mode'],
                 horizon=self.params['horizon'],
@@ -291,520 +175,375 @@ class TrainingWorker(QThread):
                 n_estimators=self.params['n_estimators'],
                 version=self.params['version']
             )
-            self.log_signal.emit("✅ 학습 프로세스 정상 종료. 새로운 엔진이 생성되었습니다.")
-            self.finished_signal.emit("엔진 생성이 완료되었습니다!")
+            self.finished_signal.emit("엔진 생성 완료")
         except Exception as e:
             self.error_signal.emit(str(e))
 
-# ------------------------------------------------------------
-# [Worker 2] 예측용 스레드 - 기존 로직 유지
-# ------------------------------------------------------------
 class PredictionWorker(QThread):
     finished_signal = Signal(object)
     error_signal = Signal(str)
-
     def __init__(self, engine_path, target_date, top_n):
         super().__init__()
         self.engine_path = engine_path
         self.target_date = target_date
         self.top_n = top_n
-
     def run(self):
         try:
-            df_result = run_prediction(
-                engine_path=self.engine_path, 
-                target_date=self.target_date, 
-                top_n=self.top_n
-            )
-            self.finished_signal.emit(df_result)
+            df = run_prediction(self.engine_path, self.target_date, self.top_n)
+            self.finished_signal.emit(df)
         except Exception as e:
             self.error_signal.emit(str(e))
 
 # ------------------------------------------------------------
-# 각 탭의 UI/로직을 캡슐화한 내부 클래스 (리팩토링)
+# Pages
 # ------------------------------------------------------------
+
 class _UIDataUpdatePage(QWidget):
     def __init__(self, manager):
         super().__init__()
         self.manager = manager
         self.init_ui()
-
     def init_ui(self):
         layout = QVBoxLayout(self)
-
-        # 안내문
-        info_label = QLabel("데이터 파이프라인 관리: RAW 데이터 수집부터 통합 DB 생성까지 순차 실행")
-        info_label.setObjectName("info_label")
-        info_label.setStyleSheet("font-weight: bold; font-size: 13px; color: #88c0d0;")
-        layout.addWidget(info_label)
-
-        # 버튼 그룹
-        btn_group = QGroupBox("▶️ 데이터 파이프라인 단계별 실행")
-        btn_layout = QHBoxLayout()
-        
-        self.btn_step1 = QPushButton("1. 시세(RAW)")
-        self.btn_step2 = QPushButton("2. KOSPI")
-        self.btn_step3 = QPushButton("3. 피처생성")
-        self.btn_step4 = QPushButton("4. DB통합")
-        self.btn_step_all = QPushButton("⚡ 전체 실행 (1~4) - 권장")
-
-        # 버튼 디자인 식별자 (QSS 적용을 위함)
-        for btn in [self.btn_step1, self.btn_step2, self.btn_step3, self.btn_step4]:
-            btn.setObjectName("data_step_btn")
-            btn.setFixedHeight(45)
-        self.btn_step_all.setObjectName("data_all_btn")
-        self.btn_step_all.setFixedHeight(50)
-
-        # 이벤트 연결 (메인 매니저의 함수에 위임)
-        self.btn_step1.clicked.connect(lambda: self.manager.run_data_task(['stock']))
-        self.btn_step2.clicked.connect(lambda: self.manager.run_data_task(['kospi']))
-        self.btn_step3.clicked.connect(lambda: self.manager.run_data_task(['feature']))
-        self.btn_step4.clicked.connect(lambda: self.manager.run_data_task(['db']))
-        self.btn_step_all.clicked.connect(lambda: self.manager.run_data_task(['stock', 'kospi', 'feature', 'db']))
-
-        btn_layout.addWidget(self.btn_step1)
-        btn_layout.addWidget(self.btn_step2)
-        btn_layout.addWidget(self.btn_step3)
-        btn_layout.addWidget(self.btn_step4)
-        btn_layout.addWidget(self.btn_step_all)
-        btn_group.setLayout(btn_layout)
-        
-        layout.addWidget(btn_group)
-
-        # 진행바
-        self.data_progress = QProgressBar()
-        self.data_progress.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.data_progress)
-
-        # 로그창
-        self.data_log = QTextEdit()
-        self.data_log.setReadOnly(True)
-        self.data_log.setPlaceholderText("데이터 작업 로그가 여기에 실시간으로 표시됩니다...")
-        self.data_log.setStyleSheet("color: #a3be8c; font-family: Consolas;") # 로그 전용 색상
-        layout.addWidget(self.data_log)
+        info = QLabel("RAW→KOSPI→FEATURE→DB 순차 실행 / + 수동 선택 다운로드")
+        info.setStyleSheet("font-weight: bold; color:#88c0d0")
+        layout.addWidget(info)
+        # Buttons
+        grp = QGroupBox("▶ 데이터 파이프라인 단계별 실행")
+        h = QHBoxLayout()
+        self.b1 = QPushButton("1. 시세(RAW)"); self.b1.setObjectName("data_step_btn")
+        self.b2 = QPushButton("2. KOSPI");     self.b2.setObjectName("data_step_btn")
+        self.b3 = QPushButton("3. 피처");      self.b3.setObjectName("data_step_btn")
+        self.b4 = QPushButton("4. DB");        self.b4.setObjectName("data_step_btn")
+        self.bAll = QPushButton("⚡ 전체 실행 (1~4)"); self.bAll.setObjectName("data_all_btn")
+        for b in (self.b1,self.b2,self.b3,self.b4): b.setFixedHeight(42)
+        self.bAll.setFixedHeight(46)
+        self.b1.clicked.connect(lambda: self.manager.run_data_task(['stock']))
+        self.b2.clicked.connect(lambda: self.manager.run_data_task(['kospi']))
+        self.b3.clicked.connect(lambda: self.manager.run_data_task(['feature']))
+        self.b4.clicked.connect(lambda: self.manager.run_data_task(['db']))
+        self.bAll.clicked.connect(lambda: self.manager.run_data_task(['stock','kospi','feature','db']))
+        for w in (self.b1,self.b2,self.b3,self.b4,self.bAll): h.addWidget(w)
+        grp.setLayout(h)
+        layout.addWidget(grp)
+        # Progress + Log
+        self.progress = QProgressBar(); layout.addWidget(self.progress)
+        self.log = QTextEdit(); self.log.setReadOnly(True); self.log.setPlaceholderText("데이터 작업 로그...")
+        layout.addWidget(self.log)
+        # Manual Download UI
+        dl = QGroupBox("📥 수동 선택 다운로드 (종목/기간 지정)")
+        v = QVBoxLayout()
+        r1 = QHBoxLayout()
+        r1.addWidget(QLabel("종목코드(쉼표):"))
+        self.edit_codes = QLineEdit(); self.edit_codes.setPlaceholderText("예: 000020,091440,005930")
+        r1.addWidget(self.edit_codes)
+        self.btn_pick_file = QPushButton("파일 선택(txt/json)")
+        self.btn_pick_file.clicked.connect(self.manager.on_pick_codes_file)
+        r1.addWidget(self.btn_pick_file)
+        v.addLayout(r1)
+        r2 = QHBoxLayout()
+        r2.addWidget(QLabel("시작일:"))
+        self.date_start = QDateEdit(); self.date_start.setCalendarPopup(True); self.date_start.setDisplayFormat("yyyyMMdd"); self.date_start.setDate(QDate.currentDate().addDays(-30))
+        r2.addWidget(self.date_start)
+        r2.addWidget(QLabel("종료일:"))
+        self.date_end = QDateEdit(); self.date_end.setCalendarPopup(True); self.date_end.setDisplayFormat("yyyyMMdd"); self.date_end.setDate(QDate.currentDate())
+        r2.addWidget(self.date_end)
+        self.chk_single = QCheckBox("단일일자"); self.chk_single.stateChanged.connect(self.manager.on_toggle_single_day)
+        r2.addWidget(self.chk_single)
+        v.addLayout(r2)
+        r3 = QHBoxLayout()
+        r3.addWidget(QLabel("저장폴더:"))
+        self.edit_out = QLineEdit(); self.edit_out.setPlaceholderText("기본: RAW/manual_download")
+        r3.addWidget(self.edit_out)
+        btn_out = QPushButton("폴더 선택"); btn_out.clicked.connect(self.manager.on_pick_outdir)
+        r3.addWidget(btn_out)
+        v.addLayout(r3)
+        r4 = QHBoxLayout()
+        self.btn_run = QPushButton("📥 선택 다운로드 실행"); self.btn_run.setFixedHeight(44); self.btn_run.clicked.connect(self.manager.start_manual_download)
+        r4.addStretch(1); r4.addWidget(self.btn_run)
+        v.addLayout(r4)
+        self.dl_log = QTextEdit(); self.dl_log.setReadOnly(True); self.dl_log.setPlaceholderText("선택 다운로드 로그…")
+        v.addWidget(self.dl_log)
+        dl.setLayout(v)
+        layout.addWidget(dl)
 
 class _UITrainingPage(QWidget):
     def __init__(self, manager):
         super().__init__()
         self.manager = manager
         self.init_ui()
-
     def init_ui(self):
         layout = QVBoxLayout(self)
-
-        group = QGroupBox("⚙️ 엔진 학습 파라미터 설정")
-        form = QHBoxLayout()
-
-        # Input Widgets
-        form.addWidget(QLabel("모드:"))
-        self.combo_mode = QComboBox()
-        self.combo_mode.addItems(["research", "real"])
-        self.combo_mode.currentTextChanged.connect(lambda t: self.spin_valid.setEnabled(t == 'research'))
-        form.addWidget(self.combo_mode)
-
-        form.addWidget(QLabel("예측일(Horizon):"))
-        self.spin_horizon = QSpinBox()
-        self.spin_horizon.setRange(1, 60)
-        self.spin_horizon.setValue(5)
-        self.spin_horizon.setSuffix("일 뒤")
-        form.addWidget(self.spin_horizon)
-
-        form.addWidget(QLabel("검증기간:"))
-        self.spin_valid = QSpinBox()
-        self.spin_valid.setRange(30, 1000)
-        self.spin_valid.setValue(365)
-        self.spin_valid.setSuffix("일")
-        form.addWidget(self.spin_valid)
-
-        form.addWidget(QLabel("나무(Trees):"))
-        self.spin_trees = QSpinBox()
-        self.spin_trees.setRange(100, 10000)
-        self.spin_trees.setValue(1000)
-        self.spin_trees.setSingleStep(100)
-        form.addWidget(self.spin_trees)
-
-        form.addWidget(QLabel("버전태그:"))
-        self.edit_version = QComboBox()
-        self.edit_version.addItems(["V31", "V32", "TEST"])
-        self.edit_version.setEditable(True)
-        form.addWidget(self.edit_version)
-
-        group.setLayout(form)
-        layout.addWidget(group)
-
-        self.btn_train = QPushButton("🚀 엔진 생산 시작 (Start Training)")
-        self.btn_train.setFixedHeight(50)
-        self.btn_train.setStyleSheet("background-color: #a3be8c; color: #2e3440; font-size: 16px; font-weight: bold;")
-        self.btn_train.clicked.connect(self.manager.start_training)
-        layout.addWidget(self.btn_train)
-
-        self.log_text = QTextEdit()
-        self.log_text.setReadOnly(True)
-        self.log_text.setPlaceholderText("모델 학습 로그가 여기에 실시간으로 표시됩니다.")
-        self.log_text.setStyleSheet("color: #88c0d0; font-family: Consolas;")
-        layout.addWidget(self.log_text)
+        g = QGroupBox("⚙ 엔진 학습 파라미터")
+        h = QHBoxLayout()
+        h.addWidget(QLabel("모드:")); self.cb_mode = QComboBox(); self.cb_mode.addItems(["research","real"]); h.addWidget(self.cb_mode)
+        h.addWidget(QLabel("Horizon:")); self.sp_h = QSpinBox(); self.sp_h.setRange(1,60); self.sp_h.setValue(5); self.sp_h.setSuffix("일"); h.addWidget(self.sp_h)
+        h.addWidget(QLabel("검증기간:")); self.sp_v = QSpinBox(); self.sp_v.setRange(30,1000); self.sp_v.setValue(365); self.sp_v.setSuffix("일"); h.addWidget(self.sp_v)
+        h.addWidget(QLabel("Trees:")); self.sp_t = QSpinBox(); self.sp_t.setRange(100,10000); self.sp_t.setValue(1000); self.sp_t.setSingleStep(100); h.addWidget(self.sp_t)
+        h.addWidget(QLabel("버전:")); self.cb_ver = QComboBox(); self.cb_ver.addItems(["V31","V32","TEST"]); self.cb_ver.setEditable(True); h.addWidget(self.cb_ver)
+        g.setLayout(h); layout.addWidget(g)
+        self.btn = QPushButton("🚀 학습 시작"); self.btn.setFixedHeight(46); self.btn.clicked.connect(self.manager.start_training); layout.addWidget(self.btn)
+        self.log = QTextEdit(); self.log.setReadOnly(True); self.log.setPlaceholderText("학습 로그…"); layout.addWidget(self.log)
 
 class _UIManagerPage(QWidget):
     def __init__(self, manager):
         super().__init__()
         self.manager = manager
         self.init_ui()
-
     def init_ui(self):
-        # Use QSplitter for responsive side-by-side layout
-        splitter = QSplitter(Qt.Horizontal)
-        
-        # Left Panel (Engine List)
-        left_widget = QWidget()
-        left_layout = QVBoxLayout(left_widget)
-        left_layout.addWidget(QLabel("📂 보유 엔진 목록 (클릭 시 상세 스펙 표시)"))
-        
-        self.table_engines = QTableWidget()
-        self.table_engines.setColumnCount(1)
-        self.table_engines.setHorizontalHeaderLabels(["Engine Filename"])
-        self.table_engines.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table_engines.setSelectionBehavior(QTableWidget.SelectRows)
-        self.table_engines.itemClicked.connect(self.manager.load_engine_metadata)
-        left_layout.addWidget(self.table_engines)
-        
-        btn_refresh = QPushButton("🔄 목록 새로고침")
-        btn_refresh.setObjectName("data_step_btn")
-        btn_refresh.clicked.connect(self.manager.refresh_engine_list)
-        left_layout.addWidget(btn_refresh)
-        
-        # Right Panel (Engine Info/Specs)
-        right_panel = QGroupBox("📋 엔진 상세 스펙 (성과표)")
-        vbox = QVBoxLayout()
-        self.txt_engine_info = QTextEdit()
-        self.txt_engine_info.setReadOnly(True)
-        self.txt_engine_info.setPlaceholderText("엔진을 선택하면 상세 정보가 여기에 로드됩니다.")
-        self.txt_engine_info.setStyleSheet("font-size: 10pt; line-height: 1.6; color: #eceff4;")
-        vbox.addWidget(self.txt_engine_info)
-        right_panel.setLayout(vbox)
-
-        # Add to splitter
-        splitter.addWidget(left_widget)
-        splitter.addWidget(right_panel)
-        splitter.setSizes([300, 700]) # Initial ratio
-
-        main_layout = QHBoxLayout(self)
-        main_layout.addWidget(splitter)
+        spl = QSplitter(Qt.Horizontal)
+        left = QWidget(); lv = QVBoxLayout(left)
+        lv.addWidget(QLabel("📂 엔진 목록"))
+        self.tbl = QTableWidget(); self.tbl.setColumnCount(1); self.tbl.setHorizontalHeaderLabels(["Engine File"]); self.tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tbl.itemClicked.connect(self.manager.load_engine_metadata)
+        lv.addWidget(self.tbl)
+        btn = QPushButton("🔄 새로고침"); btn.setObjectName("data_step_btn"); btn.clicked.connect(self.manager.refresh_engine_list); lv.addWidget(btn)
+        right = QGroupBox("📋 엔진 상세"); rv = QVBoxLayout(); self.info = QTextEdit(); self.info.setReadOnly(True); rv.addWidget(self.info); right.setLayout(rv)
+        spl.addWidget(left); spl.addWidget(right); spl.setSizes([320, 760])
+        main = QVBoxLayout(self); main.addWidget(spl)
 
 class _UIPredictPage(QWidget):
     def __init__(self, manager):
         super().__init__()
         self.manager = manager
         self.init_ui()
-
     def init_ui(self):
         layout = QVBoxLayout(self)
-
-        ctl_group = QGroupBox("🔮 예측 조건 설정 및 실행")
-        ctl_layout = QHBoxLayout()
-        
-        # 1. 예측 기간
-        ctl_layout.addWidget(QLabel("Horizon:"))
-        self.spin_pred_horizon = QSpinBox()
-        self.spin_pred_horizon.setRange(1, 60)
-        self.spin_pred_horizon.setValue(5)
-        self.spin_pred_horizon.setSuffix(" 일 뒤")
-        self.spin_pred_horizon.valueChanged.connect(self.manager.filter_engines_by_horizon)
-        self.spin_pred_horizon.setMaximumWidth(100)
-        ctl_layout.addWidget(self.spin_pred_horizon)
-        
-        ctl_layout.addSpacing(20)
-
-        # 2. 기준 날짜
-        ctl_layout.addWidget(QLabel("기준 날짜:"))
-        self.date_picker = QDateEdit()
-        self.date_picker.setCalendarPopup(True)
-        self.date_picker.setDate(QDate.currentDate().addDays(-1))
-        self.date_picker.setDisplayFormat("yyyy-MM-dd")
-        self.date_picker.setMaximumWidth(150)
-        ctl_layout.addWidget(self.date_picker)
-        
-        ctl_layout.addSpacing(20)
-
-        # 3. 엔진 선택
-        ctl_layout.addWidget(QLabel("엔진 선택:"))
-        self.combo_engine_sel = QComboBox()
-        self.combo_engine_sel.setMinimumWidth(300)
-        ctl_layout.addWidget(self.combo_engine_sel)
-
-        # 4. 출력 개수
-        ctl_layout.addWidget(QLabel("Top N:"))
-        self.spin_top = QSpinBox()
-        self.spin_top.setRange(1, 100)
-        self.spin_top.setValue(10)
-        self.spin_top.setMaximumWidth(60)
-        ctl_layout.addWidget(self.spin_top)
-        
-        ctl_layout.addStretch(1)
-
-        # 5. 예측 실행 버튼
-        self.btn_predict = QPushButton("⚡ 예측 실행")
-        self.btn_predict.setFixedWidth(150)
-        self.btn_predict.setFixedHeight(40)
-        self.btn_predict.setStyleSheet("background-color: #88c0d0; color: #2e3440;") # Cyan accent for prediction
-        self.btn_predict.clicked.connect(self.manager.start_prediction)
-        ctl_layout.addWidget(self.btn_predict)
-
-        ctl_group.setLayout(ctl_layout)
-        layout.addWidget(ctl_group)
-
-        layout.addWidget(QLabel("📈 예측 결과 (Top N 종목)"))
-        
-        self.table_result = QTableWidget()
-        self.table_result.setColumnCount(5)
-        self.table_result.setHorizontalHeaderLabels(["종목코드", "종목명", "현재가 (W)", "예측점수 (Score)", "상승확률 (Prob)"])
-        self.table_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        layout.addWidget(self.table_result)
+        g = QGroupBox("🔮 예측 실행")
+        h = QHBoxLayout()
+        h.addWidget(QLabel("Horizon:")); self.sp_h = QSpinBox(); self.sp_h.setRange(1,60); self.sp_h.setValue(5); self.sp_h.valueChanged.connect(self.manager.filter_engines_by_horizon); h.addWidget(self.sp_h)
+        h.addWidget(QLabel("기준일:")); self.date = QDateEdit(); self.date.setCalendarPopup(True); self.date.setDisplayFormat("yyyy-MM-dd"); self.date.setDate(QDate.currentDate().addDays(-1)); h.addWidget(self.date)
+        h.addWidget(QLabel("엔진:")); self.cb_engine = QComboBox(); self.cb_engine.setMinimumWidth(300); h.addWidget(self.cb_engine)
+        h.addWidget(QLabel("Top N:")); self.sp_top = QSpinBox(); self.sp_top.setRange(1,100); self.sp_top.setValue(10); h.addWidget(self.sp_top)
+        self.btn = QPushButton("⚡ 예측"); self.btn.clicked.connect(self.manager.start_prediction); h.addWidget(self.btn)
+        g.setLayout(h); layout.addWidget(g)
+        self.tbl = QTableWidget(); self.tbl.setColumnCount(5); self.tbl.setHorizontalHeaderLabels(["Code","Name","Close","Score","Prob"]); self.tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch); layout.addWidget(self.tbl)
 
 # ------------------------------------------------------------
-# 메인 UI 클래스 (메인 창 및 로직 통합)
+# Main Window
 # ------------------------------------------------------------
+
 class EngineManager(QWidget):
     def __init__(self):
         super().__init__()
-        self.all_engines = [] 
+        self.all_engines = []
         self.setup_ui()
         self.refresh_engine_list()
-
     def setup_ui(self):
-        main_layout = QVBoxLayout(self)
         self.setStyleSheet(get_modern_qss())
-        
+        v = QVBoxLayout(self)
         self.tabs = QTabWidget()
-
-        # UI Page Instances
-        self.data_page = _UIDataUpdatePage(self)
-        self.train_page = _UITrainingPage(self)
-        self.manage_page = _UIManagerPage(self)
-        self.predict_page = _UIPredictPage(self)
-        
-        self.data_log = self.data_page.data_log
-        self.data_progress = self.data_page.data_progress
-        self.btn_step_all = self.data_page.btn_step_all
-        
-        self.log_text = self.train_page.log_text
-        self.btn_train = self.train_page.btn_train
-        
-        self.table_engines = self.manage_page.table_engines
-        self.txt_engine_info = self.manage_page.txt_engine_info
-        
-        self.combo_engine_sel = self.predict_page.combo_engine_sel
-        self.spin_pred_horizon = self.predict_page.spin_pred_horizon
-        self.date_picker = self.predict_page.date_picker
-        self.spin_top = self.predict_page.spin_top
-        self.btn_predict = self.predict_page.btn_predict
-        self.table_result = self.predict_page.table_result
-
-        # Add Tabs
-        self.tabs.addTab(self.data_page, "💾 0단계: 데이터 파이프라인")
-        self.tabs.addTab(self.train_page, "🏭 1단계: 모델 학습실")
-        self.tabs.addTab(self.manage_page, "📊 2단계: 엔진 분석실")
-        self.tabs.addTab(self.predict_page, "🔮 3단계: 예측 및 검증")
-
-        main_layout.addWidget(self.tabs)
-        self.setWindowTitle("HOJ Engine Manager (Unified V32) - Modern")
-        self.resize(1200, 800)
-
-    # ----------------------------------------------------------------
-    # 로직 메서드 (기존 로직 유지 및 연결)
-    # ----------------------------------------------------------------
-    
-    # [Tab 0] 데이터 업데이트 실행
+        # pages
+        self.page_data = _UIDataUpdatePage(self)
+        self.page_train = _UITrainingPage(self)
+        self.page_manage = _UIManagerPage(self)
+        self.page_predict = _UIPredictPage(self)
+        self.tabs.addTab(self.page_data, "💾 0단계: 데이터 파이프라인")
+        self.tabs.addTab(self.page_train, "🏭 1단계: 모델 학습실")
+        self.tabs.addTab(self.page_manage, "📊 2단계: 엔진 분석실")
+        self.tabs.addTab(self.page_predict, "🔮 3단계: 예측 및 검증")
+        v.addWidget(self.tabs)
+        self.setWindowTitle("HOJ Engine Manager (Unified V32)")
+        self.resize(1280, 860)
+        # shortcuts
+        self.data_log = self.page_data.log
+        self.data_progress = self.page_data.progress
+        self.btn_all = self.page_data.bAll
+        # download refs
+        self.edit_codes = self.page_data.edit_codes
+        self.btn_pick_file = self.page_data.btn_pick_file
+        self.date_start = self.page_data.date_start
+        self.date_end = self.page_data.date_end
+        self.chk_single = self.page_data.chk_single
+        self.edit_out = self.page_data.edit_out
+        self.btn_run = self.page_data.btn_run
+        self.dl_log = self.page_data.dl_log
+        # train
+        self.train_log = self.page_train.log
+        self.train_btn = self.page_train.btn
+        self.train_mode = self.page_train.cb_mode
+        self.train_h = self.page_train.sp_h
+        self.train_v = self.page_train.sp_v
+        self.train_t = self.page_train.sp_t
+        self.train_ver = self.page_train.cb_ver
+        # manage/predict
+        self.tbl_eng = self.page_manage.tbl
+        self.info_eng = self.page_manage.info
+        self.cb_engine = self.page_predict.cb_engine
+        self.pred_h = self.page_predict.sp_h
+        self.pred_date = self.page_predict.date
+        self.pred_top = self.page_predict.sp_top
+        self.pred_btn = self.page_predict.btn
+    # --- Data Tab ---
     def run_data_task(self, tasks):
-        self.data_log.clear()
-        self.data_log.append(f"=== 🚀 데이터 작업 시작: {tasks} ===")
-        self.data_progress.setValue(0)
-        
-        # 버튼 잠금
-        self.data_page.btn_step_all.setEnabled(False)
-        for btn in [self.data_page.btn_step1, self.data_page.btn_step2, self.data_page.btn_step3, self.data_page.btn_step4]:
-             btn.setEnabled(False)
-        
-        self.data_worker = DataUpdateWorker(tasks)
-        self.data_worker.log_signal.connect(self.data_log.append)
-        self.data_worker.progress_signal.connect(self.data_progress.setValue)
-        self.data_worker.finished_signal.connect(self.on_data_finished)
-        self.data_worker.error_signal.connect(self.on_data_error)
-        self.data_worker.start()
-
-    def on_data_finished(self, msg):
-        self.data_page.btn_step_all.setEnabled(True)
-        for btn in [self.data_page.btn_step1, self.data_page.btn_step2, self.data_page.btn_step3, self.data_page.btn_step4]:
-             btn.setEnabled(True)
-        self.data_log.append(f"\n✅ {msg}")
+        self.data_log.clear(); self.data_progress.setValue(0)
+        for b in (self.page_data.b1,self.page_data.b2,self.page_data.b3,self.page_data.b4,self.page_data.bAll): b.setEnabled(False)
+        self.worker = DataUpdateWorker(tasks)
+        self.worker.log_signal.connect(self.data_log.append)
+        self.worker.progress_signal.connect(self.data_progress.setValue)
+        self.worker.finished_signal.connect(self._on_data_finish)
+        self.worker.error_signal.connect(self._on_data_error)
+        self.worker.start()
+    def _on_data_finish(self, msg):
+        for b in (self.page_data.b1,self.page_data.b2,self.page_data.b3,self.page_data.b4,self.page_data.bAll): b.setEnabled(True)
+        self.data_log.append("\n✅ " + msg)
         QMessageBox.information(self, "완료", msg)
-
-    def on_data_error(self, err):
-        self.data_page.btn_step_all.setEnabled(True)
-        for btn in [self.data_page.btn_step1, self.data_page.btn_step2, self.data_page.btn_step3, self.data_page.btn_step4]:
-             btn.setEnabled(True)
-        self.data_log.append(f"\n❌ 에러 발생: {err}")
-        QMessageBox.critical(self, "오류", str(err))
-
-    # [Tab 1] 학습
+    def _on_data_error(self, err):
+        for b in (self.page_data.b1,self.page_data.b2,self.page_data.b3,self.page_data.b4,self.page_data.bAll): b.setEnabled(True)
+        self.data_log.append("\n❌ " + err)
+        QMessageBox.critical(self, "오류", err)
+    # manual download
+    def on_toggle_single_day(self, state):
+        if state == Qt.Checked:
+            self.date_end.setDate(self.date_start.date()); self.date_end.setEnabled(False)
+        else:
+            self.date_end.setEnabled(True)
+    def on_pick_codes_file(self):
+        path, _ = QFileDialog.getOpenFileName(self, "종목 리스트 파일 선택 (txt/json)", root_dir, "Text/JSON (*.txt *.json)")
+        if path: self.edit_codes.setText(path)
+    def on_pick_outdir(self):
+        path = QFileDialog.getExistingDirectory(self, "저장 폴더 선택", raw_dir)
+        if path: self.edit_out.setText(path)
+    def start_manual_download(self):
+        raw_codes = self.edit_codes.text().strip()
+        if not raw_codes:
+            QMessageBox.warning(self, "입력 오류", "종목코드를 입력하거나 txt/json를 선택하세요.")
+            return
+        codes = []
+        if os.path.isfile(raw_codes):
+            ext = os.path.splitext(raw_codes)[1].lower()
+            try:
+                if ext == '.txt':
+                    with open(raw_codes, encoding='utf-8') as f:
+                        codes = [x.strip() for x in f if x.strip()]
+                elif ext == '.json':
+                    import json
+                    with open(raw_codes, encoding='utf-8') as f:
+                        codes = json.load(f)
+                else:
+                    QMessageBox.warning(self, "형식 오류", "txt/json만 지원"); return
+            except Exception as e:
+                QMessageBox.critical(self, "파일 로딩 오류", str(e)); return
+        else:
+            codes = [c.strip() for c in raw_codes.split(',') if c.strip()]
+        if not codes:
+            QMessageBox.warning(self, "입력 오류", "대상 종목이 없습니다."); return
+        s = self.date_start.date().toString('yyyyMMdd')
+        e = self.date_end.date().toString('yyyyMMdd')
+        if self.chk_single.isChecked(): e = s
+        out_dir = self.edit_out.text().strip() or os.path.join(raw_dir, 'manual_download')
+        os.makedirs(out_dir, exist_ok=True)
+        script_path = os.path.join(raw_dir, 'pykrx_full_dump_resumable_v2.py')
+        self.btn_run.setEnabled(False)
+        self.dl_log.clear(); self.dl_log.append(f"▶ 다운로드 시작: {codes}\n기간 {s}~{e}\n저장: {out_dir}")
+        self.dl_worker = ManualDownloadWorker(codes, s, e, out_dir, script_path)
+        self.dl_worker.log_signal.connect(self.dl_log.append)
+        self.dl_worker.finished_signal.connect(self._on_dl_finish)
+        self.dl_worker.error_signal.connect(self._on_dl_error)
+        self.dl_worker.start()
+    def _on_dl_finish(self, msg):
+        self.btn_run.setEnabled(True)
+        self.dl_log.append("\n✅ " + msg)
+        QMessageBox.information(self, "완료", msg)
+    def _on_dl_error(self, err):
+        self.btn_run.setEnabled(True)
+        self.dl_log.append("\n❌ " + err)
+        QMessageBox.critical(self, "오류", err)
+    # --- Training Tab ---
     def start_training(self):
         params = {
-            "mode": self.train_page.combo_mode.currentText(),
-            "horizon": self.train_page.spin_horizon.value(),
-            "valid_days": self.train_page.spin_valid.value(),
-            "n_estimators": self.train_page.spin_trees.value(),
-            "version": self.train_page.edit_version.currentText()
+            'mode': self.train_mode.currentText(),
+            'horizon': self.train_h.value(),
+            'valid_days': self.train_v.value(),
+            'n_estimators': self.train_t.value(),
+            'version': self.train_ver.currentText()
         }
-        self.log_text.clear()
-        self.log_text.append(f"=== 🚀 학습 요청 시작 ===\n설정: {params}")
-        self.btn_train.setEnabled(False)
-        self.btn_train.setText("⏳ 학습 진행 중... (Wait)")
-
-        self.worker = TrainingWorker(params)
-        self.worker.log_signal.connect(self.log_text.append)
-        self.worker.finished_signal.connect(self.on_train_finished)
-        self.worker.error_signal.connect(self.on_train_error)
-        self.worker.start()
-
-    def on_train_finished(self, msg):
-        self.btn_train.setEnabled(True)
-        self.btn_train.setText("🚀 엔진 생산 시작 (Start Training)")
-        self.log_text.append(f"\n✅ {msg}")
+        self.train_log.clear(); self.train_log.append(f"요청: {params}")
+        self.train_btn.setEnabled(False); self.train_btn.setText("⏳ 학습 중…")
+        self.tr_worker = TrainingWorker(params)
+        self.tr_worker.log_signal.connect(self.train_log.append)
+        self.tr_worker.finished_signal.connect(self._on_tr_finish)
+        self.tr_worker.error_signal.connect(self._on_tr_error)
+        self.tr_worker.start()
+    def _on_tr_finish(self, msg):
+        self.train_btn.setEnabled(True); self.train_btn.setText("🚀 학습 시작")
+        self.train_log.append("\n✅ " + msg)
         QMessageBox.information(self, "완료", msg)
         self.refresh_engine_list()
-
-    def on_train_error(self, err):
-        self.btn_train.setEnabled(True)
-        self.btn_train.setText("🚀 엔진 생산 시작 (Start Training)")
-        self.log_text.append(f"\n❌ 오류 발생: {err}")
-        QMessageBox.critical(self, "오류", str(err))
-
-    # [Tab 2 & 3] 엔진 관리 및 필터링
+    def _on_tr_error(self, err):
+        self.train_btn.setEnabled(True); self.train_btn.setText("🚀 학습 시작")
+        self.train_log.append("\n❌ " + err)
+        QMessageBox.critical(self, "오류", err)
+    # --- Manage & Predict ---
     def refresh_engine_list(self):
-        base_path = get_path("HOJ_ENGINE")
-        pattern = os.path.join(base_path, "**", "*.pkl")
-        files = glob.glob(pattern, recursive=True)
-        files.sort(key=os.path.getmtime, reverse=True)
-        
+        base = get_path('HOJ_ENGINE')
+        files = sorted(glob.glob(os.path.join(base, '**', '*.pkl'), recursive=True), key=os.path.getmtime, reverse=True)
         self.all_engines = []
-        self.table_engines.setRowCount(0)
-        
+        self.tbl_eng.setRowCount(0)
         for f in files:
             name = os.path.basename(f)
-            h_val = -1
-            match = re.search(r"_h(\d+)_", name)
-            if match:
-                h_val = int(match.group(1))
-            
-            self.all_engines.append({'name': name, 'path': f, 'horizon': h_val})
-
-            row = self.table_engines.rowCount()
-            self.table_engines.insertRow(row)
-            item = QTableWidgetItem(name)
-            item.setData(Qt.UserRole, f)
-            self.table_engines.setItem(row, 0, item)
-            
-        # Update predictor list after refreshing
+            m = re.search(r'_h(\d+)_', name)
+            horizon = int(m.group(1)) if m else -1
+            self.all_engines.append({'name': name, 'path': f, 'horizon': horizon})
+            r = self.tbl_eng.rowCount(); self.tbl_eng.insertRow(r)
+            it = QTableWidgetItem(name); it.setData(Qt.UserRole, f); self.tbl_eng.setItem(r, 0, it)
         self.filter_engines_by_horizon()
-        self.txt_engine_info.setText(f"총 {len(self.all_engines)}개의 엔진이 로드되었습니다.")
-
+        self.info_eng.setText(f"총 {len(self.all_engines)}개 엔진")
     def filter_engines_by_horizon(self):
-        target_h = self.spin_pred_horizon.value()
-        self.combo_engine_sel.clear()
-        
-        found_count = 0
-        for eng in self.all_engines:
-            if eng['horizon'] == target_h:
-                self.combo_engine_sel.addItem(eng['name'], eng['path'])
-                found_count += 1
-        
-        if found_count == 0:
-            self.combo_engine_sel.addItem(f"(Horizon {target_h} 엔진 없음)", None)
-            self.btn_predict.setEnabled(False)
-        else:
-             self.btn_predict.setEnabled(True)
-
+        h = self.pred_h.value(); self.cb_engine.clear(); cnt=0
+        for e in self.all_engines:
+            if e['horizon'] == h:
+                self.cb_engine.addItem(e['name'], e['path']); cnt+=1
+        self.pred_btn.setEnabled(cnt>0)
+        if cnt==0: self.cb_engine.addItem(f"(H{h} 엔진 없음)", None)
     def load_engine_metadata(self, item):
         path = item.data(Qt.UserRole)
         try:
-            with open(path, "rb") as f:
-                data = pickle.load(f)
-            
-            meta = data.get("meta", {})
-            
-            info = f"=== 📁 엔진 상세 정보 ===\n"
-            info += f"  - **파일명**: {os.path.basename(path)}\n"
-            info += f"  - **생성일**: {meta.get('train_date', 'N/A')}\n"
-            info += f"  - **데이터 기준일**: {meta.get('data_date', 'N/A')}\n"
-            info += f"  - **예측 기간 (Horizon)**: {meta.get('horizon', '?')}일\n"
-            
-            metrics = meta.get('metrics', {})
-            info += "\n=== 📊 주요 성과 지표 ===\n"
-            info += f"  - **정확도 (ACC)**: {metrics.get('acc', 0)*100:.2f}%\n"
-            info += f"  - **F1 Score**: {metrics.get('f1', 0):.4f}\n"
-            info += f"  - **AUC Score**: {metrics.get('auc', 0):.4f}\n"
-            info += f"  - **Positive Rate**: {metrics.get('pos_rate', 0)*100:.2f}%\n"
-            
-            self.txt_engine_info.setText(info)
+            with open(path,'rb') as f: data = pickle.load(f)
+            meta = data.get('meta',{})
+            lines = ["=== 엔진 상세 ===",
+                     f"파일: {os.path.basename(path)}",
+                     f"생성일: {meta.get('train_date','N/A')}",
+                     f"데이터 기준일: {meta.get('data_date','N/A')}",
+                     f"Horizon: {meta.get('horizon','?')}일",
+                     "",
+                     "=== 성과 지표 ===",
+                     f"ACC: {meta.get('metrics',{}).get('acc',0)*100:.2f}%",
+                     f"F1 : {meta.get('metrics',{}).get('f1',0):.4f}",
+                     f"AUC: {meta.get('metrics',{}).get('auc',0):.4f}",
+                     f"Pos: {meta.get('metrics',{}).get('pos_rate',0)*100:.2f}%"]
+            self.info_eng.setText("\n".join(lines))
         except Exception as e:
-            self.txt_engine_info.setText(f"❌ 정보 로드 실패: {e}")
-
+            self.info_eng.setText(f"정보 로드 실패: {e}")
     def start_prediction(self):
-        engine_path = self.combo_engine_sel.currentData()
-        if not engine_path:
-            QMessageBox.warning(self, "경고", "사용 가능한 엔진이 없습니다.")
-            return
-            
-        target_date = self.date_picker.date().toString("yyyy-MM-dd")
-        top_n = self.spin_top.value()
-        
-        self.btn_predict.setEnabled(False)
-        self.btn_predict.setText("⏳ 예측 계산 중...")
-        
-        self.pred_worker = PredictionWorker(engine_path, target_date, top_n)
-        self.pred_worker.finished_signal.connect(self.on_predict_result)
-        self.pred_worker.error_signal.connect(self.on_predict_error)
-        self.pred_worker.start()
-
-    def on_predict_result(self, df):
-        self.btn_predict.setEnabled(True)
-        self.btn_predict.setText("⚡ 예측 실행")
-        
+        path = self.cb_engine.currentData()
+        if not path:
+            QMessageBox.warning(self, "경고", "사용 가능한 엔진이 없습니다."); return
+        date = self.pred_date.date().toString('yyyy-MM-dd')
+        topn = self.pred_top.value()
+        self.pred_btn.setEnabled(False); self.pred_btn.setText("⏳ 계산…")
+        self.pw = PredictionWorker(path, date, topn)
+        self.pw.finished_signal.connect(self._on_pred_ok)
+        self.pw.error_signal.connect(self._on_pred_err)
+        self.pw.start()
+    def _on_pred_ok(self, df):
+        self.pred_btn.setEnabled(True); self.pred_btn.setText("⚡ 예측")
+        self.page_predict.tbl.setRowCount(0)
         if df is None or df.empty:
-            QMessageBox.warning(self, "알림", "해당 날짜의 데이터가 없거나 휴장일입니다.")
-            self.table_result.setRowCount(0)
-            return
-            
-        self.table_result.setRowCount(0)
+            QMessageBox.information(self, "알림", "결과 없음/휴장일"); return
         for _, row in df.iterrows():
-            r_idx = self.table_result.rowCount()
-            self.table_result.insertRow(r_idx)
-            # Apply formatting to improve readability
-            self.table_result.setItem(r_idx, 0, QTableWidgetItem(str(row['Code'])))
-            self.table_result.setItem(r_idx, 1, QTableWidgetItem(str(row.get('Name', 'Unknown'))))
-            
-            close_item = QTableWidgetItem(f"{row['Close']:,}")
-            close_item.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-            self.table_result.setItem(r_idx, 2, close_item)
-            
-            score_item = QTableWidgetItem(f"{row['Pred_Score']:.4f}")
-            score_item.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-            self.table_result.setItem(r_idx, 3, score_item)
-            
-            prob_item = QTableWidgetItem(f"{row['Pred_Prob']*100:.1f}%")
-            prob_item.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
-            # Highlight high probability in green
-            if row['Pred_Prob'] > 0.7:
-                 prob_item.setForeground(Qt.GlobalColor.darkCyan)
-            self.table_result.setItem(r_idx, 4, prob_item)
+            r = self.page_predict.tbl.rowCount(); self.page_predict.tbl.insertRow(r)
+            self.page_predict.tbl.setItem(r,0,QTableWidgetItem(str(row.get('Code',''))))
+            self.page_predict.tbl.setItem(r,1,QTableWidgetItem(str(row.get('Name',''))))
+            self.page_predict.tbl.setItem(r,2,QTableWidgetItem(f"{row.get('Close',0):,}"))
+            self.page_predict.tbl.setItem(r,3,QTableWidgetItem(f"{row.get('Pred_Score',0):.4f}"))
+            self.page_predict.tbl.setItem(r,4,QTableWidgetItem(f"{row.get('Pred_Prob',0)*100:.1f}%"))
+    def _on_pred_err(self, err):
+        self.pred_btn.setEnabled(True); self.pred_btn.setText("⚡ 예측")
+        QMessageBox.critical(self, "오류", err)
 
-    def on_predict_error(self, err):
-        self.btn_predict.setEnabled(True)
-        self.btn_predict.setText("⚡ 예측 실행")
-        QMessageBox.critical(self, "오류", str(err))
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = EngineManager()
-    window.show()
+    w = EngineManager()
+    w.show()
     sys.exit(app.exec())

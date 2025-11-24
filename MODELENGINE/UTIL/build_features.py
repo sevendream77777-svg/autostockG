@@ -2,36 +2,6 @@
 # build_features.py (V32 - Full Date Range / NaN Allowed)
 #   - 앞부분 데이터(SMA_60 등 계산 불가 구간)를 삭제하지 않음
 #   - 1월 2일부터의 모든 날짜를 DB에 포함시킴
-#  - ALPHA_SMA_20
-#  - ATR_14
-#  - BBP_20
-#  - CCI_20
-#  - Change
-#  - Close
-#  - Code
-#  - Date
-#  - High
-#  - KOSPI_수익률
-#  - KOSPI_종가
-#  - Low
-#  - MACD_12_26
-#  - MACD_SIGNAL_9
-#  - MOM_10
-#  - Market
-#  - Name
-#  - Open
-#  - ROC_20
-#  - RSI_14
-#  - SMA_120
-#  - SMA_20
-#  - SMA_40
-#  - SMA_5
-#  - SMA_60
-#  - SMA_90
-#  - STOCH_D
-#  - STOCH_K
-#  - VOL_SMA_20
-#  - Volume
 # ============================================================
 
 import sys
@@ -155,11 +125,6 @@ def normalize_kospi(df_kospi: pd.DataFrame) -> pd.DataFrame:
     return df_kospi[["Date", "KOSPI_종가", "KOSPI_수익률"]]
 
 def build_features():
-    # 경로 설정 (기존 유지 -> 최신 파일 탐색 변경)
-    # raw_file = get_path("RAW", "stocks", "all_stocks_cumulative.parquet")
-    # kospi_file = get_path("RAW", "kospi_data", "kospi_data.parquet")
-    # feature_file = get_path("FEATURE", "features_V31.parquet")
-    
     # [수정] 최신 파일 탐색 로직 적용
     raw_dir = get_path("RAW", "stocks")
     raw_file = find_latest_file(raw_dir, "all_stocks_cumulative")
@@ -173,8 +138,6 @@ def build_features():
     print("==============================================")
     print("[FEATURE V32] 피처 생성 (NaN 유지 모드)")
     
-    # 날짜 체크 로직은 유지하되, 사용자 요청으로 강제 실행될 수 있음
-    
     if not raw_file or not os.path.exists(raw_file):
         print(f"❌ [CRITICAL] RAW 데이터 파일을 찾을 수 없습니다: {raw_dir}")
         return
@@ -184,6 +147,26 @@ def build_features():
         print(f"❌ [CRITICAL] KOSPI 데이터가 없습니다: {kospi_dir}")
         return
     print(f"  📥 최신 KOSPI 로드: {os.path.basename(kospi_file)}")
+
+    # ---------------------------------------------------------------------------
+    # [추가] Skip Logic: RAW 파일의 마지막 날짜와 동일한 피처 파일이 이미 있으면 중단
+    # ---------------------------------------------------------------------------
+    try:
+        raw_date = get_latest_date_from_parquet(raw_file)
+        if raw_date:
+            raw_date_tag = raw_date.strftime("%y%m%d")
+            latest_feat = find_latest_file(feat_dir, "features_V31")
+            
+            if latest_feat and (raw_date_tag in os.path.basename(latest_feat)):
+                print("=" * 60)
+                print(f"✅ [SKIP] 최신 피처 파일이 이미 존재합니다. (Date: {raw_date_tag})")
+                print(f"   발견된 파일: {os.path.basename(latest_feat)}")
+                print("   (재생성을 원하시면 해당 파일을 삭제하거나 이동하세요.)")
+                print("=" * 60)
+                return
+    except Exception as e:
+        print(f"⚠️ [Warning] 날짜 확인 중 오류 발생 (그대로 진행): {e}")
+    # ---------------------------------------------------------------------------
 
     try:
         df_raw = pd.read_parquet(raw_file)
@@ -205,22 +188,18 @@ def build_features():
         print(f"❌ 병합 실패 (컬럼명 확인 필요): {e}"); return
 
     before_rows = len(df)
-    print("  ... 기술적 지표 계산 중")
+    print("  ... 기술적 지표 계산 중 (시간이 다소 소요될 수 있음)")
     df_feat = df.groupby("Code", group_keys=False).apply(_compute_features)
-
-    # [수정된 부분] dropna를 하지 않음!
-    # essential_cols = ["SMA_5", ... ] 리스트는 있지만 사용하지 않음
-    # df_feat = df_feat.dropna(subset=essential_cols)  <-- 이 줄 삭제/주석
 
     after_rows = len(df_feat)
     print(f"  - 생성 결과: {before_rows:,} → {after_rows:,} 행 (삭제 없음, NaN 유지)")
     print("  - 최종 피처 개수: 15개 이상 (확장됨)")
 
-    # os.makedirs(os.path.dirname(feature_file), exist_ok=True) # [수정] save 함수 내부 처리
-
     # [수정] 기존 파일 덮어쓰기 대신 날짜 태그 저장
     try:
-        save_dataframe_with_date(df_feat, feat_dir, "features_V31", date_col="Date")
+        saved_path = save_dataframe_with_date(df_feat, feat_dir, "features_V31", date_col="Date")
+        if saved_path:
+            print(f"  🎉 [완료] 피처 저장: {os.path.basename(saved_path)}")
     except Exception as e:
         print(f"❌ 저장 실패: {e}"); return
 

@@ -31,6 +31,9 @@ except ImportError:
         base, ext = os.path.splitext(path)
         return f"{base}_backup{ext}"
 
+# [수정 1: 추가] 데이터 프레임의 내부 날짜를 기준으로 파일명에 태그를 붙여 저장하는 함수를 import 합니다.
+from UTIL.version_utils import save_dataframe_with_date
+
 # ------------------------------------------------------------
 # 수집 함수 정의
 # ------------------------------------------------------------
@@ -143,17 +146,30 @@ def main():
 
         print("-" * 40)
 
+        # ------------------------------------------------------------
+        # [수정 2: 변경 및 주석 처리] 기존 덮어쓰기 로직을 날짜 태그 저장 로직으로 대체
+        # ------------------------------------------------------------
         # (1) 백업 수행
-        if do_backup and os.path.exists(target_path):
-            try:
-                backup_path = versioned_filename(target_path)
-                os.rename(target_path, backup_path)
-                print(f"📦 [백업] {os.path.basename(target_path)} -> {os.path.basename(backup_path)}")
-            except Exception as e: print(f"⚠️ 백업 에러: {e}")
+        # if do_backup and os.path.exists(target_path):
+        #     try:
+        #         backup_path = versioned_filename(target_path)
+        #         os.rename(target_path, backup_path)
+        #         print(f"📦 [백업] {os.path.basename(target_path)} -> {os.path.basename(backup_path)}")
+        #     except Exception as e: print(f"⚠️ 백업 에러: {e}")
 
-        # (2) 저장 (경로 대신 파일명만 출력)
-        df_final.to_parquet(target_path, index=False)
-        print(f"💾 [저장 완료] {os.path.basename(target_path)} (경로: RAW/kospi_data/)")
+        # # (2) 저장 (경로 대신 파일명만 출력)
+        # df_final.to_parquet(target_path, index=False)
+        # print(f"💾 [저장 완료] {os.path.basename(target_path)} (경로: RAW/kospi_data/)")
+        
+        # [변경]: save_dataframe_with_date 함수를 사용하여 내부 DF의 Max Date를 태그로 붙여 저장
+        saved_path = save_dataframe_with_date(df_final, target_dir, "kospi_data", date_col="Date")
+        if saved_path:
+            print(f"💾 [저장 완료] {os.path.basename(saved_path)} (경로: RAW/kospi_data/, 날짜 태그 적용)")
+        else:
+            print("  ▶ KOSPI 데이터 저장 건너뜀 (최신 파일이 이미 존재)")
+        # ------------------------------------------------------------
+        # [수정 끝]
+        # ------------------------------------------------------------
         
     else:
         print("\n❌ [실패] 모든 소스 수집 실패")
