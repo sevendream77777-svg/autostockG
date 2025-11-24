@@ -1,18 +1,17 @@
-
 # ============================================================
-# train_engine_unified_V34_complete_fixed.py
-#  - REAL/RESEARCH 동시 학습 지원 (mode=all 기본)
-#  - REAL: 전체 기간 학습 (검증 분리 없음)
-#  - RESEARCH: 최근 valid_days 검증, 나머지 학습
-#  - 저장 규칙: HOJ_ENGINE_{MODE}_{DBVER}_dYYMMDD_h{h}_w{Full|N}_n{N}_tYYMMDD.pkl
-#  - input_window=0 -> wFull, >0 -> w{input_window}
-#  - 파일/주석/로직 최대한 보존하면서 필수 수정만 반영
+# train_engine_unified_V34_complete.py
+#  - 통합 DB 하나(HOJ_DB_V31.*)로 REAL/RESEARCH 모두 학습
+#  - A안: 선택 피처의 '최대 기간'만큼 각 종목 앞구간 제거(초기 오염 0%)
+#  - Horizon Tail: 각 종목 뒤에서 h일 제거(미래정보 누수 0%)
+#  - input_window: 0이면 전체 피처 사용, >0이면 기간 초과 지표 제외
+#  - Close/ClosePrice 자동 인식으로 타겟 생성
+#  - meta 저장: feature_hash, data_date, horizon, input_window, valid_days 등
+#  - 저장 규칙: MODELENGINE/HOJ_ENGINE/{REAL|RESEARCH}/HOJ_ENGINE_{MODE}_YYYYMMDD_wFull.pkl
 # ============================================================
 
 import os
 import sys
 import re
-INT_PAT = re.compile(r"\d+")
 import pickle
 import argparse
 from datetime import datetime, timedelta
@@ -30,6 +29,10 @@ root_dir = os.path.dirname(modelengine_dir)      # 프로젝트 루트
 sys.path.extend([root_dir, modelengine_dir])
 
 def _try_import_paths():
+    """
+    프로젝트 표준 유틸 우선 사용.
+    (없으면 폴백: 기본 폴더 레이아웃 추정)
+    """
     HOJ_DB, HOJ_ENGINE_REAL, HOJ_ENGINE_RESEARCH, OUTPUT = None, None, None, None
     try:
         from MODELENGINE.UTIL.config_paths import get_path
@@ -37,6 +40,7 @@ def _try_import_paths():
         def _get(purpose, *args): return get_path(purpose, *args)
         _find = find_latest_file
     except Exception:
+        # 폴백: 기본 폴더 레이아웃 추정
         def _get(purpose, *args):
             base = os.path.join(root_dir, "MODELENGINE")
             if purpose == "HOJ_DB":
@@ -45,12 +49,15 @@ def _try_import_paths():
                 return os.path.join(base, "HOJ_ENGINE")
             if purpose == "OUTPUT":
                 return os.path.join(base, "OUTPUT")
+            # 하위 REAL/RESEARCH
             return os.path.join(base, "HOJ_ENGINE", args[0]) if args else os.path.join(base, "HOJ_ENGINE")
+
         def _find(folder, prefix):
             if not os.path.isdir(folder):
                 return None
             cand = [os.path.join(folder, f) for f in os.listdir(folder) if f.startswith(prefix)]
             return sorted(cand)[-1] if cand else None
+
     return _get, _find
 
 get_path, find_latest_file = _try_import_paths()
@@ -60,15 +67,19 @@ def ensure_dir(path: str):
     return path
 
 # ------------------------------------------------------------
-# 한 줄 갱신형 LightGBM 로그 콜백
+# 추가: 한 줄 갱신형 LightGBM 로그 콜백
 # ------------------------------------------------------------
 def single_line_logger(period=50):
     def _callback(env):
-        if period > 0 and env.iteration % period == 0 and env.evaluation_result_list:
-            name, metric, value, _ = env.evaluation_result_list[0]
-            print("\r" + f"[{env.iteration}] {name}-{metric}: {value:.6f}", end="", flush=True)
-        if hasattr(env, "end_iteration") and env.iteration == env.end_iteration - 1:
-            print()
+        if period > 0 and env.iteration % period == 0:
+            # env.evaluation_result_list 예: [('valid', 'rmse', 0.0234, False)]
+            if env.evaluation_result_list:
+                name, metric, value, _ = env.evaluation_result_list[0]
+                msg = f"[{env.iteration}] {name}-{metric}: {value:.6f}"
+                print("\r" + msg, end="", flush=True)
+            # 마지막이면 줄바꿈
+            if env.iteration == env.end_iteration - 1:
+                print()
     _callback.order = 10
     return _callback
 
@@ -86,41 +97,42 @@ NON_FEATURE_CANDIDATES = {
 }
 
 def pick_close_column(df: pd.DataFrame) -> str:
+    """Close/ClosePrice/Adj Close 자동 선택."""
     for c in ["Close","ClosePrice","Adj Close","AdjClose","close"]:
         if c in df.columns:
             return c
     raise KeyError("Close/ClosePrice/Adj Close 컬럼을 찾지 못했습니다.")
 
+
 def load_latest_db(version: str = "V31") -> pd.DataFrame:
+    """HOJ_DB 경로에서 최신 V31 파일을 찾아 로드."""
     base_dir = get_path("HOJ_DB")
     if "REAL" in base_dir or "RESEARCH" in base_dir:
         base_dir = os.path.dirname(base_dir)
     latest = find_latest_file(base_dir, f"HOJ_DB_{version}")
     if latest is None:
+        # 기본 이름 폴백
         cand = os.path.join(base_dir, f"HOJ_DB_{version}.parquet")
         if not os.path.exists(cand):
-            raise FileNotFoundError(f"HOJ_DB 파일을 찾을 수 없음: {base_dir} (prefix=HOJ_DB_{version})")
-        return pd.read_parquet(cand)
-    return pd.read_parquet(latest)
-
-def select_feature_columns(df):
-    drop_cols = [
-        'Date','Code','Open','High','Low','Close','Volume',
-        'Return_1d','Return_5d','Label_1d','Label_5d'
-    ]
-    feats = []
-    for col in df.columns:
-        if col in drop_cols:
-            continue
-        if str(df[col].dtype).startswith(("float","int")):
-            feats.append(col)
-    return feats
+            raise FileNotFoundError(f"HOJ_DB 파일을 찾을 수 없음: {base_dir} (prefix=HOJ_DB_{versio
+# ------------------------------------------------------------
+# 2) 기간 추출 및 마스킹(A안), 타겟/꼬리 제거
+# ------------------------------------------------------------
+INT_PAT = re.compile(r"(\d+)")
 
 def feature_period(col: str) -> int:
+    """
+    피처명에서 최대 숫자를 기간으로 추출 (예: sma120 → 120, macd_12_26 → 26).
+    숫자가 없으면 0으로 간주.
+    """
     m = [int(x) for x in INT_PAT.findall(col)]
     return max(m) if m else 0
 
 def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col: str, horizon: int) -> pd.DataFrame:
+    """
+    A안: 선택 피처들의 '최대 기간'만큼 각 종목 앞구간 제거 + 각 종목 뒤 h일 제거.
+    """
+    # input_window>0이면 해당 창을 초과하는 기간의 지표 제외
     if input_window and input_window > 0:
         feats = []
         for c in features:
@@ -129,21 +141,29 @@ def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col:
                 feats.append(c)
         features = feats
 
+    # 최대 기간 계산
     max_period = max([feature_period(c) for c in features] + [0])
 
+    # 종목별 앞/뒤 자르기
     parts = []
     for code, g in df.groupby("Code", sort=False):
         g = g.sort_values("Date")
+        # 앞쪽 제거
         if max_period > 0:
             g = g.iloc[max_period:].copy()
+        # 뒤쪽 Tail 제거
         if horizon > 0:
             g = g.iloc[:-horizon] if len(g) > horizon else g.iloc[0:0]
         parts.append(g)
     df_m = pd.concat(parts, ignore_index=True) if parts else df.iloc[0:0].copy()
 
-    df_m["TargetRet"] = df_m.groupby("Code")[close_col].shift(-horizon) / df_m[close_col] - 1.0
+    # 타겟 생성 (미래 h일 수익률)
+    df_m["TargetRet"] = (
+        df_m.groupby("Code")[close_col].shift(-horizon) / df_m[close_col] - 1.0
+    )
     df_m["TargetUp"] = (df_m["TargetRet"] > 0).astype("int8")
 
+    # 학습에 사용할 컬럼만 남기고 결측 제거
     use_cols = ["Date","Code", close_col] + features + ["TargetRet","TargetUp"]
     df_m = df_m[use_cols].dropna(subset=features + ["TargetRet"])
     return df_m, features, max_period
@@ -152,28 +172,20 @@ def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col:
 # 3) 학습/검증 스플릿 & 모델 학습
 # ------------------------------------------------------------
 def split_train_valid(df: pd.DataFrame, valid_days: int) -> tuple:
-    max_day = pd.to_datetime(df["Date"].max()).normalize()
+    max_day = df["Date"].max().normalize()
     valid_start = max_day - timedelta(days=int(valid_days))
     is_valid = df["Date"] >= valid_start
     train = df.loc[~is_valid].copy()
     valid = df.loc[ is_valid].copy()
     return train, valid, valid_start.date(), max_day.date()
-
 def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
-    # is_train 컬럼 유무/크기에 따라 eval_set 구성 결정
-    if "is_train" in df_m.columns:
-        X_tr = df_m.loc[df_m["is_train"], features]
-        y_reg_tr = df_m.loc[df_m["is_train"], "TargetRet"]
-        y_cls_tr = df_m.loc[df_m["is_train"], "TargetUp"]
-        X_va = df_m.loc[~df_m["is_train"], features]
-        y_reg_va = df_m.loc[~df_m["is_train"], "TargetRet"]
-        y_cls_va = df_m.loc[~df_m["is_train"], "TargetUp"]
-        has_valid = len(X_va) > 0
-    else:
-        X_tr = df_m[features]
-        y_reg_tr = df_m["TargetRet"]
-        y_cls_tr = df_m["TargetUp"]
-        has_valid = False
+    X_tr = df_m.loc[df_m["is_train"], features]
+    y_reg_tr = df_m.loc[df_m["is_train"], "TargetRet"]
+    y_cls_tr = df_m.loc[df_m["is_train"], "TargetUp"]
+
+    X_va = df_m.loc[~df_m["is_train"], features]
+    y_reg_va = df_m.loc[~df_m["is_train"], "TargetRet"]
+    y_cls_va = df_m.loc[~df_m["is_train"], "TargetUp"]
 
     # LightGBM Regressor
     model_reg = lgb.LGBMRegressor(
@@ -185,15 +197,12 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
         objective="regression",
         n_jobs=-1
     )
-    if has_valid:
-        model_reg.fit(X_tr, y_reg_tr,
-                      eval_set=[(X_va, y_reg_va)],
-                      eval_metric="rmse",
-                      callbacks=[single_line_logger(period=50)])
-    else:
-        model_reg.fit(X_tr, y_reg_tr)
+    model_reg.fit(X_tr, y_reg_tr,
+                  eval_set=[(X_va, y_reg_va)],
+                  eval_metric="rmse",
+                  callbacks=[single_line_logger(period=50)])
 
-    # LightGBM Classifier
+    # LightGBM Classifier (상승확률)
     model_cls = lgb.LGBMClassifier(
         n_estimators=n_estimators,
         max_depth=-1,
@@ -203,70 +212,56 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
         objective="binary",
         n_jobs=-1
     )
-    if has_valid:
-        model_cls.fit(X_tr, y_cls_tr,
-                      eval_set=[(X_va, y_cls_va)],
-                      eval_metric="auc",
-                      callbacks=[single_line_logger(period=50)])
-    else:
-        model_cls.fit(X_tr, y_cls_tr)
+    model_cls.fit(X_tr, y_cls_tr,
+                  eval_set=[(X_va, y_cls_va)],
+                  eval_metric="auc",
+                  callbacks=[single_line_logger(period=50)])
 
     return model_reg, model_cls
 
 # ------------------------------------------------------------
-# 4) 저장 (파일명 규칙 반영)
+# 4) 저장
 # ------------------------------------------------------------
 def _hash_list(lst: list) -> str:
     return str(abs(hash("|".join(map(str, lst)))))
 
-def _format_tags(db_version: str, data_date: str, horizon: int, input_window: int, n_estimators: int) -> str:
-    d_tag = pd.to_datetime(data_date).strftime("%y%m%d")  # dYYMMDD
-    w_tag = "wFull" if int(input_window) == 0 else f"w{int(input_window)}"
-    n_tag = f"n{int(n_estimators)}"
-    h_tag = f"h{int(horizon)}"
-    t_tag = "t" + datetime.now().strftime("%y%m%d")
-    return f"{db_version}_d{d_tag}_{h_tag}_{w_tag}_{n_tag}_{t_tag}"
-
 def save_engine(payload: dict, mode: str):
     base = get_path("HOJ_ENGINE")
+    # REAL/RESEARCH 하위 폴더 보장
     if os.path.isfile(base):
         base = os.path.dirname(base)
     out_dir = os.path.join(base, mode.upper())
     ensure_dir(out_dir)
 
-    tags = _format_tags(
-        db_version   = payload["meta"]["db_version"],
-        data_date    = payload["meta"]["data_date"],
-        horizon      = payload["meta"]["horizon"],
-        input_window = payload["meta"]["input_window"],
-        n_estimators = payload["meta"]["n_estimators"],
-    )
-    fname = f"HOJ_ENGINE_{mode.upper()}_{tags}.pkl"
+    tag = payload["meta"]["data_date"]
+    fname = f"HOJ_ENGINE_{mode.upper()}_{tag}_wFull.pkl"
     path = os.path.join(out_dir, fname)
     with open(path, "wb") as f:
         pickle.dump(payload, f)
+
     print(f"\n💾 엔진 저장 완료: {path}")
 
 # ------------------------------------------------------------
 # 5) 메인 러너
 # ------------------------------------------------------------
 def run_unified_training(
-    mode: str = "all",
+    mode: str = "research",
     horizon: int = 5,
     input_window: int = 0,
     valid_days: int = 365,
     n_estimators: int = 1000,
     version: str = "V31",
 ):
-    assert mode in ("real","research","all")
+    """
+    mode: "real" | "research"
+    """
+    assert mode in ("real","research")
 
     print("=== 🚀 Unified HOJ Trainer V34 ===")
     print(f"[CFG] mode={mode}  horizon={horizon}  input_window={input_window}  valid_days={valid_days}  n_estimators={n_estimators}")
 
     # 1) DB 로드
     df = load_latest_db(version)
-    if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
-        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
     close_col = pick_close_column(df)
     max_date = df["Date"].max().date()
     print(f"[DATA] DB max(Date) = {max_date}  | rows={len(df):,}")
@@ -279,10 +274,20 @@ def run_unified_training(
     df_m, features, max_period = apply_A_mask(df, features, input_window, close_col, horizon)
     print(f"[MASK] MaxPeriod={max_period}d  | After Mask rows={len(df_m):,}")
 
-    # 공통 메타
-    meta_common = {
+    # 4) 검증 분리
+    tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)
+    tr["is_train"] = True
+    va["is_train"] = False
+    data = pd.concat([tr, va], ignore_index=True)
+    print(f"[SPLIT] Train rows={len(tr):,}  Valid rows={len(va):,}  (valid={valid_start}~{valid_end})")
+
+    # 5) 학습
+    model_reg, model_cls = train_models(data, features, n_estimators=n_estimators)
+    print("[TRAIN] LightGBM reg/cls 학습 완료")
+
+    # 6) 메타/페이로드
+    meta = {
         "version": "V34",
-        "db_version": version,        # ← 저장 규칙에 사용
         "data_date": str(max_date),
         "horizon": int(horizon),
         "input_window": int(input_window),
@@ -290,38 +295,16 @@ def run_unified_training(
         "feature_hash": _hash_list(features),
         "trained_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "close_col": close_col,
-        "n_estimators": int(n_estimators),
+    }
+    payload = {
+        "model_reg": model_reg,
+        "model_cls": model_cls,
+        "features": features,
+        "meta": meta,
     }
 
-    def _train_and_save(mode_one: str):
-        if mode_one == "research":
-            tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)
-            tr["is_train"] = True
-            va["is_train"] = False
-            data = pd.concat([tr, va], ignore_index=True)
-            print(f"[SPLIT] Train rows={len(tr):,}  Valid rows={len(va):,}  (valid={valid_start}~{valid_end})")
-        else:  # real
-            data = df_m.copy()
-            data["is_train"] = True
-            print(f"[SPLIT] REAL 모드: 전체 {len(data):,}행 학습, 검증 없음")
-
-        model_reg, model_cls = train_models(data, features, n_estimators=n_estimators)
-        print(f"[TRAIN] {mode_one.upper()} LightGBM reg/cls 학습 완료")
-
-        payload = {
-            "model_reg": model_reg,
-            "model_cls": model_cls,
-            "features": features,
-            "meta": meta_common,
-        }
-        save_engine(payload, mode_one)
-
-    if mode == "all":
-        for m in ("research","real"):
-            print(f"\n🚀 [{m.upper()}] 엔진 학습 시작")
-            _train_and_save(m)
-    else:
-        _train_and_save(mode)
+    # 7) 저장
+    save_engine(payload, mode)
 
     print("=== 🏁 Done. ===")
 
@@ -330,7 +313,7 @@ def run_unified_training(
 # ------------------------------------------------------------
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", default="all", choices=["real","research","all"])
+    ap.add_argument("--mode", default="research", choices=["real","research"])
     ap.add_argument("--horizon", type=int, default=5)
     ap.add_argument("--input_window", type=int, default=0)
     ap.add_argument("--valid_days", type=int, default=365)

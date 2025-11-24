@@ -1,9 +1,12 @@
 # ui/common/styles.py
 
 def get_modern_qss():
-
-    chk_icon = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"
-    rad_icon = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3C/svg%3E"
+    # [수정] SVG 인코딩 문제 해결 (공백 -> %20 변환, viewBox 기준 스케일링)
+    # 체크 아이콘 (Check)
+    chk_icon = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpolyline%20points='20%206%209%2017%204%2012'/%3E%3C/svg%3E"
+    
+    # 라디오 아이콘 (Circle)
+    rad_icon = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='white'%3E%3Ccircle%20cx='12'%20cy='12'%20r='6'/%3E%3C/svg%3E"
 
     return f"""
     QWidget {{

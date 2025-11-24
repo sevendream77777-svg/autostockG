@@ -27,63 +27,47 @@ def find_latest_file(directory, prefix, extension=".parquet"):
     files = glob.glob(search_pattern)
     
     if not files:
-        # 1. 날짜 태그 없는 legacy 파일 있는지 확인
-        legacy_path = os.path.join(directory, f"{prefix}{extension}")
-        if os.path.exists(legacy_path):
-            print(f"  ※ 최신 버전(prefix_YYMMDD) 없음. 기존 파일 사용: {os.path.basename(legacy_path)}")
-            return legacy_path
+        # 날짜 없는 레거시 무시 (패치)
         return None
 
-    # 파일명 정렬 → 가장 마지막(최신)
     latest_file = sorted(files)[-1]
     return latest_file
+
+# -----------------------------------------------------------
+# [핵심] 날짜 정책 완전 패치
+# FEATURE / HOJ_DB 파일 → 무조건 파일 내부 Date 마지막날짜로 저장
+# 오늘 날짜 fallback, SKIP 로직 전부 제거
+# -----------------------------------------------------------
 
 def save_dataframe_with_date(df, base_dir, file_prefix, date_col="Date", extension=".parquet"):
     """
     DF 내부 최대 날짜(Max Date)를 읽어 파일명에 YYMMDD 태그로 저장.
+    날짜 없는 파일 생성 금지.
     파일 중복 시 _1, _2 시퀀스 생성.
     """
+
     os.makedirs(base_dir, exist_ok=True)
-    
-    # 1. 기본 날짜 태그 = 오늘
-    date_tag = get_timestamp()
 
-    # DF에서 날짜 추출
-    if date_col in df.columns and not df.empty:
-        try:
-            if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
-                temp_dates = pd.to_datetime(df[date_col], errors='coerce')
-                max_date = temp_dates.max()
-            else:
-                max_date = df[date_col].max()
-            
-            if pd.notnull(max_date):
-                date_tag = max_date.strftime("%y%m%d")
-        except Exception as e:
-            print(f"  ※ 날짜 태그 생성 실패 (기본 날짜 사용): {e}")
+    # 1. 날짜 태그 = 무조건 데이터 마지막 날짜
+    if date_col not in df.columns or df.empty:
+        raise ValueError(f"[ERROR] '{date_col}' 컬럼이 없어서 날짜 태그 생성 불가")
 
-    # 기존 동일 날짜 파일이 있는지 확인 → 있다면 SKIP
-    try:
-        existing = glob.glob(os.path.join(base_dir, f"{file_prefix}_{date_tag}*{extension}"))
-        if existing:
-            latest_existing = sorted(existing)[-1]
-            try:
-                df_prev = pd.read_parquet(latest_existing, columns=[date_col])
-            except Exception:
-                df_prev = pd.read_parquet(latest_existing)
-            if date_col in df_prev.columns and not df_prev.empty:
-                prev_date = pd.to_datetime(df_prev[date_col], errors="coerce").max()
-                if pd.notnull(prev_date) and prev_date.strftime("%y%m%d") == date_tag:
-                    print(f"  ▶ [SKIP] 동일 날짜({date_tag}) 파일 존재: {os.path.basename(latest_existing)}")
-                    return latest_existing
-    except Exception as e:
-        print(f"  ※ 기존 파일 확인 오류: {e}")
+    if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
+        temp_dates = pd.to_datetime(df[date_col], errors='coerce')
+        max_date = temp_dates.max()
+    else:
+        max_date = df[date_col].max()
 
-    # 2. 파일명 기본 경로
+    if pd.isnull(max_date):
+        raise ValueError("[ERROR] Date 컬럼에서 유효한 날짜를 찾을 수 없음")
+
+    date_tag = max_date.strftime("%y%m%d")
+
+    # 2. 파일명 생성
     base_filename = f"{file_prefix}_{date_tag}"
     save_path = os.path.join(base_dir, f"{base_filename}{extension}")
 
-    # 3. 중복 파일 처리 (_1, _2…)
+    # 3. 중복 처리 (_1, _2…)
     counter = 1
     while os.path.exists(save_path):
         save_path = os.path.join(base_dir, f"{base_filename}_{counter}{extension}")
@@ -95,11 +79,11 @@ def save_dataframe_with_date(df, base_dir, file_prefix, date_col="Date", extensi
             df.to_parquet(save_path, index=False)
         elif extension == ".csv":
             df.to_csv(save_path, index=False)
-        
+
         print(f"  ▶ [저장 완료] {os.path.basename(save_path)} (Rows: {len(df):,}, Date: {date_tag})")
         return save_path
     except Exception as e:
-        print(f"※ 저장 실패: {e}")
+        print(f"[ERROR] 저장 실패: {e}")
         return None
 
 # -----------------------------------------------------------
@@ -119,7 +103,6 @@ def backup_existing_file(file_path, date_tag: str | None = None):
     backup_name = f"{name}_{ts}{ext}"
     backup_path = os.path.join(dirname, backup_name)
 
-    # 중복 방지
     counter = 1
     while os.path.exists(backup_path):
         backup_name = f"{name}_{ts}_{counter}{ext}"

@@ -1,0 +1,212 @@
+=========================================================================================================
+🚀 파일 분석 시작: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31_251124_1.parquet
+=========================================================================================================
+✨ 요약 정보
+  > 총 행 수 (Total Rows): 6067574
+  > 컬럼 수 (Columns Count): 30
+
+📋 컬럼 이름 및 타입 (Schema)
+
+Name          Value
+----          -----
+Date          datetime64[ns]
+Open          float64
+High          float64
+Low           float64
+Close         float64
+Volume        float64
+Change        float64
+Code          object
+Name          object
+Market        object
+KOSPI_종가    float64
+KOSPI_수익률  float64
+SMA_5         float64
+SMA_20        float64
+SMA_40        float64
+SMA_60        float64
+SMA_90        float64
+SMA_120       float64
+VOL_SMA_20    float64
+RSI_14        float64
+MOM_10        float64
+ROC_20        float64
+MACD_12_26    float64
+MACD_SIGNAL_9 float64
+BBP_20        float64
+ATR_14        float64
+STOCH_K       float64
+STOCH_D       float64
+CCI_20        float64
+ALPHA_SMA_20  float64
+
+
+⬇️ 최근 5개 행 데이터 (Tail 5 Rows)
+
+Date                    Open     High      Low    Close     Volume Change Code   Name                 Market
+----                    ----     ----      ---    -----     ------ ------ ----   ----                 ------
+2025-11-24 00:00:00  3795.00  3795.00  3510.00  3610.00  399613.00  -0.05 950170 JTC
+2025-11-24 00:00:00  8800.00  8990.00  8610.00  8730.00  200251.00  -0.01 950190 고스트스튜디오
+2025-11-24 00:00:00  3585.00  3645.00  3400.00  3400.00   34235.00  -0.05 950200 소마젠
+2025-11-24 00:00:00 11950.00 13140.00 11580.00 11800.00  287273.00  -0.01 950210 프레스티지바이오파마
+2025-11-24 00:00:00   589.00   607.00   566.00   570.00 1516117.00  -0.03 950220 네오이뮨텍
+
+
+=========================================================================================================
+🚀 파일 분석 시작: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31_251121.parquet
+=========================================================================================================
+✨ 요약 정보
+  > 총 행 수 (Total Rows): 6064688
+  > 컬럼 수 (Columns Count): 30
+
+📋 컬럼 이름 및 타입 (Schema)
+
+Name          Value
+----          -----
+Date          datetime64[ns]
+Open          float64
+High          float64
+Low           float64
+Close         float64
+Volume        float64
+Change        float64
+Code          object
+Name          object
+Market        object
+KOSPI_종가    float64
+KOSPI_수익률  float64
+SMA_5         float64
+SMA_20        float64
+SMA_40        float64
+SMA_60        float64
+SMA_90        float64
+SMA_120       float64
+VOL_SMA_20    float64
+RSI_14        float64
+MOM_10        float64
+ROC_20        float64
+MACD_12_26    float64
+MACD_SIGNAL_9 float64
+BBP_20        float64
+ATR_14        float64
+STOCH_K       float64
+STOCH_D       float64
+CCI_20        float64
+ALPHA_SMA_20  float64
+
+
+⬇️ 최근 5개 행 데이터 (Tail 5 Rows)
+
+Date                    Open     High      Low    Close     Volume Change Code   Name                 Market
+----                    ----     ----      ---    -----     ------ ------ ----   ----                 ------
+2025-11-21 00:00:00  3485.00  3820.00  3350.00  3800.00  751083.00   0.09 950170 JTC
+2025-11-21 00:00:00  9400.00  9680.00  8800.00  8840.00  607729.00  -0.06 950190 고스트스튜디오
+2025-11-21 00:00:00  3600.00  3670.00  3580.00  3590.00    8791.00  -0.01 950200 소마젠
+2025-11-21 00:00:00 12090.00 12090.00 11700.00 11860.00   93119.00  -0.02 950210 프레스티지바이오파마
+2025-11-21 00:00:00   599.00   615.00   582.00   589.00 2173466.00  -0.02 950220 네오이뮨텍
+
+
+=========================================================================================================
+🚀 파일 분석 시작: F:\autostockG\MODELENGINE\HOJ_DB\@HOJ_DB_V31_251121_5.parquet
+=========================================================================================================
+✨ 요약 정보
+  > 총 행 수 (Total Rows): 6064688
+  > 컬럼 수 (Columns Count): 30
+
+📋 컬럼 이름 및 타입 (Schema)
+
+Name          Value
+----          -----
+Date          datetime64[ns]
+Open          float64
+High          float64
+Low           float64
+Close         float64
+Volume        float64
+Change        float64
+Code          object
+Name          object
+Market        object
+KOSPI_종가    float64
+KOSPI_수익률  float64
+SMA_5         float64
+SMA_20        float64
+SMA_40        float64
+SMA_60        float64
+SMA_90        float64
+SMA_120       float64
+VOL_SMA_20    float64
+RSI_14        float64
+MOM_10        float64
+ROC_20        float64
+MACD_12_26    float64
+MACD_SIGNAL_9 float64
+BBP_20        float64
+ATR_14        float64
+STOCH_K       float64
+STOCH_D       float64
+CCI_20        float64
+ALPHA_SMA_20  float64
+
+
+⬇️ 최근 5개 행 데이터 (Tail 5 Rows)
+
+Date                    Open     High      Low    Close     Volume Change Code   Name                 Market
+----                    ----     ----      ---    -----     ------ ------ ----   ----                 ------
+2025-11-21 00:00:00  3485.00  3820.00  3350.00  3800.00  751083.00   0.09 950170 JTC
+2025-11-21 00:00:00  9400.00  9680.00  8800.00  8840.00  607729.00  -0.06 950190 고스트스튜디오
+2025-11-21 00:00:00  3600.00  3670.00  3580.00  3590.00    8791.00  -0.01 950200 소마젠
+2025-11-21 00:00:00 12090.00 12090.00 11700.00 11860.00   93119.00  -0.02 950210 프레스티지바이오파마
+2025-11-21 00:00:00   599.00   615.00   582.00   589.00 2173466.00  -0.02 950220 네오이뮨텍
+
+
+=========================================================================================================
+🚀 파일 분석 시작: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31_251105.parquet
+=========================================================================================================
+✨ 요약 정보
+  > 총 행 수 (Total Rows): 5867250
+  > 컬럼 수 (Columns Count): 28
+
+📋 컬럼 이름 및 타입 (Schema)
+
+Name          Value
+----          -----
+Date          datetime64[ns]
+Open          int64
+High          int64
+Low           int64
+Close         int64
+Volume        int64
+Change        float64
+Code          object
+Name          object
+Market        object
+KOSPI_종가    float64
+KOSPI_수익률  float64
+SMA_5         float64
+SMA_20        float64
+SMA_60        float64
+VOL_SMA_20    float64
+MOM_10        float64
+ROC_20        float64
+MACD_12_26    float64
+MACD_SIGNAL_9 float64
+BBP_20        float64
+ATR_14        float64
+STOCH_K       float64
+STOCH_D       float64
+CCI_20        float64
+ALPHA_SMA_20  float64
+Return_5d     float64
+Label_5d      int64
+
+
+⬇️ 최근 5개 행 데이터 (Tail 5 Rows)
+
+Date                 Open  High   Low Close  Volume Change Code   Name                 Market
+----                 ----  ----   --- -----  ------ ------ ----   ----                 ------
+2025-11-05 00:00:00  5480  5600  5190  5390  118520  -0.02 950170 JTC                  KOSDAQ
+2025-11-05 00:00:00  8130  8130  7700  7870   21408  -0.02 950190 고스트스튜디오       KOSDAQ
+2025-11-05 00:00:00  3335  3355  3260  3355   13765   0.01 950200 소마젠               KOSDAQ
+2025-11-05 00:00:00 12650 12710 12030 12340  179384  -0.02 950210 프레스티지바이오파마 KOSPI
+2025-11-05 00:00:00   579   588   540   582 1702683   0.00 950220 네오이뮨텍           KOSDAQ
