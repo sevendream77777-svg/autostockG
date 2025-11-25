@@ -1,0 +1,308 @@
+PS F:\autostockG\MODELENGINE> python final_top10simple.py
+=== MODELENGINE 통합 실행기 (SIMPLE) 시작 ===
+※ 순서 고정 실행: 1→2→3→4→5→6 (지능형 로직 없음)
+
+================================================================
+[RUN-RAW] F:\autostockG\MODELENGINE\RAW\raw_patch.py
+================================================================
+┌──────────────────────────────────────────────┐
+│ 🎉 흰둥이 원본데이터 업데이트 (V6)           │
+└──────────────────────────────────────────────┘
+[PATH] RAW_MAIN : F:\autostockG\MODELENGINE\RAW\stocks\all_stocks_cumulative.parquet
+
+[2025-11-25 05:56:54] [INFO] 최신 RAW 파일 사용: all_stocks_cumulative_251124.parquet
+[2025-11-25 05:57:07] [STEP 1] RAW 최신 날짜: 2025-11-24
+[2025-11-25 05:57:07] [STEP 2] 수집 기간: 2025-11-24 ~ 2025-11-24
+[2025-11-25 05:57:07] ✅ [SKIP] 이미 최신 데이터(2025-11-24)가 RAW 파일에 존재합니다.
+[2025-11-25 05:57:07]    (추가 수집 없이 종료합니다.)
+[RAW] 완료 ✔ 22.92s
+
+================================================================
+[RUN-KOSPI] F:\autostockG\MODELENGINE\RAW\make_kospi_index_10y.py
+================================================================
+
+============================================================
+[KOSPI] 10년치 지수 수집 (kospi_data 폴더 저장)
+============================================================
+🕒 현재 05:57 (장마감 전) -> '전일(2025-11-24)' 기준 + 실시간 시세 수집
+   [1순위] FinanceDataReader (Naver) 시도...
+----------------------------------------
+✅ 데이터 수집 완료 (최신: 2025-11-24)
+✅ 확정 데이터이므로 기존 파일을 백업합니다.
+----------------------------------------
+  ▶ [저장 완료] kospi_data_251124_4.parquet (Rows: 2,697, Date: 251124)
+💾 [저장 완료] kospi_data_251124_4.parquet (경로: RAW/kospi_data/, 날짜 태그 적용)
+[KOSPI] 완료 ✔ 7.05s
+
+================================================================
+[RUN-FEATURE] F:\autostockG\MODELENGINE\UTIL\build_features.py
+================================================================
+==============================================
+[FEATURE V32] 피처 생성 (NaN 유지 모드)
+  📥 최신 RAW 로드: all_stocks_cumulative_251124.parquet
+  📥 최신 KOSPI 로드: kospi_data_251124_4.parquet
+============================================================
+✅ [SKIP] 최신 피처 파일이 이미 존재합니다. (Date: 251124)
+   발견된 파일: features_V31_251124.parquet
+   (재생성을 원하시면 해당 파일을 삭제하거나 이동하세요.)
+============================================================
+[FEATURE] 완료 ✔ 10.03s
+
+================================================================
+[RUN-DB] F:\autostockG\MODELENGINE\UTIL\build_unified_db.py
+================================================================
+============================================================
+[DB BUILDER] 통합 DB 생성 시작 (HOJ_DB_V31)
+  📥 입력: F:\autostockG\MODELENGINE\FEATURE\features_V31_251124.parquet
+  💾 출력: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31.parquet
+  ✅ 피처 로드 성공: 6,067,574 rows
+  📅 데이터 기간: 2015-01-02 ~ 2025-11-24
+  ▶ [저장 완료] HOJ_DB_V31_251124_4.parquet (Rows: 6,067,574, Date: 251124)
+  🎉 [완료] 통합 DB 저장 성공 (날짜 태그 파일)
+[DB] 완료 ✔ 50.14s
+
+================================================================
+[RUN-ENGINE] F:\autostockG\MODELENGINE\UTIL\train_engine_unified.py
+================================================================
+=== 🚀 Unified HOJ Trainer V34 ===
+[CFG] mode=all  horizon=5  input_window=0  valid_days=365  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-24  | rows=6,067,574
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=120d  | After Mask rows=5,696,653
+
+🚀 [RESEARCH] 엔진 학습 시작
+[SPLIT] Train rows=5,024,598  Valid rows=672,055  (valid=2024-11-06~2025-11-06)
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.457151 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5024598, number of used features: 21
+[LightGBM] [Info] Start training from score 0.001909
+[950] valid_0-rmse: 0.095038
+[LightGBM] [Info] Number of positive: 2260135, number of negative: 2764463
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.118984 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5024598, number of used features: 21
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.449814 -> initscore=-0.201422
+[LightGBM] [Info] Start training from score -0.201422
+[950] valid_0-auc: 0.565564
+[TRAIN] RESEARCH LightGBM reg/cls 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_d251124_h5_wFull_n1000_t251125.pkl
+
+🚀 [REAL] 엔진 학습 시작
+[SPLIT] REAL 모드: 전체 5,696,653행 학습, 검증 없음
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.107715 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5696653, number of used features: 21
+[LightGBM] [Info] Start training from score 0.002135
+[LightGBM] [Info] Number of positive: 2557392, number of negative: 3139261
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.121413 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5696653, number of used features: 21
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.448929 -> initscore=-0.204999
+[LightGBM] [Info] Start training from score -0.204999
+[TRAIN] REAL LightGBM reg/cls 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_d251124_h5_wFull_n1000_t251125.pkl
+=== 🏁 Done. ===
+[ENGINE] 완료 ✔ 393.31s
+
+================================================================
+[RUN-TOP10] F:\autostockG\MODELENGINE\UTIL\daily_recommender.py
+================================================================
+[Gemini] 분석 완료.                                 ...
+============================================================
+📈 HOJ AI Daily Report [2025-11-24]
+============================================================
+
+[1] 예측 Top 10 (기준: combo)
+------------------------------------------------------------
+     종목명   종목코드      현재가  상승확률(%)  예측수익률(%)  동시적용 기대수익(%)
+    럭스피아 092590    422.0    59.09     14.16          8.37
+    이앤에치 341310    500.0    61.41      8.74          5.37
+    천일고속 000650 107900.0    56.82      8.30          4.71
+      광림 014200   1870.0    25.73     10.19          2.62
+    이노벡스 279060    799.0    55.77      4.51          2.52
+         219550    200.0    15.50     16.02          2.48
+    애머릿지 900100    498.0    41.77      5.03          2.10
+     쌍방울 102280    482.0    32.95      6.18          2.04
+가이아코퍼레이션 296520    613.0    50.39      3.88          1.96
+  아이씨에이치 368600   1213.0    45.81      4.25          1.95
+------------------------------------------------------------
+
+[2] Gemini AI Investment Opinion
+------------------------------------------------------------
+=== Gemini's Pick ===
+1.  **럭스피아**: 가장 높은 동시적용 기대수익률을 보여, 상승 확률과 예측 수익률 모두에서 긍정적인 기대가 높습니다.
+2.  **이앤에치**: 상승 확률이 가장 높고 예측 수익률도 준수하여, 전반적인 상승 가능성이 매우 유망합니다.
+3.  **천일고속**: 높은 현재가에도 불구하고 상당한 상승 확률과 예측 수익률을 보여, 매력적인 기대 수익을 제공합니다.
+============================================================
+
+[ENGINE] HOJ_ENGINE_REAL_V31_d251124_h5_wFull_n1000_t251125.pkl
+[DB]     HOJ_DB_V31_251124_4.parquet
+[SAVE]   CSV: recommendation_HOJ_V34_2025-11-24_20251125_060500_combo.csv
+[SAVE]   TXT: Report_HOJ_V34_2025-11-24_20251125_060500.txt (AI 분석 포함)
+
+[*] Generating Formatted Excel: Final_Report_HOJ_2025-11-24_20251125_060500.xlsx...
+[SAVE]   Excel: Final_Report_HOJ_2025-11-24_20251125_060500.xlsx (서식 적용 완료)
+[TOP10] 완료 ✔ 15.11s
+
+------------------------------------------------------------------------------------------------------------
+
+PS F:\autostockG\MODELENGINE> python final_top10simple.py
+=== MODELENGINE 통합 실행기 (SIMPLE) 시작 ===
+※ 순서 고정 실행: 1→2→3→4→5→6 (지능형 로직 없음)
+
+================================================================
+[RUN-RAW] F:\autostockG\MODELENGINE\RAW\raw_patch.py
+================================================================
+┌──────────────────────────────────────────────┐
+│ 🎉 흰둥이 원본데이터 업데이트 (V6)           │
+└──────────────────────────────────────────────┘
+[PATH] RAW_MAIN : F:\autostockG\MODELENGINE\RAW\stocks\all_stocks_cumulative.parquet
+
+[2025-11-25 08:11:31] [INFO] 최신 RAW 파일 사용: all_stocks_cumulative_251124.parquet
+[2025-11-25 08:11:47] [STEP 1] RAW 최신 날짜: 2025-11-24
+[2025-11-25 08:11:47] [STEP 2] 수집 기간: 2025-11-24 ~ 2025-11-24
+[2025-11-25 08:11:47] ✅ [SKIP] 이미 최신 데이터(2025-11-24)가 RAW 파일에 존재합니다.
+[2025-11-25 08:11:47]    (추가 수집 없이 종료합니다.)
+[RAW] 완료 ✔ 39.66s
+
+================================================================
+[RUN-KOSPI] F:\autostockG\MODELENGINE\RAW\make_kospi_index_10y.py
+================================================================
+
+============================================================
+[KOSPI] 10년치 지수 수집 (kospi_data 폴더 저장)
+============================================================
+🕒 현재 08:11 (장마감 전) -> '전일(2025-11-24)' 기준 + 실시간 시세 수집
+   [1순위] FinanceDataReader (Naver) 시도...
+----------------------------------------
+✅ 데이터 수집 완료 (최신: 2025-11-24)
+✅ 확정 데이터이므로 기존 파일을 백업합니다.
+----------------------------------------
+  ▶ [저장 완료] kospi_data_251124_5.parquet (Rows: 2,697, Date: 251124)
+💾 [저장 완료] kospi_data_251124_5.parquet (경로: RAW/kospi_data/, 날짜 태그 적용)
+[KOSPI] 완료 ✔ 7.00s
+
+================================================================
+[RUN-FEATURE] F:\autostockG\MODELENGINE\UTIL\build_features.py
+================================================================
+==============================================
+[FEATURE V32] 피처 생성 (NaN 유지 모드)
+  📥 최신 RAW 로드: all_stocks_cumulative_251124.parquet
+  📥 최신 KOSPI 로드: kospi_data_251124_5.parquet
+============================================================
+✅ [SKIP] 최신 피처 파일이 이미 존재합니다. (Date: 251124)
+   발견된 파일: features_V31_251124.parquet
+   (재생성을 원하시면 해당 파일을 삭제하거나 이동하세요.)
+============================================================
+[FEATURE] 완료 ✔ 10.15s
+
+================================================================
+[RUN-DB] F:\autostockG\MODELENGINE\UTIL\build_unified_db.py
+================================================================
+============================================================
+[DB BUILDER] 통합 DB 생성 시작 (HOJ_DB_V31)
+  📥 입력: F:\autostockG\MODELENGINE\FEATURE\features_V31_251124.parquet
+  💾 출력: F:\autostockG\MODELENGINE\HOJ_DB\HOJ_DB_V31.parquet
+  ✅ 피처 로드 성공: 6,067,574 rows
+  📅 데이터 기간: 2015-01-02 ~ 2025-11-24
+  ▶ [저장 완료] HOJ_DB_V31_251124_5.parquet (Rows: 6,067,574, Date: 251124)
+  🎉 [완료] 통합 DB 저장 성공 (날짜 태그 파일)
+[DB] 완료 ✔ 53.40s
+
+================================================================
+[RUN-ENGINE] F:\autostockG\MODELENGINE\UTIL\train_engine_unified.py
+================================================================
+=== 🚀 Unified HOJ Trainer V34 ===
+[CFG] mode=all  horizon=5  input_window=0  valid_days=365  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-24  | rows=6,067,574
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=120d  | After Mask rows=5,696,653
+
+🚀 [RESEARCH] 엔진 학습 시작
+[SPLIT] Train rows=5,024,598  Valid rows=672,055  (valid=2024-11-06~2025-11-06)
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.439861 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5024598, number of used features: 21
+[LightGBM] [Info] Start training from score 0.001909
+[950] valid_0-rmse: 0.095038
+[LightGBM] [Info] Number of positive: 2260135, number of negative: 2764463
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.127170 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5024598, number of used features: 21
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.449814 -> initscore=-0.201422
+[LightGBM] [Info] Start training from score -0.201422
+[950] valid_0-auc: 0.565564
+[TRAIN] RESEARCH LightGBM reg/cls 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_d251124_h5_wFull_n1000_t251125.pkl
+
+🚀 [REAL] 엔진 학습 시작
+[SPLIT] REAL 모드: 전체 5,696,653행 학습, 검증 없음
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.729053 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5696653, number of used features: 21
+[LightGBM] [Info] Start training from score 0.002135
+[LightGBM] [Info] Number of positive: 2557392, number of negative: 3139261
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.124436 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 5355
+[LightGBM] [Info] Number of data points in the train set: 5696653, number of used features: 21
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.448929 -> initscore=-0.204999
+[LightGBM] [Info] Start training from score -0.204999
+[TRAIN] REAL LightGBM reg/cls 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_d251124_h5_wFull_n1000_t251125.pkl
+=== 🏁 Done. ===
+[ENGINE] 완료 ✔ 424.32s
+
+================================================================
+[RUN-TOP10] F:\autostockG\MODELENGINE\UTIL\daily_recommender.py
+================================================================
+[Gemini] 분석 완료.                                 ...
+============================================================
+📈 HOJ AI Daily Report [2025-11-24]
+============================================================
+
+[1] 예측 Top 10 (기준: combo)
+------------------------------------------------------------
+     종목명   종목코드      현재가  상승확률(%)  예측수익률(%)  동시적용 기대수익(%)
+    럭스피아 092590    422.0    59.09     14.16          8.37
+    이앤에치 341310    500.0    61.41      8.74          5.37
+    천일고속 000650 107900.0    56.82      8.30          4.71
+      광림 014200   1870.0    25.73     10.19          2.62
+    이노벡스 279060    799.0    55.77      4.51          2.52
+         219550    200.0    15.50     16.02          2.48
+    애머릿지 900100    498.0    41.77      5.03          2.10
+     쌍방울 102280    482.0    32.95      6.18          2.04
+가이아코퍼레이션 296520    613.0    50.39      3.88          1.96
+  아이씨에이치 368600   1213.0    45.81      4.25          1.95
+------------------------------------------------------------
+
+[2] Gemini AI Investment Opinion
+------------------------------------------------------------
+=== Gemini's Pick ===
+1.  종목명: 럭스피아: 가장 높은 동시적용 기대수익률을 보이며, 높은 상승확률과 예측수익률을 모두 갖춰 상승 가능성이 높습니다.
+2.  종목명: 이앤에치: 가장 높은 상승확률을 기록하며, 동시적용 기대수익률 또한 두 번째로 높아 긍정적인 움직임을 기대할 수 있습니다.
+3.  종목명: 천일고속: 안정적인 상승확률과 예측수익률을 바탕으로 전체 종목 중 세 번째로 높은 동시적용 기대수익률을 보여줍니다.
+============================================================
+
+[ENGINE] HOJ_ENGINE_REAL_V31_d251124_h5_wFull_n1000_t251125.pkl
+[DB]     HOJ_DB_V31_251124_5.parquet
+[SAVE]   CSV: recommendation_HOJ_V34_2025-11-24_20251125_082028_combo.csv
+[SAVE]   TXT: Report_HOJ_V34_2025-11-24_20251125_082028.txt (AI 분석 포함)
+
+[*] Generating Formatted Excel: Final_Report_HOJ_2025-11-24_20251125_082028.xlsx...
+[SAVE]   Excel: Final_Report_HOJ_2025-11-24_20251125_082028.xlsx (서식 적용 완료)
+[TOP10] 완료 ✔ 29.61s
+
+=== MODELENGINE 통합 실행기 (SIMPLE) 종료 ===

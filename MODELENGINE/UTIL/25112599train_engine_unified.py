@@ -10,8 +10,6 @@
 # ============================================================
 
 import os
-import numpy as np
-np.random.seed(42)
 import sys
 import re
 INT_PAT = re.compile(r"\d+")
@@ -218,10 +216,8 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
 # ------------------------------------------------------------
 # 4) 저장 (파일명 규칙 반영)
 # ------------------------------------------------------------
-def _hash_list(lst):
-    import hashlib
-    s = "|".join(map(str, lst)).encode('utf-8')
-    return hashlib.md5(s).hexdigest()
+def _hash_list(lst: list) -> str:
+    return str(abs(hash("|".join(map(str, lst)))))
 
 def _format_tags(db_version: str, data_date: str, horizon: int, input_window: int, n_estimators: int) -> str:
     d_tag = pd.to_datetime(data_date).strftime("%y%m%d")  # dYYMMDD
