@@ -7,7 +7,6 @@
 #  - Close/ClosePrice 자동 인식으로 타겟 생성
 #  - meta 저장: feature_hash, data_date, horizon, input_window, valid_days 등
 #  - 저장 규칙: MODELENGINE/HOJ_ENGINE/{REAL|RESEARCH}/HOJ_ENGINE_{MODE}_YYYYMMDD_w{input_window}.pkl
-#  - [추가] 실행 시 Research -> Real 순차 자동 실행 지원
 # ============================================================
 
 import os
@@ -96,7 +95,6 @@ NON_FEATURE_CANDIDATES = {
     "Name","name",
     "Open","High","Low","Close","ClosePrice","Adj Close","AdjClose","Volume","Amount",
     "open","high","low","close","volume","amount",
-    "KOSPI_Close", "KOSPI_Change" # [추가] KOSPI 단순 컬럼은 피처후보에서 제외
 }
 
 def pick_close_column(df: pd.DataFrame) -> str:
@@ -125,11 +123,9 @@ def load_latest_db(version: str = "V31") -> pd.DataFrame:
     return pd.read_parquet(latest)
 
 def select_feature_columns(df):
-    # [수정] 피처 제외 리스트 보강
     drop_cols = [
         'Date','Code','Open','High','Low','Close','Volume',
-        'Return_1d','Return_5d','Label_1d','Label_5d',
-        'KOSPI_Close', 'KOSPI_Change' 
+        'Return_1d','Return_5d','Label_1d','Label_5d'
     ]
     feats = []
     for col in df.columns:
@@ -197,7 +193,6 @@ def split_train_valid(df: pd.DataFrame, valid_days: int) -> tuple:
     train = df.loc[~is_valid].copy()
     valid = df.loc[ is_valid].copy()
     return train, valid, valid_start.date(), max_day.date()
-
 def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
     X_tr = df_m.loc[df_m["is_train"], features]
     y_reg_tr = df_m.loc[df_m["is_train"], "TargetRet"]
@@ -256,13 +251,12 @@ def save_engine(payload: dict, mode: str):
     tag = datetime.strptime(payload["meta"]["data_date"], "%Y-%m-%d").strftime("%y%m%d")
     # === A안 파일명 규칙 적용 ===
     # HOJ_ENGINE_{MODE}_V31_h{horizon}_w{window}_n{n}_{YYMMDD}.pkl
-    # [수정] 파일명 생성 로직 (f-string 중괄호 오류 수정 및 날짜 슬라이싱)
     fname = (
         f"HOJ_ENGINE_{mode.upper()}_V31"
         f"_h{payload['meta']['horizon']}"
         f"_w{payload['meta']['input_window']}"
         f"_n{payload['meta']['n_estimators']}"
-        f"_{tag.replace('-', '')[2:]}.pkl"
+        f"_{tag.replace('-', '')}[2:]}.pkl"
     )
 
     path = os.path.join(out_dir, fname)
@@ -287,46 +281,14 @@ def run_unified_training(
     """
     assert mode in ("real","research")
 
-    print(f"=== 🚀 Unified HOJ Trainer V31 ({mode.upper()}) ===")
+    print("=== 🚀 Unified HOJ Trainer V31 ===")
     print(f"[CFG] mode={mode}  horizon={horizon}  input_window={input_window}  valid_days={valid_days}  n_estimators={n_estimators}")
 
     # 1) DB 로드
     df = load_latest_db(version)
     close_col = pick_close_column(df)
-    
-    # [보완] Date 컬럼 타입 안전 변환
-    if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
-        df["Date"] = pd.to_datetime(df["Date"])
-        
     max_date = df["Date"].max().date()
     print(f"[DATA] DB max(Date) = {max_date}  | rows={len(df):,}")
-
-    # ============================================================
-    # [추가] 입구컷 SKIP: 이미 동일한 설정과 데이터 날짜의 엔진이 있으면 SKIP
-    # ============================================================
-    base = get_path("HOJ_ENGINE")
-    if os.path.isfile(base):
-        base = os.path.dirname(base)
-    out_dir = os.path.join(base, mode.upper())
-    ensure_dir(out_dir)
-
-    tag_chk = max_date.strftime("%y%m%d") # 251126
-    # 파일명 생성 규칙 (save_engine과 동일)
-    fname_chk = (
-        f"HOJ_ENGINE_{mode.upper()}_V31"
-        f"_h{horizon}"
-        f"_w{input_window}"
-        f"_n{n_estimators}"
-        f"_{tag_chk.replace('-', '')[2:]}.pkl"
-    )
-    path_chk = os.path.join(out_dir, fname_chk)
-
-    if os.path.exists(path_chk):
-        print(f"\n[SKIP] 이미 동일한 설정과 데이터 날짜의 엔진이 존재합니다.")
-        print(f"       파일명: {fname_chk}")
-        print("       (학습을 건너뜁니다.)")
-        return # <--- 해당 모드는 종료 (루프가 있으면 다음 모드로 넘어감)
-    # ============================================================
 
     # 2) 피처 선택
     features = select_feature_columns(df)
@@ -376,8 +338,7 @@ def run_unified_training(
 # ------------------------------------------------------------
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    # [수정] default='all' 로 변경 (Research -> Real 순차 실행)
-    ap.add_argument("--mode", default="all", choices=["real","research","all"])
+    ap.add_argument("--mode", default="research", choices=["real","research"])
     ap.add_argument("--horizon", type=int, default=5)
     ap.add_argument("--input_window", type=int, default=0)
     ap.add_argument("--valid_days", type=int, default=365)
@@ -385,24 +346,14 @@ if __name__ == "__main__":
     ap.add_argument("--version", default="V31")
     args = ap.parse_args()
 
-    # 실행할 모드 리스트 결정
-    if args.mode == "all":
-        modes_to_run = ["research", "real"]
-    else:
-        modes_to_run = [args.mode]
-
     try:
-        # [수정] 순차 실행 루프
-        for m in modes_to_run:
-            run_unified_training(
-                mode=m,
-                horizon=args.horizon,
-                input_window=args.input_window,
-                valid_days=args.valid_days,
-                n_estimators=args.n_estimators,
-                version=args.version,
-            )
-            print("-" * 60) # 구분선
-
+        run_unified_training(
+            mode=args.mode,
+            horizon=args.horizon,
+            input_window=args.input_window,
+            valid_days=args.valid_days,
+            n_estimators=args.n_estimators,
+            version=args.version,
+        )
     except Exception as e:
         print(f"\n❌ [Error] {e}")

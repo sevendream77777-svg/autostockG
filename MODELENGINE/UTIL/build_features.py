@@ -1,212 +1,248 @@
-# ============================================================
-# build_features.py (V32 - Full Date Range / NaN Allowed)
-#   - 앞부분 데이터(SMA_60 등 계산 불가 구간)를 삭제하지 않음
-#   - 1월 2일부터의 모든 날짜를 DB에 포함시킴
-# ============================================================
 
-import sys
 import os
-from typing import List, Optional
-import numpy as np
+import sys
+import re
 import pandas as pd
+import numpy as np
+from pathlib import Path
 
-# 프로젝트 경로 설정 (기존 유지)
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-try:
-    from UTIL.config_paths import get_path, versioned_filename
-    from UTIL.version_utils import find_latest_file, save_dataframe_with_date # [수정] 유틸 추가
-except ImportError:
-    from config_paths import get_path, versioned_filename
-    from version_utils import find_latest_file, save_dataframe_with_date # [수정] 유틸 추가
+# === 필수 추가 (UTIL 경로 인식) ===
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-def get_latest_date_from_parquet(path: str, date_cols: Optional[List[str]] = None):
-    if date_cols is None:
-        date_cols = ["Date", "날짜", "date"]
-    if not os.path.exists(path):
+from UTIL.version_utils import find_latest_file, load_raw_data, load_kospi_index
+
+# ============================================================
+#  BUILD FEATURES  —  Version V31 (Smart Skip & Fast, 251126)
+#   - Skip 로직: 파일명 내 YYMMDD 정규식 기반 추출
+#   - STOCH: 분모 clip(lower=1e-6)
+#   - CCI: 벡터화 (apply 제거, 산식 동일)
+#   - ALPHA_20: (종목수익률 - KOSPI수익률)의 20일 평균
+#   - 저장 직전 KOSPI 컬럼명 표준화
+#   - 스피너 안전 종료(try/finally)
+# ============================================================
+
+def _latest_tag_in_folder(feat_dir: Path, prefix: str):
+    """폴더 내 파일명에서 YYMMDD를 정규식으로 추출해 가장 최신 날짜를 반환."""
+    tags = []
+    if not feat_dir.exists():
         return None
-    try:
-        df = pd.read_parquet(path, columns=date_cols)
-    except Exception:
-        try:
-            df = pd.read_parquet(path)
-        except Exception:
-            return None
-    for col in date_cols:
-        if col in df.columns:
+    for fn in os.listdir(feat_dir):
+        if not fn.startswith(prefix) or not fn.endswith(".parquet"):
+            continue
+        # 파일명 전체에서 6자리 숫자(YYMMDD) 모두 추출
+        candidates = re.findall(r"(\d{6})", fn)
+        for c in candidates:
             try:
-                return pd.to_datetime(df[col]).max().date()
+                d = pd.to_datetime(c, format="%y%m%d").date()
+                tags.append(d)
             except Exception:
                 continue
-    return None
+    return max(tags) if tags else None
 
-def _compute_features(group: pd.DataFrame) -> pd.DataFrame:
-    g = group.sort_values("Date").copy()
-    c = g["Close"]; h = g["High"]; l = g["Low"]; v = g["Volume"]
-    r_mkt = g["KOSPI_수익률"]
+def build_features(raw_dir, kospi_dir, feat_dir):
+    print("------------------------------------------------------------")
+    print("[FEATURE] 피처 생성 시작 (V31 - 스마트 스킵 적용)")
+    print("------------------------------------------------------------")
 
-    # 1. 이동평균선 (SMA) - [수정] 다양한 기간 추가 (풀 옵션)
-    g["SMA_5"] = c.rolling(5).mean()
-    g["SMA_20"] = c.rolling(20).mean()
-    g["SMA_40"] = c.rolling(40).mean()   # 추가됨
-    g["SMA_60"] = c.rolling(60).mean()   # 앞쪽 59일은 NaN이 됨 (삭제 안 함)
-    g["SMA_90"] = c.rolling(90).mean()   # 추가됨
-    g["SMA_120"] = c.rolling(120).mean() # 추가됨 (장기/경기선)
+    # ------------------------------------------------------------
+    # 1) RAW 로드
+    # ------------------------------------------------------------
+    raw_path = find_latest_file(raw_dir, "all_stocks_cumulative")
+    if raw_path is None:
+        print(f"❌ RAW 파일을 찾을 수 없습니다. (경로: {raw_dir})")
+        return
 
-    g["VOL_SMA_20"] = v.rolling(20).mean()
+    print(f"  ✓ RAW 로딩: {raw_path.name}")
+    df = load_raw_data(raw_path)
 
-    # 2. RSI_14 추가 (누락된 핵심 지표 복구)
-    delta = c.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-    rs = gain / (loss + 1e-9)
-    g["RSI_14"] = 100 - (100 / (1 + rs))
+    # ------------------------------------------------------------
+    # 2) KOSPI 로드 및 전처리
+    # ------------------------------------------------------------
+    kospi_path = find_latest_file(kospi_dir, "kospi_data")
+    if kospi_path is None:
+        print(f"❌ KOSPI 파일을 찾을 수 없습니다. (경로: {kospi_dir})")
+        return
 
-    g["MOM_10"] = c.pct_change(10)
-    g["ROC_20"] = c.pct_change(20)
+    print(f"  ✓ KOSPI 로딩: {kospi_path.name}")
+    df_kospi = load_kospi_index(kospi_path)
 
-    ema12 = c.ewm(span=12, adjust=False).mean()
-    ema26 = c.ewm(span=26, adjust=False).mean()
-    macd = ema12 - ema26
-    g["MACD_12_26"] = macd
-    g["MACD_SIGNAL_9"] = macd.ewm(span=9, adjust=False).mean()
-
-    ma20 = c.rolling(20).mean()
-    std20 = c.rolling(20).std()
-    upper = ma20 + 2*std20
-    lower = ma20 - 2*std20
-    g["BBP_20"] = (c - lower) / (upper - lower + 1e-9)
-
-    prev_close = c.shift(1)
-    tr = pd.concat([(h-l).abs(), (h-prev_close).abs(), (l-prev_close).abs()], axis=1).max(axis=1)
-    g["ATR_14"] = tr.rolling(14).mean()
-
-    low14 = l.rolling(14).min(); high14 = h.rolling(14).max()
-    stoch_k = (c - low14) / (high14 - low14 + 1e-9)
-    g["STOCH_K"] = stoch_k; g["STOCH_D"] = stoch_k.rolling(3).mean()
-
-    tp = (h + l + c) / 3.0
-    ma_tp = tp.rolling(20).mean()
-    md = tp.rolling(20).apply(lambda x: np.mean(np.abs(x - x.mean())), raw=True)
-    g["CCI_20"] = (tp - ma_tp) / (0.015 * (md + 1e-9))
-
-    r_stock = c.pct_change()
-    g["ALPHA_SMA_20"] = (r_stock - r_mkt).rolling(20).mean()
-
-    return g
-
-def normalize_kospi(df_kospi: pd.DataFrame) -> pd.DataFrame:
-    if "Date" not in df_kospi.columns:
-        for cand in ["날짜", "date"]:
-            if cand in df_kospi.columns:
-                df_kospi = df_kospi.rename(columns={cand: "Date"})
-                break
-    if "Date" not in df_kospi.columns:
-        raise ValueError("[KOSPI] 'Date' 컬럼을 찾을 수 없습니다.")
-
-    df_kospi["Date"] = pd.to_datetime(df_kospi["Date"], errors="coerce")
-    df_kospi = df_kospi.dropna(subset=["Date"])
-
-    if "KOSPI_종가" not in df_kospi.columns:
-        for c in ["Close", "close", "종가", "KOSPI_Close", "adj_close"]:
-            if c in df_kospi.columns:
-                df_kospi = df_kospi.rename(columns={c: "KOSPI_종가"})
-                break
-        else:
-            raise ValueError("[KOSPI] 'KOSPI_종가' 또는 대체 가능한 종가 컬럼이 없습니다.")
-
-    df_kospi["KOSPI_종가"] = pd.to_numeric(df_kospi["KOSPI_종가"], errors="coerce")
-    df_kospi = df_kospi.dropna(subset=["KOSPI_종가"])
-
-    if "KOSPI_수익률" not in df_kospi.columns:
+    # [안전장치] 수익률 계산 및 컬럼명 변경
+    if "Date" in df_kospi.columns:
         df_kospi = df_kospi.sort_values("Date")
-        df_kospi["KOSPI_수익률"] = df_kospi["KOSPI_종가"].pct_change()
+    if "Close" in df_kospi.columns:
+        df_kospi["Change"] = df_kospi["Close"].pct_change()
 
-    df_kospi = df_kospi.sort_values("Date").drop_duplicates(subset=["Date"], keep="last").reset_index(drop=True)
-    return df_kospi[["Date", "KOSPI_종가", "KOSPI_수익률"]]
+    rename_map = {"Close": "KOSPI_Close", "Change": "KOSPI_Change"}
+    df_kospi = df_kospi.rename(columns=rename_map)
 
-def build_features():
-    # [수정] 최신 파일 탐색 로직 적용
-    raw_dir = get_path("RAW", "stocks")
-    raw_file = find_latest_file(raw_dir, "all_stocks_cumulative")
-    
-    kospi_dir = get_path("RAW", "kospi_data")
-    kospi_file = find_latest_file(kospi_dir, "kospi_data")
-    
-    # 저장할 폴더
-    feat_dir = get_path("FEATURE")
+    cols_to_use = ["Date"]
+    if "KOSPI_Close" in df_kospi.columns: cols_to_use.append("KOSPI_Close")
+    if "KOSPI_Change" in df_kospi.columns: cols_to_use.append("KOSPI_Change")
+    df_kospi = df_kospi[cols_to_use]
 
-    print("==============================================")
-    print("[FEATURE V32] 피처 생성 (NaN 유지 모드)")
-    
-    if not raw_file or not os.path.exists(raw_file):
-        print(f"❌ [CRITICAL] RAW 데이터 파일을 찾을 수 없습니다: {raw_dir}")
+    # ------------------------------------------------------------
+    # 3) 병합 및 날짜 확인 (★여기서 바로 SKIP 판단★)
+    # ------------------------------------------------------------
+    print("  ✓ RAW + KOSPI 병합")
+    df = df.merge(df_kospi, on="Date", how="left")
+    if "KOSPI_Close" in df.columns: df["KOSPI_Close"] = df["KOSPI_Close"].ffill()
+    if "KOSPI_Change" in df.columns: df["KOSPI_Change"] = df["KOSPI_Change"].fillna(0)
+
+    # 병합된 데이터 기준 최신 날짜 확인
+    feat_dates = pd.to_datetime(df["Date"], errors="coerce").dropna()
+    if len(feat_dates) == 0:
+        print("❌ 데이터에 Date가 없습니다.")
         return
-    print(f"  📥 최신 RAW 로드: {os.path.basename(raw_file)}")
 
-    if not kospi_file or not os.path.exists(kospi_file):
-        print(f"❌ [CRITICAL] KOSPI 데이터가 없습니다: {kospi_dir}")
-        return
-    print(f"  📥 최신 KOSPI 로드: {os.path.basename(kospi_file)}")
+    new_date = feat_dates.max().date()
+    new_tag = new_date.strftime("%y%m%d")
+    print(f"  → 데이터 최신 날짜: {new_date}")
 
-    # ---------------------------------------------------------------------------
-    # [추가] Skip Logic: RAW 파일의 마지막 날짜와 동일한 피처 파일이 이미 있으면 중단
-    # ---------------------------------------------------------------------------
-    try:
-        raw_date = get_latest_date_from_parquet(raw_file)
-        if raw_date:
-            raw_date_tag = raw_date.strftime("%y%m%d")
-            latest_feat = find_latest_file(feat_dir, "features_V31")
-            
-            if latest_feat and (raw_date_tag in os.path.basename(latest_feat)):
-                print("=" * 60)
-                print(f"✅ [SKIP] 최신 피처 파일이 이미 존재합니다. (Date: {raw_date_tag})")
-                print(f"   발견된 파일: {os.path.basename(latest_feat)}")
-                print("   (재생성을 원하시면 해당 파일을 삭제하거나 이동하세요.)")
-                print("=" * 60)
-                return
-    except Exception as e:
-        print(f"⚠️ [Warning] 날짜 확인 중 오류 발생 (그대로 진행): {e}")
-    # ---------------------------------------------------------------------------
+    # === [핵심] 기존 파일 확인 및 입구 컷 ===
+    prefix = "features_V31"
+    feat_dir = Path(feat_dir)
+    feat_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
-        df_raw = pd.read_parquet(raw_file)
-        df_kospi = pd.read_parquet(kospi_file)
-    except Exception as e:
-        print(f"❌ 파일 로드 실패: {e}"); return
+    latest_existing = _latest_tag_in_folder(feat_dir, prefix)
+    if latest_existing is not None and latest_existing >= new_date:
+        print(f"  ✓ [SKIP] 최신 파일이 이미 존재합니다. ({latest_existing} >= {new_date})")
+        print("       (지표 생성을 건너뜁니다.)")
+        print("------------------------------------------------------------")
+        return  # <--- ★ 무거운 계산 하기 전에 탈출! ★
 
-    df_raw["Date"] = pd.to_datetime(df_raw["Date"], errors="coerce")
-    df_raw = df_raw.dropna(subset=["Date"]).sort_values(["Date", "Code"]).reset_index(drop=True)
+    # ------------------------------------------------------------
+    # 4) 기술적 지표 생성 (SKIP 통과한 경우만 실행)
+    # ------------------------------------------------------------
+    print("  ✓ 신규 데이터 감지 -> 기술적 지표 생성 시작 (고속 연산)...")
 
-    try:
-        df_kospi = normalize_kospi(df_kospi)
-    except Exception as e:
-        print(f"❌ KOSPI 정규화 실패: {e}"); return
+    # === 처리중 스피너 시작 ===
+    import threading, time
+    __bf_running = True
+    def __bf_spinner():
+        sec = 0
+        while __bf_running:
+            sys.stdout.write(f"\r[처리중] {sec}초 경과")
+            sys.stdout.flush()
+            time.sleep(1)
+            sec += 1
+    __bf_thread = threading.Thread(target=__bf_spinner, daemon=True)
+    __bf_thread.start()
 
     try:
-        df = pd.merge(df_raw, df_kospi, on="Date", how="inner")
-    except KeyError as e:
-        print(f"❌ 병합 실패 (컬럼명 확인 필요): {e}"); return
+        # 속도 최적화 (정렬)
+        df.sort_values(["Code", "Date"], inplace=True)
+        df.reset_index(drop=True, inplace=True)
 
-    before_rows = len(df)
-    print("  ... 기술적 지표 계산 중 (시간이 다소 소요될 수 있음)")
-    df_feat = df.groupby("Code", group_keys=False).apply(_compute_features)
+        # groupby 객체 미리 생성
+        g = df.groupby("Code")
 
-    after_rows = len(df_feat)
-    print(f"  - 생성 결과: {before_rows:,} → {after_rows:,} 행 (삭제 없음, NaN 유지)")
-    print("  - 최종 피처 개수: 15개 이상 (확장됨)")
+        # (1) 이동평균 (SMA)
+        for w in [5, 20, 40, 60, 90, 120]:
+            df[f"SMA_{w}"] = g["Close"].transform(lambda x: x.rolling(w).mean())
 
-    # [수정] 기존 파일 덮어쓰기 대신 날짜 태그 저장
-    try:
-        saved_path = save_dataframe_with_date(df_feat, feat_dir, "features_V31", date_col="Date")
-        if saved_path:
-            print(f"  🎉 [완료] 피처 저장: {os.path.basename(saved_path)}")
-    except Exception as e:
-        print(f"❌ 저장 실패: {e}"); return
+        # (2) 거래량 평균
+        df["VOL_SMA_20"] = g["Volume"].transform(lambda x: x.rolling(20).mean())
 
+        # (3) RSI (현행 유지)
+        delta = g["Close"].diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        roll_gain = gain.groupby(df['Code']).rolling(14).mean().reset_index(0, drop=True)
+        roll_loss = loss.groupby(df['Code']).rolling(14).mean().reset_index(0, drop=True)
+        rs = roll_gain / roll_loss.replace(0, 1e-6)
+        df["RSI_14"] = 100 - (100 / (1 + rs))
+
+        # (4) STOCHASTIC (clip 포함 + 분모 보정)
+        high14 = g["High"].transform(lambda x: x.rolling(14).max())
+        low14  = g["Low"].transform(lambda x: x.rolling(14).min())
+        denom = (high14 - low14).clip(lower=1e-6)
+        df["STOCH_K"] = ((df["Close"] - low14) / denom).clip(0, 1)
+        df["STOCH_D"] = df.groupby("Code")["STOCH_K"].transform(lambda x: x.rolling(3).mean())
+
+        # (5) MOM / ROC
+        df["MOM_10"] = g["Close"].diff(10)
+        df["ROC_20"] = g["Close"].pct_change(20)
+
+        # (6) MACD
+        ema12 = g["Close"].transform(lambda x: x.ewm(span=12, adjust=False).mean())
+        ema26 = g["Close"].transform(lambda x: x.ewm(span=26, adjust=False).mean())
+        df["MACD_12_26"] = ema12 - ema26
+        df["MACD_SIGNAL_9"] = df.groupby("Code")["MACD_12_26"].transform(lambda x: x.ewm(span=9, adjust=False).mean())
+
+        # (7) BBP
+        mband = df["SMA_20"]
+        std20 = g["Close"].transform(lambda x: x.rolling(20).std())
+        ub = mband + 2 * std20
+        lb = mband - 2 * std20
+        df["BBP_20"] = (df["Close"] - lb) / (ub - lb).replace(0, 1e-6)
+
+        # (8) ATR
+        prev_close = g["Close"].shift(1)
+        high_low = df["High"] - df["Low"]
+        high_close = (df["High"] - prev_close).abs()
+        low_close = (df["Low"] - prev_close).abs()
+        tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+        df["ATR_14"] = tr.groupby(df["Code"]).rolling(14).mean().reset_index(0, drop=True)
+
+        # (9) CCI — 벡터 최적화 (산식 동일)
+        tp = (df["High"] + df["Low"] + df["Close"]) / 3
+        sma_tp = tp.groupby(df["Code"]).transform(lambda x: x.rolling(20).mean())
+        abs_dev = (tp - sma_tp).abs()
+        mad = abs_dev.groupby(df["Code"]).transform(lambda x: x.rolling(20).mean())
+        mad = mad.replace(0, 1e-6)
+        df["CCI_20"] = (tp - sma_tp) / (0.015 * mad)
+
+        # (10) 금융 ALPHA_20 = (종목수익률 - KOSPI수익률)의 20일 평균
+        stock_ret = g["Close"].pct_change()
+        if "KOSPI_Change" in df.columns:
+            kospi_ret = df["KOSPI_Change"]
+        else:
+            # 혹시 모를 누락 대비
+            kospi_ret = 0.0
+        excess = stock_ret - kospi_ret
+        df["ALPHA_20"] = excess.groupby(df["Code"]).transform(lambda x: x.rolling(20).mean())
+
+    finally:
+        # 스피너 종료 보장
+        __bf_running = False
+        try:
+            __bf_thread.join(timeout=1)
+        except Exception:
+            pass
+        sys.stdout.write("\n")  # 스피너 잔상 제거
+        sys.stdout.flush()
+
+    # ------------------------------------------------------------
+    # 5) 저장
+    # ------------------------------------------------------------
+    base = Path(feat_dir) / f"{prefix}_{new_tag}.parquet"
+    out = base
+    i = 1
+    while out.exists():
+        out = Path(feat_dir) / f"{prefix}_{new_tag}_{i}.parquet"
+        i += 1
+
+    # === KOSPI 컬럼명 표준화 ===
+    df.rename(columns={
+        "KOSPI_Close": "KOSPI_종가",
+        "KOSPI_Change": "KOSPI_수익률",
+    }, inplace=True)
+
+    print(f"  ✓ 저장 경로: {out}")
+    df.rename(columns={"ALPHA_20": "ALPHA_SMA_20"}, inplace=True)
+    df.to_parquet(out, index=False)
+    print(f"  🎉 FEATURE 저장 완료: {out.name}")
+    print("------------------------------------------------------------")
     print("[FEATURE] 작업 완료")
+    print("------------------------------------------------------------")
 
-def main():
-    build_features()
 
 if __name__ == "__main__":
-    main()
+    ROOT = Path(__file__).resolve().parents[1]
+    RAW_DIR = ROOT / "RAW" / "stocks"
+    KOSPI_DIR = ROOT / "RAW" / "kospi_data"
+    FEAT_DIR = ROOT / "FEATURE"
+
+    build_features(RAW_DIR, KOSPI_DIR, FEAT_DIR)

@@ -69,67 +69,24 @@ def pick_close_col(df):
     raise KeyError("종가 컬럼 찾지 못함(Close/ClosePrice/종가/가격).")
 
 
-
 def find_engine_real():
-    """엔진 파일 중 데이터날짜 최신 → h=5,w=60,n=1000 기준과 가장 가까운 옵션 선택"""
+    """HOJ_ENGINE/REAL 폴더에서 최신 엔진 자동 찾기"""
     base_root = get_path("HOJ_ENGINE")
     if os.path.isfile(base_root):
         base_root = os.path.dirname(base_root)
+
     real_dir = os.path.join(base_root, "REAL")
     if not os.path.isdir(real_dir):
         raise FileNotFoundError("REAL 폴더 없음: " + real_dir)
 
-    # 후보 수집
-    cands = []
-    for fn in os.listdir(real_dir):
-        if fn.startswith("HOJ_ENGINE_REAL") and fn.endswith(".pkl"):
-            cands.append(fn)
-    if not cands:
+    # .pkl 확장자 지정
+    latest = find_latest_file(real_dir, "HOJ_ENGINE_REAL", extension=".pkl")
+    if not latest:
         raise FileNotFoundError("REAL 폴더에 엔진이 없습니다.")
 
-    def parse(fn):
-        # extract tokens
-        parts = fn.split("_")
-        # last is YYMMDD.pkl
-        date_token = parts[-1].replace(".pkl","")
-        try:
-            d = int(date_token)
-        except:
-            d = -1
-        h=w=n=None
-        for p in parts:
-            if p.startswith("h"):
-                try: h=int(p[1:])
-                except: pass
-            if p.startswith("w"):
-                try: w=int(p[1:])
-                except: pass
-            if p.startswith("n"):
-                try: n=int(p[1:])
-                except: pass
-        return d,h,w,n
+    return latest
 
-    parsed=[]
-    for fn in cands:
-        d,h,w,n = parse(fn)
-        parsed.append((d,h,w,n,fn))
 
-    # 최신 날짜
-    maxd = max(p[0] for p in parsed)
-    same=[p for p in parsed if p[0]==maxd]
-
-    # 기준값
-    H0=5; W0=60; N0=1000
-
-    def score(p):
-        _,h,w,n,fn = p
-        sh = abs((h or H0)-H0)
-        sw = abs((w or W0)-W0)
-        sn = abs((n or N0)-N0)
-        return (sh, sw, sn, fn)
-
-    chosen = min(same, key=score)
-    return os.path.join(real_dir, chosen[4])
 def load_latest_db(version="V31"):
     db_dir = get_path("HOJ_DB")
     latest = find_latest_file(db_dir, f"HOJ_DB_{version}")

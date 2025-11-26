@@ -6,8 +6,8 @@
 # 3. [오염 방지] 장 마감(16:00) 전에는 백업(Rename) 생략
 # ============================================================
 
-import os
 import sys
+import os
 import pandas as pd
 import FinanceDataReader as fdr
 from datetime import datetime, time, timedelta
@@ -162,6 +162,7 @@ def main():
         # print(f"💾 [저장 완료] {os.path.basename(target_path)} (경로: RAW/kospi_data/)")
         
         # === KOSPI 저장 로직 (내부 날짜 기준) ===
+        import os
         from pathlib import Path
         df_dates = pd.to_datetime(df_final["Date"], errors="coerce").dropna()
         if len(df_dates)==0:

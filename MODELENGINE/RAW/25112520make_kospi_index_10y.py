@@ -6,8 +6,8 @@
 # 3. [오염 방지] 장 마감(16:00) 전에는 백업(Rename) 생략
 # ============================================================
 
-import os
 import sys
+import os
 import pandas as pd
 import FinanceDataReader as fdr
 from datetime import datetime, time, timedelta
@@ -161,37 +161,15 @@ def main():
         # df_final.to_parquet(target_path, index=False)
         # print(f"💾 [저장 완료] {os.path.basename(target_path)} (경로: RAW/kospi_data/)")
         
-        # === KOSPI 저장 로직 (내부 날짜 기준) ===
-        from pathlib import Path
-        df_dates = pd.to_datetime(df_final["Date"], errors="coerce").dropna()
-        if len(df_dates)==0:
-            print("❌ KOSPI 저장 실패: Date 없음")
-            return
-        new_date = df_dates.max().date()
-        tag = new_date.strftime("%y%m%d")
-        prefix="kospi_data"
-        out_dir = Path(target_dir)
-        # 기존 파일 날짜 읽기
-        existing=[]
-        for fn in os.listdir(out_dir):
-            if fn.startswith(prefix) and fn.endswith(".parquet"):
-                try:
-                    dtag=fn.split("_")[1].split(".")[0]
-                    d=pd.to_datetime(dtag,format="%y%m%d").date()
-                    existing.append(d)
-                except: pass
-        if existing and max(existing)>=new_date:
-            print(f"✓ SKIP (기존 {max(existing)} >= 신규 {new_date})")
-            return
-        # 저장 (_1,_2 증가)
-        base=out_dir/f"{prefix}_{tag}.parquet"
-        out=base
-        i=1
-        while out.exists():
-            out=out_dir/f"{prefix}_{tag}_{i}.parquet"
-            i+=1
-        df_final.to_parquet(out,index=False)
-        print(f"💾 저장 완료: {out.name}")
+        # [변경]: save_dataframe_with_date 함수를 사용하여 내부 DF의 Max Date를 태그로 붙여 저장
+        saved_path = save_dataframe_with_date(df_final, target_dir, "kospi_data", date_col="Date")
+        if saved_path:
+            print(f"💾 [저장 완료] {os.path.basename(saved_path)} (경로: RAW/kospi_data/, 날짜 태그 적용)")
+        else:
+            print("  ▶ KOSPI 데이터 저장 건너뜀 (최신 파일이 이미 존재)")
+        # ------------------------------------------------------------
+        # [수정 끝]
+        # ------------------------------------------------------------
         
     else:
         print("\n❌ [실패] 모든 소스 수집 실패")

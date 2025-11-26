@@ -1,149 +1,178 @@
-# ============================================
-# version_utils.py
-# 버전 파일 / 날짜 기반 셀렉터 (V32 스펙 업데이트)
-# ============================================
 
 import os
-import shutil
-import datetime
-import glob
-import pandas as pd  # 날짜 확인용
+import re
+from pathlib import Path
+from typing import Optional, List, Tuple
+import pandas as pd
 
-def get_timestamp():
-    """현재 날짜 타임스탬프 (예: 251123)"""
-    return datetime.datetime.now().strftime("%y%m%d")
+# ============================================================
+# version_utils.py  —  Stable utilities (V31 policy)
+#   - find_latest_file: pick latest file by internal or filename date
+#   - save_dataframe_with_date: tag by internal max(Date), no overwrite, _1/_2 suffix
+#   - versioned_filename: helper (kept for compatibility)
+# ============================================================
 
-# -----------------------------------------------------------
-# [V32 추가] 최신 날짜 태그 기반 파일 검색
-# -----------------------------------------------------------
+_TAG_RE = re.compile(r'_(\d{6})(?:_\d+)?\.parquet$', re.IGNORECASE)
 
-def find_latest_file(directory, prefix, extension=".parquet"):
-    """
-    directory 내에서 'prefix_YYMMDD*.extension' 패턴을 가진
-    파일 중 가장 최신(정렬 기준 마지막) 파일을 반환한다.
-    예: features_V31_251123_1.parquet
-    """
-    search_pattern = os.path.join(directory, f"{prefix}_*{extension}")
-    files = glob.glob(search_pattern)
-    
-    if not files:
-        # 날짜 없는 레거시 무시 (패치)
+def _extract_date_tag_from_name(name: str) -> Optional[pd.Timestamp]:
+    m = _TAG_RE.search(name)
+    if not m:
         return None
-
-    latest_file = sorted(files)[-1]
-    return latest_file
-
-# -----------------------------------------------------------
-# [핵심] 날짜 정책 완전 패치
-# FEATURE / HOJ_DB 파일 → 무조건 파일 내부 Date 마지막날짜로 저장
-# 오늘 날짜 fallback, SKIP 로직 전부 제거
-# -----------------------------------------------------------
-
-def save_dataframe_with_date(df, base_dir, file_prefix, date_col="Date", extension=".parquet"):
-    """
-    DF 내부 최대 날짜(Max Date)를 읽어 파일명에 YYMMDD 태그로 저장.
-    날짜 없는 파일 생성 금지.
-    파일 중복 시 _1, _2 시퀀스 생성.
-    """
-
-    os.makedirs(base_dir, exist_ok=True)
-
-    # 1. 날짜 태그 = 무조건 데이터 마지막 날짜
-    if date_col not in df.columns or df.empty:
-        raise ValueError(f"[ERROR] '{date_col}' 컬럼이 없어서 날짜 태그 생성 불가")
-
-    if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
-        temp_dates = pd.to_datetime(df[date_col], errors='coerce')
-        max_date = temp_dates.max()
-    else:
-        max_date = df[date_col].max()
-
-    if pd.isnull(max_date):
-        raise ValueError("[ERROR] Date 컬럼에서 유효한 날짜를 찾을 수 없음")
-
-    date_tag = max_date.strftime("%y%m%d")
-
-    # 2. 파일명 생성
-    base_filename = f"{file_prefix}_{date_tag}"
-    save_path = os.path.join(base_dir, f"{base_filename}{extension}")
-
-    # 3. 중복 처리 (_1, _2…)
-    counter = 1
-    while os.path.exists(save_path):
-        save_path = os.path.join(base_dir, f"{base_filename}_{counter}{extension}")
-        counter += 1
-    
-    # 4. 저장
     try:
-        if extension == ".parquet":
-            df.to_parquet(save_path, index=False)
-        elif extension == ".csv":
-            df.to_csv(save_path, index=False)
-
-        print(f"  ▶ [저장 완료] {os.path.basename(save_path)} (Rows: {len(df):,}, Date: {date_tag})")
-        return save_path
-    except Exception as e:
-        print(f"[ERROR] 저장 실패: {e}")
-        return None
-
-# -----------------------------------------------------------
-# [유틸 함수] 기존 파일 백업
-# -----------------------------------------------------------
-
-def backup_existing_file(file_path, date_tag: str | None = None):
-    """기존 파일이 있을 경우 백업 생성"""
-    if not os.path.exists(file_path):
-        return None
-
-    dirname, filename = os.path.split(file_path)
-    name, ext = os.path.splitext(filename)
-
-    ts = (date_tag or _infer_parquet_date_tag(file_path) or get_timestamp())
-
-    backup_name = f"{name}_{ts}{ext}"
-    backup_path = os.path.join(dirname, backup_name)
-
-    counter = 1
-    while os.path.exists(backup_path):
-        backup_name = f"{name}_{ts}_{counter}{ext}"
-        backup_path = os.path.join(dirname, backup_name)
-        counter += 1
-
-    try:
-        shutil.move(file_path, backup_path)
-        print(f"  ▶ 백업 생성: {os.path.basename(backup_path)}")
-    except Exception as e:
-        print(f"  ※ 백업 이동 실패: {e}")
-    return backup_path
-
-def save_new_file(df, save_path):
-    """(Deprecated) 신규 파일 저장 유틸 함수"""
-    backup_existing_file(save_path)
-
-    dirname = os.path.dirname(save_path)
-    os.makedirs(dirname, exist_ok=True)
-
-    df.to_parquet(save_path, index=False)
-    print(f"  ▶ 새 파일 저장 완료: {save_path}")
-
-def _infer_parquet_date_tag(file_path: str) -> str | None:
-    """기존 parquet 파일에서 Date 컬럼을 읽어 YYMMDD 태그를 추출"""
-    try:
-        if os.path.exists(file_path) and file_path.lower().endswith((".parquet", ".pq")):
-            try:
-                df = pd.read_parquet(file_path, columns=["Date"])
-            except:
-                df = pd.read_parquet(file_path)
-            
-            if "Date" in df.columns and not df.empty:
-                if not pd.api.types.is_datetime64_any_dtype(df["Date"]):
-                    dt_series = pd.to_datetime(df["Date"], errors="coerce")
-                else:
-                    dt_series = df["Date"]
-                
-                latest = dt_series.max()
-                if pd.notnull(latest):
-                    return latest.strftime("%y%m%d")
+        return pd.to_datetime(m.group(1), format="%y%m%d")
     except Exception:
-        pass
+        return None
+
+def _max_date_from_parquet(path: Path, date_col: str = "Date") -> Optional[pd.Timestamp]:
+    try:
+        df = pd.read_parquet(path, columns=[date_col])
+        s = pd.to_datetime(df[date_col], errors="coerce").dropna()
+        return s.max() if not s.empty else None
+    except Exception:
+        return None
+
+# ------------------------------------------------------------
+# Public: find_latest_file
+#   - scans dir for files starting with prefix and ending .parquet
+#   - picks latest by internal max(Date) if available,
+#     otherwise falls back to filename date tag,
+#     finally falls back to mtime.
+# ------------------------------------------------------------
+def find_latest_file(dir_path, prefix: str, date_col: str = "Date") -> Optional[Path]:
+    dir_p = Path(dir_path)
+    if not dir_p.exists():
+        return None
+
+    candidates: List[Path] = [
+        p for p in dir_p.iterdir()
+        if p.is_file() and p.name.startswith(prefix) and p.suffix.lower() == ".parquet"
+    ]
+    if not candidates:
+        return None
+
+    scored: List[Tuple[pd.Timestamp, Path]] = []
+    fallback_name: List[Tuple[pd.Timestamp, Path]] = []
+    fallback_mtime: List[Tuple[float, Path]] = []
+
+    for p in candidates:
+        # Try internal date
+        md = _max_date_from_parquet(p, date_col=date_col)
+        if md is not None:
+            scored.append((md, p))
+            continue
+        # Try filename tag
+        dt = _extract_date_tag_from_name(p.name)
+        if dt is not None:
+            fallback_name.append((dt, p))
+            continue
+        # Fallback: mtime
+        try:
+            fallback_mtime.append((p.stat().st_mtime, p))
+        except Exception:
+            pass
+
+    if scored:
+        scored.sort(key=lambda x: (x[0], x[1].name))
+        return scored[-1][1]
+    if fallback_name:
+        fallback_name.sort(key=lambda x: (x[0], x[1].name))
+        return fallback_name[-1][1]
+    if fallback_mtime:
+        fallback_mtime.sort(key=lambda x: (x[0], x[1].name))
+        return fallback_mtime[-1][1]
     return None
+
+# ------------------------------------------------------------
+# Public: save_dataframe_with_date
+#   - Tag = internal max(Date) of df
+#   - Skip if any existing file (same prefix) has internal max(Date) >= new
+#   - Otherwise save with no overwrite; use _1, _2 ... suffix if needed
+#   - Return saved path (str); return None if skipped
+# ------------------------------------------------------------
+def save_dataframe_with_date(
+    df: pd.DataFrame,
+    dir_path,
+    prefix: str,
+    date_col: str = "Date",
+    ext: str = ".parquet"
+) -> Optional[str]:
+    dir_p = Path(dir_path)
+    dir_p.mkdir(parents=True, exist_ok=True)
+
+    # Determine new date from dataframe
+    dates = pd.to_datetime(df[date_col], errors="coerce").dropna()
+    if dates.empty:
+        print(f"[WARN] {prefix}: no valid '{date_col}' to determine date tag; skip")
+        return None
+    new_date = dates.max().date()
+    date_tag = pd.to_datetime(new_date).strftime("%y%m%d")
+
+    # Scan existing files and read their internal dates
+    existing: List[Path] = [
+        p for p in dir_p.iterdir()
+        if p.is_file() and p.name.startswith(prefix) and p.suffix.lower() == ext.lower()
+    ]
+
+    max_exist: Optional[pd.Timestamp] = None
+    for p in existing:
+        md = _max_date_from_parquet(p, date_col=date_col)
+        if md is not None:
+            if (max_exist is None) or (md > max_exist):
+                max_exist = md
+
+    # Skip if existing >= new
+    if (max_exist is not None) and (max_exist.date() >= new_date):
+        print(f"[SKIP] {prefix}: existing {max_exist.date()} >= new {new_date}")
+        return None
+
+    # Build output path with suffix increment (no overwrite)
+    base = dir_p / f"{prefix}_{date_tag}{ext}"
+    out = base
+    idx = 1
+    while out.exists():
+        out = dir_p / f"{prefix}_{date_tag}_{idx}{ext}"
+        idx += 1
+
+    # Save
+    df.to_parquet(out, index=False)
+    return str(out)
+
+# ------------------------------------------------------------
+# Public: versioned_filename (compat helper)
+# ------------------------------------------------------------
+def versioned_filename(prefix: str, date_tag: str, idx: int = 0, ext: str = ".parquet") -> str:
+    if idx and idx > 0:
+        return f"{prefix}_{date_tag}_{idx}{ext}"
+    return f"{prefix}_{date_tag}{ext}"
+
+# ============================================================
+# [추가] build_features.py 지원을 위한 데이터 로드 함수
+# (raw_utils.py가 없어서 발생하는 에러를 여기서 처리)
+# ============================================================
+def load_raw_data(file_path):
+    """
+    주식 원본 데이터(RAW)를 로드합니다.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"파일을 찾을 수 없습니다: {path}")
+
+    print(f"  [Loader] 읽는 중: {path.name}")
+    try:
+        if path.suffix == '.parquet':
+            df = pd.read_parquet(path)
+        else:
+            df = pd.read_csv(path)
+            
+        if 'Date' in df.columns:
+            df['Date'] = pd.to_datetime(df['Date'])
+        return df
+    except Exception as e:
+        print(f"  ❌ 데이터 로드 실패: {e}")
+        raise
+
+def load_kospi_index(file_path):
+    """
+    KOSPI 지수 데이터를 로드합니다.
+    """
+    return load_raw_data(file_path)

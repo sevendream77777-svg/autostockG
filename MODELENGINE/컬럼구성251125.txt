@@ -1,0 +1,12 @@
+RAW(일별 DAILY/20251117.parquet): 컬럼 7개 Date, Code, Open, High, Low, Close, Volume
+KOSPI 조인 결과(피처에 반영): KOSPI_종가, KOSPI_수익률 2개
+피처/DB 공통 스키마(총 30개 = 원본/메타 10 + KOSPI 2 + 파생 18)
+원본/메타 10: Date, Code, Open, High, Low, Close, Volume, Change, Name, Market
+KOSPI 2: KOSPI_종가, KOSPI_수익률
+파생 18: SMA_5, SMA_20, SMA_40, SMA_60, SMA_90, SMA_120, VOL_SMA_20, RSI_14, MOM_10, ROC_20, MACD_12_26, MACD_SIGNAL_9, BBP_20, ATR_14, STOCH_K, STOCH_D, CCI_20, ALPHA_SMA_20
+검증 결과 요약
+RAW↔FEATURE 공통 컬럼 값 차이: 0 (Open/High/Low/Close/Volume 절대차 합계 0)
+키 누락/중복: 없음 ((Code, Date) 매칭 정상, 중복 0)
+NaN: 롤링 지표 초기 구간에서만 발생(SMA_120~40 등); 자연스러운 패턴
+KOSPI 컬럼 결측: 0%
+파생 지표 재계산 비교: 주요 12개 지표 max diff ≈ 0 (CCI_20도 1e-6 수준 오차)

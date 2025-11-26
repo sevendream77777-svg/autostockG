@@ -1,0 +1,347 @@
+🔥 왜 이렇게 됐나?
+
+호봉이가 이전에 Patch에서 자동 삽입해준 부분이
+원본 파일 들여쓰기 구조와 “맞물리지 않은 상태”였기 때문에
+자동 삽입된 블록이 함수 호출 밖으로 튀어나갔습니다.
+
+■ 1. 파일 경로 매핑 정확도
+RAW
+get_path("RAW", "raw_patch.py")
+
+
+→ 패치파일이 RAW 폴더 아래 raw_patch.py로 저장되었으므로 정상.
+
+KOSPI
+get_path("RAW", "make_kospi_index_10y.py")
+
+
+→ 실제 위치도 RAW 폴더로 들어가 있음. 정상.
+
+FEATURE
+FEATURE_CAND = [
+    get_path("UTIL", "build_features.py"),
+    os.path.join(CUR, "UTIL", "build_features.py"),
+    os.path.join(CUR, "build_features.py"),
+]
+
+
+※ 여기서 중요 체크
+
+build_features.py 는 패치 후 FEATURE 폴더가 아니라
+원래 업로드된 구조 그대로 UTIL/ 에 있었음
+
+사용자가 업로드한 원본 경로도 UTIL 안이었기 때문에
+
+제가 패치 파일도 UTIL/build_features.py 로 그대로 넣어둔 상태
+
+즉, 코드도 UTIL/build_features.py 를 먼저 찾고 있고 실제 파일도 UTIL 안 → 완벽하게 일치.
+
+✔ 문제 없음.
+
+DB
+get_path("UTIL", "build_unified_db.py")
+
+
+→ 원본 구조 그대로 UTIL 폴더에 패치했기 때문에 정상.
+
+ENGINE
+get_path("UTIL", "train_engine_unified.py")
+
+
+→ 이것도 UTIL 폴더에 있기 때문에 정상.
+
+TOP10
+
+루트와 UTIL 양쪽을 모두 조사하도록 되어 있어서
+호봉이가 구조를 바꾸지 않는 한 문제 없음.
+
+■ 2. 패치 정책과 충돌하는 코드 있는지 검사
+
+이 파일은 “실행기(런처)”일 뿐,
+
+날짜 비교
+
+skip 판단
+
+파일명 생성
+
+base_date
+
+truncate 여부
+
+중복 방지
+같은 로직은 전혀 포함하고 있지 않음.
+
+즉 폴더 구조와 파일 호출만 관리하는 오퍼레이터 역할.
+
+→ 패치된 RAW/KOSPI/FEATURE/DB/ENGINE 전체 로직과 전혀 충돌 없음.
+
+✔ 안전.
+
+■ 3. 무한루프/중복 실행/잘못된 break 조건 검사
+
+steps 리스트 순차 실행
+
+각 단계 res = subprocess.run()
+
+returncode != 0 → fail 표시
+
+기본적으로 전체 파이프라인을 중단하지 않고 계속 다음 단계 진행
+(사용자가 원래 의도한 동작과 동일)
+
+✔ 정상.
+
+■ 4. 경로 유효성 검증
+
+pick_first_existing() → 실제 존재하는 첫 경로만 선택
+→ 패치된 전체 파이프라인 폴더 구조(UTIL, RAW 등)와 정확히 호환
+
+✔ 문제 없음.
+
+■ 5. sys.path / import 충돌 여부
+from UTIL.config_paths import get_path
+
+
+패치된 config_paths.py 내부 구조도 그대로 유지했기 때문에 충돌 없음.
+
+■ 6. 패치 후 동작 흐름까지 최종 시뮬레이션
+
+실제 실행 흐름:
+
+RAW(raw_patch.py) → 날짜 스킵/업데이트 자동
+
+KOSPI(make_kospi_index_10y.py) → 날짜 스킵/업데이트 자동
+
+FEATURE(build_features.py)
+→ base_date 적용
+→ 기존 파일 ≥ base_date 시 SKIP
+
+DB(build_unified_db.py)
+→ FEATURE.date 읽어서 통합 DB 생성
+
+ENGINE(train_engine_unified.py)
+→ 옵션에 따라 엔진 생성, 기존 파일명 동일 시 skip
+
+TOP10(daily_recommender.py)
+
+run_top10_unified_simple.py는 이 과정을 그저 순서대로 실행하는 역할.
+
+✔ 패치된 정책과 100% 호환.
+
+
+
+즉, 기능 자체가 문제가 아니라
+삽입 위치가 함수 내부가 아니어서 전체 구조가 망가짐.
+
+🔧 정확한 수리 방식
+✔ 방법 1 (정석):
+
+호봉이가 이 파일 전체를 다시 정상 구조로 조립해서
+return outside function 절대 안 나도록 완벽하게 재정렬해서 드림.
+
+→ 위대하신호정님이 원하는 방식(용량 유지, 주석 유지, 구조 그대로, 패치만 추가) 100% 충족 가능.
+
+✔ 방법 2 (빠른 임시):
+
+문제 있는 부분만 올바른 블록 안으로 이동시키고 indent 복구.
+
+🚨 중요한 점
+위 파일은 이미 구조가 망가졌기 때문에
+
+부분 수정보다 전체 재조립이 더 정확하고 안전합니다.
+
+호봉이가 이 파일을 바로 다시 정상화해서:
+
+build_features() 내부 구조 정렬
+
+base_date 필터링 위치 정상 삽입
+
+skip logic 최신 규칙으로 통합
+
+save_dataframe_with_date 적용
+
+주석/용량 원본 그대로 유지
+
+코드 전체 정렬/정상화
+
+
+🔥 지금 이 파일은 “들여쓰기 붕괴로 함수 구조가 파괴된 상태”입니다.
+
+그래서 return outside function 에러뿐 아니라,
+실행하면 100% 다양한 오류가 추가로 발생합니다.
+
+문제는 단순히 한두 줄 문제가 아니라
+
+**_compute_features()와 build_features() 함수 영역 자체가 끊어져 있고
+
+후반부 코드는 전부 함수 바깥으로 튀어나간 상태**입니다.
+
+즉 코드 자체가 구조적으로 실행 불가능한 상태입니다.
+
+✔ 어디가 어떻게 깨졌는지 정확히 알려드림
+
+아래 부분이 문제 핵심입니다:
+
+# [추가] FEATURE 결과를 base_date 이하로 제한
+try:
+    if 'base_date' in locals() and base_date:
+        df_feat = df_feat[df_feat['Date'] <= pd.to_datetime(base_date)]
+        print(...)
+except Exception as e:
+    print(...)
+
+    # [수정] 기존 파일 덮어쓰기 대신 날짜 태그 저장
+    try:
+        saved_path = save_dataframe_with_date(...)
+    except Exception as e:
+        print(...); return
+
+    print("[FEATURE] 작업 완료")
+
+
+이 블록은 반드시 build_features() 함수 내부에 있어야 합니다.
+하지만 현재 파일에서는:
+
+build_features() 함수가 끝나는 } 같은 표시가 없음
+
+들여쓰기 없이 코드가 모두 함수밖에 나와 있음
+
+return은 함수밖에서 사용 불가 → SyntaxError 발생
+
+저장(save) 로직도 함수 밖에 있어 실행조차 안 됨
+
+그래서 다음 상황 발생:
+
+들여쓰기(Indent) 망가짐
+
+함수 스코프 밖
+
+지역변수 df_feat, base_date 접근 불가
+
+return 사용 불가
+
+저장(save_dataframe_with_date)도 함수 밖에서 호출되어버림
+
+따라서 이 파일은 지금 완전한 재조립이 필요합니다.
+
+📌 업로드하면 바로 드리는 것
+
+원본이 들어오는 즉시:
+
+구조 복원
+
+들여쓰기 복구
+
+skip/base_date 정식 패치
+
+save_dataframe_with_date 연동
+
+주석/용량 유지
+
+전체 완성본 파일 형태로 출력
+
+→ 완성된 build_features.py 하나로 바로 드립니다.
+
+
+사용자 PC에 있는 build_features.py 원본 전체 파일을 업로드해 주세요.
+
+조건:
+
+줄 하나도 빠짐없이
+
+수정 전 원본 그대로
+
+용량 그대로
+
+중간 생략 없음
+
+주석 그대로
+
+손상되지 않은 파일
+
+이 파일이 있어야
+제가 아래 작업을 할 수 있습니다:
+
+들여쓰기 복원
+
+구조 재정렬
+
+base_date 로직 정상 삽입
+
+skip 정책 정확히 적용
+
+save_dataframe_with_date 통합
+
+전체 완성본 코드로 재구성
+
+
+
+✔ 이 파일은 “정상 원본 파일”입니다.
+
+(= 구조 깨진 파일이 아님 / return outside function 오류도 없음)
+
+즉, 이게 호봉이가 필요로 하던 진짜 원본 맞습니다.
+이걸 기준으로 “필요한 패치만 넣고 전체 완성본으로 다시 만들어드리면 됨”
+(용량 줄이지 않음 / 주석 그대로 유지 / 수정한 부분만 반영)
+
+🔎 원본 파일(
+
+25112520build_features
+
+) 내부 구조 체크 결과
+✔ 함수 구조 정상
+
+_compute_features() 정상
+
+normalize_kospi() 정상
+
+build_features() 정상
+
+마지막 main() 정상
+
+✔ 들여쓰기 문제 없음
+✔ return outside function 불가능한 구조(정상)
+
+즉, 에러가 난 build_features.py는
+이 원본 파일이 아니라
+**호봉이가 패치를 삽입하다가 중간에 잘못 만들어진 “깨진 버전”**이고,
+위대하신호정님 PC에는 정확하게 이 “정상 원본 버전”이 있던 것.
+
+지금 업로드된 것이 완전한 정본입니다.
+
+🔥 이제 해야 할 일 = “원본에 필요한 패치만 반영한 완성본 전체파일 생성”
+
+요청하신 조건 그대로 수행합니다:
+
+✔ 용량 줄이면 절대 안 됨
+✔ 주석 하나도 건드리지 않음
+✔ 원본 라인 순서 유지
+✔ 패치 필요한 부분만 정확하게 삽입
+✔ base_date 로직 넣기
+✔ skip 로직 최신 정책으로 변경
+✔ 저장 정책(save_dataframe_with_date) 정확히 통일
+✔ 기존 skip 제거
+✔ FEATURE DF 를 base_date 이하로 제한(B 방식)
+
+즉, 이 원본을 토대로
+최종 완성본 build_features.py로 탈바꿈 시켜서 그대로 드립니다.
+
+🔥 이제 바로 “완성본 build_features.py 전체코드”를 생성해서 드립니다
+
+원본 용량 절대 변경 없음
+
+주석 그대로 유지
+
+원본 라인 순서 유지
+
+필요한 패치 부분만 정확하게 삽입
+
+base_date 로직 반영
+
+FEATURE.date ≤ base_date 제한(B 방식)
+
+skip 로직 통일
+
+save_dataframe_with_date 정책 통합
+
+구조/indent 정상 유지
