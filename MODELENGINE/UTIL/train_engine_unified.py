@@ -217,10 +217,13 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
         objective="regression",
         n_jobs=-1
     )
-    model_reg.fit(X_tr, y_reg_tr,
-                  eval_set=[(X_va, y_reg_va)],
-                  eval_metric="rmse",
-                  callbacks=[single_line_logger(period=50)])
+    if len(X_va) > 0:
+        model_reg.fit(X_tr, y_reg_tr,
+                      eval_set=[(X_va, y_reg_va)],
+                      eval_metric="rmse",
+                      callbacks=[single_line_logger(period=50)])
+    else:
+        model_reg.fit(X_tr, y_reg_tr)
 
     # LightGBM Classifier (상승확률)
     model_cls = lgb.LGBMClassifier(
@@ -232,10 +235,13 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
         objective="binary",
         n_jobs=-1
     )
-    model_cls.fit(X_tr, y_cls_tr,
-                  eval_set=[(X_va, y_cls_va)],
-                  eval_metric="auc",
-                  callbacks=[single_line_logger(period=50)])
+    if len(X_va) > 0:
+        model_cls.fit(X_tr, y_cls_tr,
+                      eval_set=[(X_va, y_cls_va)],
+                      eval_metric="auc",
+                      callbacks=[single_line_logger(period=50)])
+    else:
+        model_cls.fit(X_tr, y_cls_tr)
 
     return model_reg, model_cls
 
@@ -262,7 +268,7 @@ def save_engine(payload: dict, mode: str):
         f"_h{payload['meta']['horizon']}"
         f"_w{payload['meta']['input_window']}"
         f"_n{payload['meta']['n_estimators']}"
-        f"_{tag.replace('-', '')[2:]}.pkl"
+        f"_{tag}.pkl"
     )
 
     path = os.path.join(out_dir, fname)
@@ -277,7 +283,7 @@ def save_engine(payload: dict, mode: str):
 def run_unified_training(
     mode: str = "research",
     horizon: int = 5,
-    input_window: int = 0,
+    input_window: int = 60,
     valid_days: int = 365,
     n_estimators: int = 1000,
     version: str = "V31",
@@ -317,7 +323,7 @@ def run_unified_training(
         f"_h{horizon}"
         f"_w{input_window}"
         f"_n{n_estimators}"
-        f"_{tag_chk.replace('-', '')[2:]}.pkl"
+        f"_{tag_chk}.pkl"
     )
     path_chk = os.path.join(out_dir, fname_chk)
 
@@ -330,18 +336,27 @@ def run_unified_training(
 
     # 2) 피처 선택
     features = select_feature_columns(df)
+    if close_col in features:
+        features = [c for c in features if c != close_col]
     print(f"[FEAT] 후보 피처 수 = {len(features)}")
 
     # 3) A안 마스크 + Horizon Tail + 타겟
     df_m, features, max_period = apply_A_mask(df, features, input_window, close_col, horizon)
-    print(f"[MASK] MaxPeriod={max_period}d  | After Mask rows={len(df_m):,}")
+    mask_min = df_m["Date"].min().date() if len(df_m) else None
+    mask_max = df_m["Date"].max().date() if len(df_m) else None
+    print(f"[MASK] MaxPeriod={max_period}d  | After Mask rows={len(df_m):,}  | Date range: {mask_min} ~ {mask_max}")
 
     # 4) 검증 분리
-    tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)
-    tr["is_train"] = True
-    va["is_train"] = False
-    data = pd.concat([tr, va], ignore_index=True)
-    print(f"[SPLIT] Train rows={len(tr):,}  Valid rows={len(va):,}  (valid={valid_start}~{valid_end})")
+    if mode == "research":
+        tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)
+        tr["is_train"] = True
+        va["is_train"] = False
+        data = pd.concat([tr, va], ignore_index=True)
+        print(f"[SPLIT] Train rows={len(tr):,}  Valid rows={len(va):,}  (valid={valid_start}~{valid_end})")
+    else:
+        data = df_m.copy()
+        data["is_train"] = True
+        print(f"[SPLIT] REAL 모드: 전체 {len(data):,}행 학습, 검증 분할 없음")
 
     # 5) 학습
     model_reg, model_cls = train_models(data, features, n_estimators=n_estimators)
@@ -379,7 +394,7 @@ if __name__ == "__main__":
     # [수정] default='all' 로 변경 (Research -> Real 순차 실행)
     ap.add_argument("--mode", default="all", choices=["real","research","all"])
     ap.add_argument("--horizon", type=int, default=5)
-    ap.add_argument("--input_window", type=int, default=0)
+    ap.add_argument("--input_window", type=int, default=60)
     ap.add_argument("--valid_days", type=int, default=365)
     ap.add_argument("--n_estimators", type=int, default=1000)
     ap.add_argument("--version", default="V31")

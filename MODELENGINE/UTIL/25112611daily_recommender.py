@@ -75,11 +75,8 @@ def pick_close_col(df):
 
 def find_engine_real():
     """
-    [수정] 엔진 파일 선택 로직 (Strict Mode)
-    1. 목표 옵션(h, w, n)과 '정확히 일치'하는 파일만 필터링 (타협 없음)
-    2. 일치하는 파일들 중 '데이터 날짜(YYMMDD)가 가장 최신'인 파일 선택
-    3. 날짜도 같으면 '생성 시간(mtime)'이 최신인 파일 선택
-    4. 조건에 맞는 파일이 없으면 명확하게 에러 발생 (FileNotFoundError)
+    [수정됨] 엔진 파일 중 데이터날짜 최신 → h=5,w=60,n=1000 기준과 가장 가까운 옵션 선택.
+    날짜 형식(4자리/6자리) 통일하여 최신 파일 선택 오류를 수정함.
     """
     base_root = get_path("HOJ_ENGINE")
     if os.path.isfile(base_root):
@@ -88,92 +85,84 @@ def find_engine_real():
     if not os.path.isdir(real_dir):
         raise FileNotFoundError("REAL 폴더 없음: " + real_dir)
 
-    cands = []
+    # 후보 수집
+    cands = [] # [FIXED] NameError 방지
     for fn in os.listdir(real_dir):
         if fn.startswith("HOJ_ENGINE_REAL") and fn.endswith(".pkl"):
             cands.append(fn)
     if not cands:
-        raise FileNotFoundError("REAL 폴더에 엔진 파일이 하나도 없습니다.")
+        raise FileNotFoundError("REAL 폴더에 엔진이 없습니다.")
 
-    # ---------------------------------------------------------
-    # [설정] 찾고자 하는 엔진의 목표 옵션 (Strict Target)
-    # 추후 UI 연동 시 이 부분을 인자로 받게 수정 가능
-    # ---------------------------------------------------------
-    TARGET_H = 5      # Horizon
-    TARGET_W = 60     # Input Window
-    TARGET_N = 1000   # Estimators
-
-    valid_candidates = []
-
-    for fn in cands:
-        # 1. 날짜 파싱 (YYMMDD 6자리 통일)
+    def parse(fn):
+        # extract tokens
         parts = fn.split("_")
         date_token = parts[-1].replace(".pkl","")
+        
         d = -1
-        try:
-            if len(date_token) == 6 and date_token.startswith("25"):
-                d = int(date_token)
-            elif len(date_token) == 4:
-                d = int("25" + date_token)
-            elif len(date_token) == 8 and date_token.startswith("20"):
-                d = int(date_token[2:])
-            else:
-                 # t251125 등 복잡한 패턴 처리
-                 match = re.search(r'(\d{6})\.pkl$', fn)
-                 if match and match.group(1).startswith("25"):
-                     d = int(match.group(1))
-                 elif len(date_token) >= 6 and date_token.startswith("25"):
-                     d = int(date_token)
-        except:
-            d = -1
-
-        # 2. 옵션(h, w, n) 파싱
         h=w=n=None
+
+        # 파라미터(h, w, n) 추출 로직 (기존 로직 유지)
         for p in parts:
             if p.startswith("h"):
                 try: h=int(p[1:])
                 except: pass
-            
             if p.startswith("w"):
-                if "full" in p.lower():
-                    w = 0  # wFull은 0으로 간주
-                else:
-                    try: w=int(p[1:])
-                    except: pass
-                    
+                try: w=int(p[1:])
+                except: pass
             if p.startswith("n"):
                 try: n=int(p[1:])
                 except: pass
         
-        # 3. [핵심] 옵션 완전 일치 여부 검사 (Strict Check)
-        # 하나라도 다르면 후보에서 즉시 제외
-        if h == TARGET_H and w == TARGET_W and n == TARGET_N:
-            # 파일 수정 시간(mtime) - 동점자 처리용
-            full_path = os.path.join(real_dir, fn)
-            try:
-                mtime = os.path.getmtime(full_path)
-            except:
-                mtime = 0
-            
-            # (날짜, 생성시간, 파일명) 튜플 저장
-            valid_candidates.append((d, mtime, fn))
+        # [수정된 로직]: 날짜 토큰을 YYMMDD 6자리 숫자로 통일하여 비교 가능하게 함 (25년 기준 가정)
+        try:
+            if len(date_token) == 6 and date_token.startswith("25"): # YYMMDD (예: 251122)
+                d = int(date_token)
+            elif len(date_token) == 4: # MMDD (예: 1125). 앞에 '25'를 붙여 YYMMDD로 통일
+                d = int("25" + date_token) 
+            elif len(date_token) == 8 and date_token.startswith("20"): # YYYYMMDD -> YYMMDD로 변환
+                d = int(date_token[2:])
+            else:
+                 # 파일명 중간에 6자리 날짜가 있으면 그것을 날짜로 사용 (옵션만 붙은 파일 처리 포함)
+                 match = re.search(r'(\d{6})\.pkl$', fn)
+                 if match and match.group(1).startswith("25"):
+                     d = int(match.group(1))
+                 elif len(date_token) >= 6 and date_token.startswith("25"): # 숫자로만 이루어진 마지막 토큰이 6자리 이상이고 25로 시작하면 일단 인정
+                     d = int(date_token)
+                 else:
+                    d = -1
+        except Exception:
+            d = -1
+        # [수정된 로직 끝]
 
-    # 4. 결과 처리
-    if not valid_candidates:
-        # 일치하는 파일이 없으면 에러 발생 (대충 아무거나 주지 않음)
-        msg = (f"❌ [Error] 조건에 맞는 엔진 파일을 찾을 수 없습니다.\n"
-               f"   - 요청 조건: h={TARGET_H}, w={TARGET_W}, n={TARGET_N}\n"
-               f"   - 대상 폴더: {real_dir}")
-        raise FileNotFoundError(msg)
+        return d,h,w,n
 
-    # 5. 정렬: 날짜(d) 내림차순 -> 생성시간(mtime) 내림차순
-    # 가장 최신 날짜, 가장 최근에 만들어진 파일을 0번으로 가져옴
-    valid_candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
-    
-    best_file = valid_candidates[0][2]
-    print(f"[Engine Selector] 조건 일치 파일 발견: {best_file} (Date: {valid_candidates[0][0]})")
-    
-    return os.path.join(real_dir, best_file)
+    parsed=[]
+    for fn in cands:
+        d,h,w,n = parse(fn)
+        parsed.append((d,h,w,n,fn))
+
+    # 최신 날짜
+    # d=-1 인 파일은 제외하고 최댓값을 찾습니다.
+    valid_dates = [p[0] for p in parsed if p[0] != -1]
+    if not valid_dates:
+        # 이전에 cands는 존재했으므로, 날짜 파싱이 모두 실패했음을 의미
+        raise FileNotFoundError("REAL 폴더의 엔진 파일에서 유효한 날짜 태그를 찾을 수 없습니다.")
+        
+    maxd = max(valid_dates)
+    same=[p for p in parsed if p[0]==maxd]
+
+    # 기준값
+    H0=5; W0=60; N0=1000
+
+    def score(p):
+        _,h,w,n,fn = p
+        sh = abs((h or H0)-H0)
+        sw = abs((w or W0)-W0)
+        sn = abs((n or N0)-N0)
+        return (sh, sw, sn, fn)
+
+    chosen = min(same, key=score)
+    return os.path.join(real_dir, chosen[4])
 
 def load_latest_db(version="V31"): # [FIXED] NameError 해결을 위해 함수 정의 복구
     """DB 디렉토리에서 최신 통합 DB 파일을 찾아 로드합니다."""

@@ -90,6 +90,12 @@ def build_features(raw_dir, kospi_dir, feat_dir):
     if "KOSPI_Close" in df.columns: df["KOSPI_Close"] = df["KOSPI_Close"].ffill()
     if "KOSPI_Change" in df.columns: df["KOSPI_Change"] = df["KOSPI_Change"].fillna(0)
 
+    # 종목별 수익률(Change) 재계산: 첫 행만 0으로 두고 나머지는 pct_change 값 사용
+    if "Close" in df.columns:
+        df = df.sort_values(["Code", "Date"])
+        df["Change"] = df.groupby("Code")["Close"].pct_change()
+        df["Change"] = df["Change"].fillna(0)
+
     # 병합된 데이터 기준 최신 날짜 확인
     feat_dates = pd.to_datetime(df["Date"], errors="coerce").dropna()
     if len(feat_dates) == 0:
