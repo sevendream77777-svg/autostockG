@@ -9,7 +9,20 @@ from common.workers import DataUpdateWorker, ManualDownloadWorker
 class DataPage(QWidget):
     def __init__(self):
         super().__init__()
+        # MODELENGINE 경로 자동 탐색
+        self.base_path = self.find_modelengine_path()
         self.init_ui()
+
+    def find_modelengine_path(self):
+        # 1. 현재 파일 기준 상위 폴더 탐색
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        path_candidate = os.path.abspath(os.path.join(current_dir, "../../MODELENGINE"))
+        
+        if os.path.exists(path_candidate):
+            return path_candidate
+        
+        # 2. 실패 시 하드코딩 경로
+        return r"F:\autostockG\MODELENGINE"
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -17,6 +30,12 @@ class DataPage(QWidget):
         # 1. 파이프라인 섹션
         gb_pipe = QGroupBox("🔄 데이터 파이프라인 (Data Factory)")
         v_pipe = QVBoxLayout()
+        
+        # 경로 확인용 라벨
+        lbl_path = QLabel(f"엔진 경로: {self.base_path}")
+        lbl_path.setStyleSheet("color: gray; font-size: 8pt;")
+        v_pipe.addWidget(lbl_path)
+
         lbl_info = QLabel("각 단계를 개별 실행하거나, 전체 실행을 통해 한 번에 처리할 수 있습니다.")
         lbl_info.setStyleSheet("color: #88c0d0; margin-bottom: 10px;")
         v_pipe.addWidget(lbl_info)
@@ -38,15 +57,26 @@ class DataPage(QWidget):
         self.progress.setValue(0)
         v_pipe.addWidget(self.progress)
         
+        # [수정] 로그창 상단에 '로그 지우기' 버튼 추가 (너무 많이 쌓이면 지울 수 있게)
+        h_log_ctrl = QHBoxLayout()
+        h_log_ctrl.addWidget(QLabel("📋 실행 로그"))
+        h_log_ctrl.addStretch()
+        btn_clear_log = QPushButton("로그 지우기")
+        btn_clear_log.setFixedSize(80, 25)
+        btn_clear_log.clicked.connect(self.clear_log_view)
+        h_log_ctrl.addWidget(btn_clear_log)
+        v_pipe.addLayout(h_log_ctrl)
+
         self.log_pipe = QTextEdit()
         self.log_pipe.setReadOnly(True)
-        self.log_pipe.setMaximumHeight(120)
+        self.log_pipe.setMaximumHeight(200) # 로그창 높이 조금 키움
+        self.log_pipe.setStyleSheet("background-color: #2e3440; color: #d8dee9; font-family: Consolas;")
         v_pipe.addWidget(self.log_pipe)
         
         gb_pipe.setLayout(v_pipe)
         layout.addWidget(gb_pipe)
 
-        # 2. 수동 다운로드 섹션
+        # 2. 수동 다운로드 섹션 (기존 유지)
         gb_manual = QGroupBox("📥 수동 선택 다운로드 (Manual Download)")
         v_manual = QVBoxLayout()
         
@@ -87,10 +117,9 @@ class DataPage(QWidget):
         h2 = QHBoxLayout()
         h2.addWidget(QLabel("기간:"))
         
-        # [수정] 시작 날짜를 오늘 날짜로 변경
         self.date_start = QDateEdit()
         self.date_start.setCalendarPopup(True)
-        self.date_start.setDate(QDate.currentDate()) # 기존: .addDays(-30) 제거
+        self.date_start.setDate(QDate.currentDate())
         
         self.date_end = QDateEdit()
         self.date_end.setCalendarPopup(True)
@@ -121,7 +150,6 @@ class DataPage(QWidget):
         h_cols.setContentsMargins(0,0,0,0)
         
         self.chk_cols = {}
-        # 컬럼 목록
         for c in ["Open", "High", "Low", "Close", "Volume", "Amount", "Change"]:
             chk = QCheckBox(c)
             chk.setChecked(True)
@@ -137,7 +165,6 @@ class DataPage(QWidget):
         gb_cols.setLayout(v_cols)
         v_manual.addWidget(gb_cols)
         
-        # 초기 상태 적용
         self.toggle_col_selection()
 
         # 실행 버튼
@@ -147,6 +174,7 @@ class DataPage(QWidget):
         
         self.log_manual = QTextEdit()
         self.log_manual.setReadOnly(True)
+        self.log_manual.setStyleSheet("background-color: #2e3440; color: #d8dee9; font-family: Consolas;")
         v_manual.addWidget(self.log_manual)
         
         gb_manual.setLayout(v_manual)
@@ -161,9 +189,21 @@ class DataPage(QWidget):
         self.btn_down_run.clicked.connect(self.run_manual_download)
 
     # --- 로직 ---
+    def clear_log_view(self):
+        self.log_pipe.clear()
+
     def run_pipeline(self, tasks):
-        self.log_pipe.clear(); self.progress.setValue(0)
-        self.worker = DataUpdateWorker(tasks)
+        # [수정] 기존 로그를 지우지 않고 구분선만 추가
+        # self.log_pipe.clear()  <-- 삭제됨
+        self.log_pipe.append("\n" + "="*50)
+        self.log_pipe.append(f"🚀 작업을 시작합니다: {tasks}")
+        self.log_pipe.append("="*50 + "\n")
+        
+        self.progress.setValue(0)
+        
+        # 워커 생성
+        self.worker = DataUpdateWorker(tasks, base_path=self.base_path)
+        
         self.worker.log_signal.connect(self.log_pipe.append)
         self.worker.progress_signal.connect(self.progress.setValue)
         self.worker.finished_signal.connect(lambda m: QMessageBox.information(self, "완료", m))
@@ -180,12 +220,9 @@ class DataPage(QWidget):
         if not enabled: self.txt_codes.clear()
 
     def toggle_col_selection(self):
-        # [수정] "모두 저장" 체크 시 하위 항목을 모두 체크하고, 비활성화(Grey-out) 하지 않음
         if self.chk_all_original.isChecked():
             for chk in self.chk_cols.values():
                 chk.setChecked(True)
-        
-        # 항상 활성화 상태 유지 (사용자가 명시적으로 해제 가능하게 하거나, 그냥 뷰로 둠)
         self.widget_col_select.setEnabled(True)
 
     def toggle_individual_cols(self):
@@ -217,8 +254,6 @@ class DataPage(QWidget):
         final_cols = None
         col_msg = "ALL (Original)"
         
-        # "모두 저장"이 체크되어 있으면 컬럼 필터 없이(None) 진행 -> 스크립트가 알아서 전체 다운
-        # 체크가 해제되어 있으면 선택된 컬럼만 전달
         if not self.chk_all_original.isChecked():
             selected = [col for col, chk in self.chk_cols.items() if chk.isChecked()]
             if not selected: 
@@ -228,22 +263,24 @@ class DataPage(QWidget):
             col_msg = str(final_cols)
 
         # 3. 경로 설정 및 실행
-        script = r"../MODELENGINE/RAW/시세다운로드full단독/pykrx_full_dump_resumable.py"
-        # 절대 경로 보정 (실행 위치에 따라 다를 수 있음)
-        abs_script = os.path.abspath(os.path.join(os.path.dirname(__file__), script))
-        if not os.path.exists(abs_script):
-             # 기본 경로 폴백
-             script = r"F:\autostockG\MODELENGINE\RAW\시세다운로드full단독\pykrx_full_dump_resumable.py"
+        script = os.path.join(self.base_path, "RAW", "시세다운로드full단독", "pykrx_full_dump_resumable.py")
+        out = os.path.join(self.base_path, "RAW", "시세다운로드full단독", "raw_only_down_ui")
         
-        out = r"F:\autostockG\MODELENGINE\RAW\시세다운로드full단독\raw_only_down_ui"
+        if not os.path.exists(script):
+             QMessageBox.critical(self, "오류", f"스크립트를 찾을 수 없습니다:\n{script}")
+             return
+             
         if not os.path.exists(out): os.makedirs(out, exist_ok=True)
 
-        self.log_manual.clear()
+        # [수정] 수동 다운로드 로그도 누적되도록 변경
+        # self.log_manual.clear() <-- 삭제됨
+        self.log_manual.append("\n" + "-"*40)
         self.log_manual.append(f"📥 다운로드 요청 시작...")
         self.log_manual.append(f" - 대상: {target_msg}")
         self.log_manual.append(f" - 기간: {s} ~ {e}")
         self.log_manual.append(f" - 컬럼: {col_msg}")
         self.log_manual.append(f" - 저장 경로: {out}")
+        self.log_manual.append(f" - 실행 파일: {script}")
         
         self.md_worker = ManualDownloadWorker(codes, s, e, out, script, columns=final_cols)
         self.md_worker.log_signal.connect(self.log_manual.append)

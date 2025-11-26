@@ -1,0 +1,65 @@
+🔥 학습 프로세스 시작 (모드: RESEARCH)...
+=== 🚀 Unified HOJ Trainer V31 (RESEARCH) ===
+[CFG] mode=research  horizon=1  input_window=60  valid_days=365  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-26  | rows=6,073,344
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=60d  | After Mask rows=5,892,925  | Date range: 2015-04-01 ~ 2025-11-24
+[SPLIT] Train rows=5,222,792  Valid rows=670,133  (valid=2024-11-24~2025-11-24)
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.408401 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5222792, number of used features: 19
+[LightGBM] [Info] Start training from score 0.000394
+
+[0] valid_0-rmse: 0.038086
+[50] valid_0-rmse: 0.038198
+[100] valid_0-rmse: 0.038238
+[150] valid_0-rmse: 0.038300
+[200] valid_0-rmse: 0.038364
+[250] valid_0-rmse: 0.038411
+[300] valid_0-rmse: 0.038461
+[350] valid_0-rmse: 0.038500
+[400] valid_0-rmse: 0.038534
+[450] valid_0-rmse: 0.038521
+[500] valid_0-rmse: 0.038527
+[550] valid_0-rmse: 0.038568
+[600] valid_0-rmse: 0.038601
+[650] valid_0-rmse: 0.038659
+[700] valid_0-rmse: 0.038671
+[750] valid_0-rmse: 0.038686
+[800] valid_0-rmse: 0.038684
+[850] valid_0-rmse: 0.038689
+[900] valid_0-rmse: 0.038692
+[950] valid_0-rmse: 0.038691[LightGBM] [Info] Number of positive: 2273896, number of negative: 2948896
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.110242 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5222792, number of used features: 19
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.435379 -> initscore=-0.259936
+[LightGBM] [Info] Start training from score -0.259936
+
+[0] valid_0-auc: 0.542767
+[50] valid_0-auc: 0.551700
+[100] valid_0-auc: 0.553444
+[150] valid_0-auc: 0.551177
+[200] valid_0-auc: 0.552678
+[250] valid_0-auc: 0.551689
+[300] valid_0-auc: 0.549820
+[350] valid_0-auc: 0.548502
+[400] valid_0-auc: 0.547962
+[450] valid_0-auc: 0.547633
+[500] valid_0-auc: 0.547925
+[550] valid_0-auc: 0.547044
+[600] valid_0-auc: 0.547040
+[650] valid_0-auc: 0.545798
+[700] valid_0-auc: 0.546133
+[750] valid_0-auc: 0.545789
+[800] valid_0-auc: 0.546140
+[850] valid_0-auc: 0.545612
+[900] valid_0-auc: 0.545567
+[950] valid_0-auc: 0.545470[TRAIN] LightGBM reg/cls 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_h1_w60_n1000_251126.pkl
+=== 🏁 Done. ===
+------------------------------------------------------------
+[SUCCESS] 엔진 학습/생성 완료 (research)

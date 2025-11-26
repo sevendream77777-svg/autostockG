@@ -3,21 +3,11 @@ import os
 import sys
 import time
 import subprocess
-import pandas as pd
+import datetime
 from PySide6.QtCore import QThread, Signal
 
 # ---------------------------------------------------------
-# 경로 설정 (전역)
-# ---------------------------------------------------------
-current_dir = os.path.dirname(os.path.abspath(__file__))
-ui_dir = os.path.dirname(current_dir)
-root_dir = os.path.dirname(ui_dir) # F:\autostockG
-sys.path.append(root_dir)
-sys.path.append(os.path.join(root_dir, "MODELENGINE", "UTIL"))
-sys.path.append(os.path.join(root_dir, "MODELENGINE", "RAW"))
-
-# ---------------------------------------------------------
-# 1. 데이터 파이프라인 워커
+# 1. 데이터 파이프라인 워커 (기존 유지)
 # ---------------------------------------------------------
 class DataUpdateWorker(QThread):
     log_signal = Signal(str)
@@ -25,180 +15,192 @@ class DataUpdateWorker(QThread):
     finished_signal = Signal(str)
     error_signal = Signal(str)
 
-    def __init__(self, task_list): 
+    def __init__(self, task_list, base_path=None): 
         super().__init__()
         self.task_list = task_list
+        if base_path:
+            self.base_path = base_path
+        else:
+            self.base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../MODELENGINE"))
 
     def run(self):
+        script_map = {
+            'stock':   os.path.join(self.base_path, "RAW", "raw_patch.py"),
+            'kospi':   os.path.join(self.base_path, "RAW", "make_kospi_index_10y.py"),
+            'feature': os.path.join(self.base_path, "UTIL", "build_features.py"),
+            'db':      os.path.join(self.base_path, "UTIL", "build_unified_db.py")
+        }
+        task_names = {
+            'stock': "1. 시세 수집 (RAW)", 'kospi': "2. KOSPI 지수 갱신",
+            'feature': "3. 피처 생성", 'db': "4. DB 통합"
+        }
+        total = len(self.task_list)
         try:
-            # Lazy import to avoid circular dependency or startup lag
-            import update_raw_data
-            import make_kospi_index_10y
-            import build_features
-            import build_unified_db
-        except ImportError as e: 
-            self.error_signal.emit(f"스크립트 로딩 실패: {e}")
-            return
-
-        try:
-            total = len(self.task_list)
             for i, task in enumerate(self.task_list):
-                self.progress_signal.emit(int((i/total)*100))
-                
-                if task == 'stock': 
-                    self.log_signal.emit("\n>>> [1] 시세(RAW) 업데이트...")
-                    update_raw_data.main()
-                elif task == 'kospi': 
-                    self.log_signal.emit("\n>>> [2] KOSPI 지수 생성...")
-                    make_kospi_index_10y.main()
-                elif task == 'feature': 
-                    self.log_signal.emit("\n>>> [3] 피처 엔지니어링...")
-                    build_features.main()
-                elif task == 'db': 
-                    self.log_signal.emit("\n>>> [4] DB 통합...")
-                    build_unified_db.build_unified_db()
-                
-                self.log_signal.emit(f"✅ {task} 단계 완료")
+                script_path = script_map.get(task)
+                display_name = task_names.get(task, task)
+
+                if not script_path or not os.path.exists(script_path):
+                    self.error_signal.emit(f"❌ 파일을 찾을 수 없음: {script_path}")
+                    continue
+
+                self.log_signal.emit(f"\n>>> [{display_name}] 실행 중... ({script_path})")
+                self.progress_signal.emit(int((i / total) * 100))
+
+                cmd = [sys.executable, script_path]
+                process = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    text=True, encoding='utf-8', errors='replace',
+                    creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+                )
+                while True:
+                    line = process.stdout.readline()
+                    if not line and process.poll() is not None: break
+                    if line: self.log_signal.emit(line.strip())
+
+                if process.poll() == 0:
+                    self.log_signal.emit(f"✅ [{display_name}] 완료")
+                else:
+                    self.error_signal.emit(f"⚠️ [{display_name}] 중단됨 (코드: {process.poll()})")
                 time.sleep(0.5)
-            
+
             self.progress_signal.emit(100)
-            self.finished_signal.emit("모든 데이터 작업이 완료되었습니다.")
-        except Exception as e: 
-            import traceback
-            self.error_signal.emit(f"오류 발생: {traceback.format_exc()}")
+            self.finished_signal.emit("요청하신 모든 작업이 완료되었습니다.")
+        except Exception as e:
+            self.error_signal.emit(f"시스템 오류: {str(e)}")
 
 # ---------------------------------------------------------
-# 2. 수동 다운로드 워커
+# 2. 학습 워커 (기능 강화: 결과 딕셔너리 전달)
+# ---------------------------------------------------------
+class TrainingWorker(QThread):
+    log_signal = Signal(str)
+    finished_signal = Signal(dict) # 변경: 단순 문자열 대신 결과 dict 전달
+    error_signal = Signal(str)
+    
+    def __init__(self, params, base_path=None): 
+        super().__init__()
+        self.params = params
+        if base_path:
+            self.base_path = base_path
+        else:
+            self.base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../MODELENGINE"))
+        
+    def run(self):
+        script_path = os.path.join(self.base_path, "UTIL", "train_engine_unified.py")
+        
+        if not os.path.exists(script_path):
+            self.error_signal.emit(f"❌ 학습 스크립트 없음: {script_path}")
+            return
+
+        # 로그 저장 경로 설정
+        log_dir = os.path.join(self.base_path, "HOJ_ENGINE", self.params['mode'].upper(), "logs")
+        os.makedirs(log_dir, exist_ok=True)
+        
+        now_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_filename = f"Log_{self.params['mode'].upper()}_{now_str}.txt"
+        log_path = os.path.join(log_dir, log_filename)
+
+        start_msg = f"🔥 학습 프로세스 시작 (모드: {self.params['mode'].upper()})..."
+        self.log_signal.emit(start_msg)
+        self.save_log(log_path, start_msg)
+
+        try:
+            cmd = [
+                sys.executable, script_path,
+                "--mode", str(self.params['mode']),
+                "--horizon", str(self.params['horizon']),
+                "--input_window", str(self.params['input_window']),
+                "--valid_days", str(self.params['valid_days']),
+                "--n_estimators", str(self.params['n_estimators']),
+                "--version", "V31"
+            ]
+            
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, encoding='utf-8', errors='replace',
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+            )
+
+            last_lines = []
+            while True:
+                line = process.stdout.readline()
+                if not line and process.poll() is not None: break
+                if line:
+                    msg = line.strip()
+                    self.log_signal.emit(msg)
+                    self.save_log(log_path, msg)
+                    last_lines.append(msg)
+                    if len(last_lines) > 20: last_lines.pop(0) # 마지막 20줄 보관
+
+            if process.poll() == 0:
+                # 완료 시 UI로 넘길 정보 패키징
+                result_package = {
+                    "status": "success",
+                    "message": f"엔진 학습 완료 ({self.params['mode']})",
+                    "mode": self.params['mode'],
+                    "log_path": log_path,
+                    "last_lines": last_lines,
+                    "params": self.params # 다음 단계 상속용
+                }
+                self.finished_signal.emit(result_package)
+                self.save_log(log_path, "[SUCCESS] Process Finished")
+            else:
+                self.error_signal.emit(f"학습 중단됨 (Exit Code: {process.poll()})")
+                self.save_log(log_path, f"[ERROR] Exit Code {process.poll()}")
+
+        except Exception as e:
+            self.error_signal.emit(f"실행 오류: {str(e)}")
+            self.save_log(log_path, f"[EXCEPTION] {str(e)}")
+
+    def save_log(self, path, content):
+        try:
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(content + "\n")
+        except: pass
+
+# ---------------------------------------------------------
+# [기존 유지] 수동 다운로드 & 예측 워커
 # ---------------------------------------------------------
 class ManualDownloadWorker(QThread):
     log_signal = Signal(str)
     finished_signal = Signal(str)
     error_signal = Signal(str)
-    
     def __init__(self, codes, start_date, end_date, out_dir, script_path, columns=None):
         super().__init__()
-        self.codes = codes
-        self.start_date = start_date
-        self.end_date = end_date
-        self.out_dir = out_dir
-        self.script_path = script_path
-        self.columns = columns
-
+        self.codes, self.s, self.e, self.out, self.script, self.cols = codes, start_date, end_date, out_dir, script_path, columns
     def run(self):
         try:
-            if not os.path.exists(self.script_path): 
-                self.error_signal.emit(f"스크립트 파일 없음: {self.script_path}")
+            if not os.path.exists(self.script): 
+                self.error_signal.emit(f"파일 없음: {self.script}")
                 return
-            
-            cmd = [sys.executable, self.script_path, "--out", self.out_dir, "--start", self.start_date, "--end", self.end_date]
-
+            cmd = [sys.executable, self.script, "--out", self.out, "--start", self.s, "--end", self.e]
             if self.codes:
                 cmd.append("--codes")
-                if isinstance(self.codes, list): 
-                    cmd.extend(self.codes)
-                else: 
-                    cmd.extend([c.strip() for c in self.codes.split(',') if c.strip()])
-            
-            if self.columns: 
+                if isinstance(self.codes, list): cmd.extend(self.codes)
+                else: cmd.extend([c.strip() for c in self.codes.split(',') if c.strip()])
+            if self.cols: 
                 cmd.append("--columns")
-                cmd.extend(self.columns)
-            
-            self.log_signal.emit(f"실행 명령:\n{' '.join(cmd)}")
-            
-            # Run subprocess
-            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, encoding='utf-8', errors='replace') as p:
-                for line in p.stdout: 
-                    self.log_signal.emit(line.rstrip())
+                cmd.extend(self.cols)
+            self.log_signal.emit(f"실행: {' '.join(cmd)}")
+            with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace') as p:
+                for line in p.stdout: self.log_signal.emit(line.rstrip())
                 p.wait()
-                if p.returncode != 0: 
-                    raise RuntimeError(f"프로세스 종료 코드: {p.returncode}")
-            
             self.finished_signal.emit("다운로드 완료")
-        except Exception as e: 
-            self.error_signal.emit(str(e))
+        except Exception as e: self.error_signal.emit(str(e))
 
-# ---------------------------------------------------------
-# 3. 학습 워커 (파라미터 확장 적용됨)
-# ---------------------------------------------------------
-class TrainingWorker(QThread):
-    log_signal = Signal(str)
-    finished_signal = Signal(str)
-    error_signal = Signal(str)
-    
-    def __init__(self, params): 
-        super().__init__()
-        self.params = params
-        
-    def run(self):
-        try: 
-            # 통합 트레이너 임포트
-            from train_engine_unified import run_unified_training
-        except ImportError as e: 
-            self.error_signal.emit(f"학습 스크립트 로딩 실패: {e}")
-            return
-            
-        try:
-            self.log_signal.emit(f"▶ 학습 프로세스 시작: {self.params}")
-            
-            # UI 파라미터를 실제 함수 인자로 매핑
-            # (train_engine_unified.py가 해당 인자를 받을 수 있어야 함. 
-            # 현재는 표준 인자만 전달하고, 나머지는 로직 내에서 처리되거나 기본값 사용)
-            run_unified_training(
-                mode=self.params['mode'],
-                horizon=self.params['horizon'],
-                valid_days=365 if self.params['mode'] == 'research' else 0, 
-                n_estimators=self.params.get('n_estimators', 1000),
-                version=self.params['version']
-            )
-            
-            self.finished_signal.emit(f"엔진 생성 완료 ({self.params['version']})")
-        except Exception as e: 
-            import traceback
-            self.error_signal.emit(f"학습 중 오류: {str(e)}\n{traceback.format_exc()}")
-
-# ---------------------------------------------------------
-# 4. 예측 워커 (특정 종목 지원 적용됨)
-# ---------------------------------------------------------
 class PredictionWorker(QThread):
     finished_signal = Signal(object)
     error_signal = Signal(str)
-    
     def __init__(self, engine_path, target_date, top_n, specific_code=None): 
         super().__init__()
-        self.eng = engine_path
-        self.date = target_date
-        self.n = top_n
-        self.code = specific_code
-        
+        self.eng = engine_path; self.date = target_date; self.n = top_n; self.code = specific_code
     def run(self):
         try: 
+            sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "MODELENGINE", "UTIL"))
             from predict_daily_top10 import run_prediction
-        except ImportError as e: 
-            self.error_signal.emit(f"예측 스크립트 로딩 실패: {e}")
-            return
-            
-        try:
-            # 엔진 경로가 없으면 최신 엔진 자동 탐색 로직이 내부에 있다고 가정
             df = run_prediction(self.eng, self.date, self.n)
-            
-            # 특정 종목 필터링 (결과가 DataFrame일 경우)
             if self.code and df is not None and not df.empty:
-                filtered_df = pd.DataFrame()
-                
-                # 컬럼명 대소문자 대응
-                code_col = None
-                for col in df.columns:
-                    if col.lower() == 'code':
-                        code_col = col
-                        break
-                
-                if code_col:
-                    filtered_df = df[df[code_col].astype(str) == str(self.code)]
-                
-                # 필터링 결과가 있으면 덮어쓰기, 없으면 빈 데이터프레임
-                df = filtered_df
-            
+                code_col = next((c for c in df.columns if c.lower() == 'code'), None)
+                if code_col: df = df[df[code_col].astype(str) == str(self.code)]
             self.finished_signal.emit(df)
-        except Exception as e: 
-            import traceback
-            self.error_signal.emit(str(e))
+        except Exception as e: self.error_signal.emit(f"예측 실패: {str(e)}")

@@ -5,112 +5,148 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                                QHBoxLayout, QPushButton, QStackedWidget, QLabel, QGridLayout)
 from PySide6.QtCore import Qt
 
-# 모듈 경로 설정
+# 모듈 경로 설정 (현재 ui 폴더 기준 상위도 인식)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
-# 공통 스타일 및 페이지 로드
+# 공통 스타일
 from common.styles import get_modern_qss
+
+# 페이지 로드 (없으면 빈 위젯)
 try:
     from pages.p0_data_pipeline import DataPage
     from pages.p1_training import TrainingPage
     from pages.p2_analysis import AnalysisPage
     from pages.p3_prediction import PredictionPage
+    from pages.p4_trading import TradingPage
+    from pages.p5_portfolio import PortfolioPage
+    from pages.p6_settings import SettingsPage
 except ImportError as e:
-    print(f"페이지 로딩 에러: {e}")
-    # 에러나면 빈 위젯으로 대체 (프로그램 꺼짐 방지)
-    DataPage = TrainingPage = AnalysisPage = PredictionPage = QWidget
+    print(f"❌ 페이지 로딩 에러: {e}")
+    # 에러 발생 시 더미 클래스 생성
+    DataPage = TrainingPage = AnalysisPage = PredictionPage = \
+    TradingPage = PortfolioPage = SettingsPage = QWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HOJ Pro Manager (Modular V1)")
-        self.resize(1280, 800)
+        self.setWindowTitle("HOJ Pro Manager (Unified V2)")
+        self.resize(1400, 900)
         self.setStyleSheet(get_modern_qss())
 
-        # 중앙 위젯 설정 (스택 위젯: 카드 돌리기 방식)
+        # 중앙 위젯 설정
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
 
-        # --- 0번 페이지: 홈 메뉴 (아이콘 그리드) ---
+        # --- [Page 0] 홈 메뉴 (대시보드) ---
         self.home_widget = QWidget()
         self.init_home_ui()
         self.central_widget.addWidget(self.home_widget) # Index 0
 
-        # --- 1~N번 페이지: 기능별 화면 ---
-        self.page_data = DataPage()
-        self.page_train = TrainingPage()
-        self.page_analysis = AnalysisPage()
-        self.page_pred = PredictionPage()
+        # --- [Page 1~7] 기능별 화면 ---
+        self.pages = [
+            DataPage(),         # Index 1 (P0)
+            TrainingPage(),     # Index 2 (P1)
+            AnalysisPage(),     # Index 3 (P2)
+            PredictionPage(),   # Index 4 (P3)
+            TradingPage(),      # Index 5 (P4)
+            PortfolioPage(),    # Index 6 (P5)
+            SettingsPage()      # Index 7 (P6)
+        ]
+        
+        for p in self.pages:
+            self.central_widget.addWidget(p)
 
-        self.central_widget.addWidget(self.page_data)     # Index 1
-        self.central_widget.addWidget(self.page_train)    # Index 2
-        self.central_widget.addWidget(self.page_analysis) # Index 3
-        self.central_widget.addWidget(self.page_pred)     # Index 4
+        # 툴바 생성
+        self.create_toolbar()
 
     def init_home_ui(self):
         layout = QVBoxLayout(self.home_widget)
         
         # 타이틀
-        title = QLabel("HOJ SYSTEM MANAGER")
+        title = QLabel("HOJ SYSTEM COMMANDER")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 24pt; font-weight: bold; color: #88c0d0; margin-bottom: 30px;")
+        title.setStyleSheet("font-size: 32pt; font-weight: bold; color: #88c0d0; margin-top: 20px; margin-bottom: 40px;")
         layout.addWidget(title)
 
         # 그리드 메뉴
         grid = QGridLayout()
+        grid.setSpacing(20)
         layout.addLayout(grid)
 
-        # 메뉴 정의 (이름, 연결할 페이지 인덱스)
+        # 메뉴 정의: (이름, 아이콘/설명, 이동할 페이지 Index)
+        # Index 0은 홈이므로, 실제 페이지는 1부터 시작
         menus = [
-            ("💾 데이터 파이프라인", 1),
-            ("🏭 모델 학습", 2),
-            ("📊 엔진 분석", 3),
-            ("🔮 예측 시뮬레이션", 4),
-            ("📈 매매 시스템(준비중)", None), # 연결 없음
-            ("⚙️ 설정(준비중)", None)
+            ("🔄 P0. 데이터 구축\n(Data Pipeline)", "시세 수집, DB 통합", 1),
+            ("🔥 P1. 엔진 학습\n(Model Training)", "AI 모델 훈련/갱신", 2),
+            ("📊 P2. 엔진 분석\n(Model Analysis)", "성능 지표, 백테스팅", 3),
+            ("🔮 P3. 과거 예측\n(Simulation)", "과거 시점 예측 검증", 4),
+            ("📈 P4. 실전 매매\n(Live Trading)", "Top10 추천 & 주문", 5),
+            ("💰 P5. 포트폴리오\n(My Account)", "잔고, 수익률 관리", 6),
+            ("⚙️ P6. 설정\n(Settings)", "경로, API 설정", 7)
         ]
 
         row, col = 0, 0
-        for name, idx in menus:
-            btn = QPushButton(name)
-            btn.setObjectName("menu_btn") # 스타일 적용용 ID
-            btn.setFixedSize(250, 150)
-            if idx is not None:
-                btn.clicked.connect(lambda checked, i=idx: self.switch_page(i))
-            else:
-                btn.setEnabled(False)
+        for name, desc, idx in menus:
+            btn = QPushButton(f"{name}\n\n{desc}")
+            btn.setObjectName("menu_btn") # 스타일시트 적용
+            btn.setFixedSize(280, 180)
+            btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #3b4252; 
+                    color: #eceff4; 
+                    font-size: 14pt; 
+                    border-radius: 15px;
+                    border: 2px solid #4c566a;
+                    text-align: center;
+                }
+                QPushButton:hover {
+                    background-color: #4c566a;
+                    border: 2px solid #88c0d0;
+                }
+            """)
+            btn.clicked.connect(lambda checked, i=idx: self.switch_page(i))
             
             grid.addWidget(btn, row, col)
             col += 1
-            if col > 2: # 3열 배치
+            if col > 3: # 4열 배치
                 col = 0
                 row += 1
         
         layout.addStretch()
+        
+        # 하단 상태바
+        version_lbl = QLabel("System Version: 2.0 | Engine: Ready | API: Disconnected")
+        version_lbl.setStyleSheet("color: #6f7788;")
+        version_lbl.setAlignment(Qt.AlignCenter)
+        layout.addWidget(version_lbl)
 
     def switch_page(self, index):
         self.central_widget.setCurrentIndex(index)
-        # 페이지로 이동하면 상단에 '홈으로' 버튼 추가가 필요할 수 있음
-        # 이번 구조에서는 각 페이지 상단에 '홈으로' 버튼을 넣는 방식을 추천합니다.
-        # (현재는 예시로 윈도우 타이틀바나 별도 네비게이션이 없으므로, 
-        # 각 페이지 파일 __init__에 홈 버튼을 추가하는 로직을 넣거나, 
-        # Main에서 Toolbar를 쓰는게 좋습니다. 일단 간단히 Toolbar 추가)
-        
+
     def go_home(self):
         self.central_widget.setCurrentIndex(0)
 
     def create_toolbar(self):
-        # 상단 툴바 (어디서든 홈으로 가기 위해)
         toolbar = self.addToolBar("Navigation")
+        toolbar.setMovable(False)
+        
         btn_home = QPushButton("🏠 HOME")
-        btn_home.setObjectName("home_btn")
+        btn_home.setStyleSheet("font-weight: bold; font-size: 11pt; padding: 5px 15px;")
         btn_home.clicked.connect(self.go_home)
         toolbar.addWidget(btn_home)
+        
+        toolbar.addSeparator()
+        
+        # 툴바에도 바로가기 추가 (선택사항)
+        shortcuts = [("데이터", 1), ("학습", 2), ("매매", 5)]
+        for name, idx in shortcuts:
+            btn = QPushButton(name)
+            btn.clicked.connect(lambda checked, i=idx: self.switch_page(i))
+            toolbar.addWidget(btn)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWindow()
-    win.create_toolbar() # 툴바 생성
     win.show()
     sys.exit(app.exec())
