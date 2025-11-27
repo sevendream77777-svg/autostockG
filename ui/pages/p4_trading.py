@@ -1,338 +1,473 @@
-import sys
-import os
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
-                               QLabel, QPushButton, QTableWidget, QTableWidgetItem, 
-                               QHeaderView, QDateEdit, QLineEdit, QFormLayout, 
-                               QSplitter, QComboBox, QMessageBox)
-from PySide6.QtCore import Qt, QDate, QTimer, Slot, QThread, Signal
+# ui/pages/p4_trading.py
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+import os, json, csv, traceback
+from typing import List, Dict, Any, Optional
+
+from PySide6.QtCore import Qt, QDate
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QLineEdit, QPushButton,
+    QComboBox, QSpinBox, QCheckBox, QTextEdit, QDateEdit, QTableWidget, QTableWidgetItem,
+    QFileDialog, QGroupBox
+)
+
+import requests
 
 # ---------------------------------------------------------
-# [필수] 루트 경로 설정
+# 환경 변수
 # ---------------------------------------------------------
-current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
-sys.path.append(root_dir)
+KIWOOM_HOST = os.getenv("KIWOOM_HOST", "https://api.kiwoom.com")
+AUTH_TOKEN  = os.getenv("KIWOOM_TOKEN", "")  # "Bearer ..." 또는 순수 토큰
 
-# Kiwoom REST API 모듈 임포트
-try:
-    from kiwoom_rest.kiwoom_api import KiwoomRestApi
-except ImportError:
-    KiwoomRestApi = None
+def _bearer(token: str) -> str:
+    t = (token or "").strip()
+    return t if t.lower().startswith("bearer ") else f"Bearer {t}" if t else ""
 
-# ==========================================================
-# [백그라운드] 데이터 수집 스레드 (멈춤 방지)
-# ==========================================================
-class DataFetcher(QThread):
-    data_received = Signal(dict, dict) # kospi, account
 
-    def __init__(self, api):
-        super().__init__()
-        self.api = api
+# ---------------------------------------------------------
+# 공통 유틸
+# ---------------------------------------------------------
+def pretty(obj: Any) -> str:
+    try:
+        return json.dumps(obj, ensure_ascii=False, indent=2)
+    except Exception:
+        return str(obj)
 
-    def run(self):
-        """API 문서에 맞춘 정확한 데이터 요청"""
-        if not self.api: return
+def normalize_ohlcv(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out = []
+    for r in items:
+        date = r.get("dt") or r.get("date")
+        out.append({
+            "date": date,
+            "open": r.get("open_pric"),
+            "high": r.get("high_pric"),
+            "low":  r.get("low_pric"),
+            "close": r.get("close_pric"),
+            "volume": r.get("trde_qty"),
+        })
+    return out
 
-        # --------------------------------------------------
-        # 1. KOSPI 조회 (ka20003) - 문서 기준 수정
-        # --------------------------------------------------
-        kospi_data = {}
+
+# ---------------------------------------------------------
+# 디버그 가능한 POST 함수
+# ---------------------------------------------------------
+def debug_post(url: str, headers: Dict[str, str], body: Dict[str, Any], timeout: int = 15):
+    """실제 전송된 헤더/바디/URL + 응답/에러까지 모두 반환"""
+    session = requests.Session()
+    req = requests.Request("POST", url, headers=headers, json=body)
+    prepped = session.prepare_request(req)
+
+    result = {
+        "outgoing_url": prepped.url,
+        "outgoing_headers": dict(prepped.headers),
+        "outgoing_body": body,
+        "status": None,
+        "resp_headers": {},
+        "json": None,
+        "text": None,
+        "error": None
+    }
+
+    try:
+        resp = session.send(prepped, timeout=timeout)
+        result["status"] = resp.status_code
+        result["resp_headers"] = dict(resp.headers)
+
         try:
-            # [문서] 필수 파라미터: inds_cd
-            res = self.api._call_api(
-                api_id="ka20003", 
-                url_path="/api/dostk/sect", 
-                body={"inds_cd": "001"}, 
-                method="POST"
-            )
-            
-            # [문서] 응답 구조: {"all_inds_idex": [...], "return_code": 0}
-            if res and str(res.get("return_code")) == "0":
-                data_list = res.get("all_inds_idex", [])
-                if data_list and len(data_list) > 0:
-                    kospi_data = data_list[0] # 리스트 첫번째 요소가 KOSPI
-            else:
-                print(f"[Error] KOSPI 실패: {res.get('return_msg', res)}") 
-        except Exception as e:
-            print(f"[Critical] KOSPI 예외: {e}")
+            result["json"] = resp.json()
+        except Exception:
+            result["text"] = resp.text
 
-        # --------------------------------------------------
-        # 2. 예수금 조회 (kt00001) - 문서 기준 수정
-        # --------------------------------------------------
-        account_data = {}
-        try:
-            # [문서] Body: qry_tp
-            res = self.api.get_deposit_details(qry_tp="2")
-            
-            # [문서] 응답 구조: {"entr": "...", "return_code": 0} -> output 래퍼 없음!
-            if res and str(res.get("return_code")) == "0":
-                account_data = res # 전체 응답을 그대로 전달 (entr이 루트에 있음)
-            else:
-                print(f"[Error] 예수금 실패: {res.get('return_msg', res)}")
-        except Exception as e:
-            print(f"[Critical] 예수금 예외: {e}")
-        
-        self.data_received.emit(kospi_data, account_data)
+        resp.raise_for_status()
 
+    except Exception:
+        result["error"] = traceback.format_exc()
+
+    return result
+
+
+# ---------------------------------------------------------
+# TradingPage UI
+# ---------------------------------------------------------
 class TradingPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        
-        # API 초기화
-        self.api = None
-        if KiwoomRestApi:
-            try:
-                self.api = KiwoomRestApi()
-                print("[System] Kiwoom REST API 준비 완료")
-            except Exception as e:
-                print(f"[System] API 준비 실패: {e}")
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._setup_ui()
+        self._connect()
+        self._log("[SYSTEM] P4 (Kiwoom REST, Debug Mode Enabled) Loaded.")
+        self._log(f"[ENV] KIWOOM_HOST={KIWOOM_HOST}")
+        self._log(f"[ENV] KIWOOM_TOKEN={'SET' if AUTH_TOKEN else 'EMPTY'}")
 
-        # 스레드 설정
-        self.worker = None
-        if self.api:
-            self.worker = DataFetcher(self.api)
-            self.worker.data_received.connect(self.on_data_update)
+    # ---------------- UI 구성 ----------------
+    def _setup_ui(self):
+        root = QVBoxLayout(self)
 
-        # UI 구성
-        self.init_ui()
-        self.init_signals()
-        
-        # 자동 갱신 (5초)
-        self.refresh_timer = QTimer(self)
-        self.refresh_timer.timeout.connect(self.start_background_worker)
-        self.refresh_timer.start(5000) 
+        # 대시보드
+        box_dash = QGroupBox("요약 대시보드")
+        g = QGridLayout(box_dash)
+        self.lbl_dep = QLabel("예수금: -")
+        self.lbl_hold = QLabel("보유종목수: -")
+        self.lbl_pnl = QLabel("총평가/손익: -")
+        self.btn_dash = QPushButton("대시보드 갱신")
 
-        # 초기 실행 (1초 후)
-        QTimer.singleShot(1000, self.start_background_worker)
+        g.addWidget(self.lbl_dep, 0, 0)
+        g.addWidget(self.lbl_hold, 0, 1)
+        g.addWidget(self.lbl_pnl, 1, 0)
+        g.addWidget(self.btn_dash, 1, 1)
+        root.addWidget(box_dash)
 
-    def init_ui(self):
-        layout = QVBoxLayout(self)
-        
-        # --- 상단 ---
-        h_top = QHBoxLayout()
-        
-        gb_market = QGroupBox("📊 Market Index (KOSPI)")
-        h_market = QHBoxLayout()
-        self.lbl_kospi = QLabel("KOSPI: 조회 대기...")
-        self.lbl_kospi.setStyleSheet("color: #bf616a; font-weight: bold; font-size: 14pt;")
-        h_market.addWidget(self.lbl_kospi)
-        gb_market.setLayout(h_market)
-        h_top.addWidget(gb_market)
-        
-        gb_account = QGroupBox("💰 내 계좌 (예수금)")
-        h_acc = QHBoxLayout()
-        self.lbl_deposit = QLabel("예수금: - 원")
-        self.lbl_deposit.setStyleSheet("font-weight: bold; color: #ebcb8b;")
-        h_acc.addWidget(self.lbl_deposit)
-        
-        btn_refresh = QPushButton("🔄")
-        btn_refresh.setFixedWidth(30)
-        btn_refresh.clicked.connect(self.start_background_worker)
-        h_acc.addWidget(btn_refresh)
-        gb_account.setLayout(h_acc)
-        h_top.addWidget(gb_account)
-        
-        layout.addLayout(h_top)
+        # 디버그 옵션
+        dbg_box = QGroupBox("디버그 옵션")
+        dg = QGridLayout(dbg_box)
+        self.chk_debug = QCheckBox("디버그 모드(전체 요청/응답 출력)")
+        self.chk_dual_auth = QCheckBox("authorization 헤더 이중전송")
+        self.chk_save_req = QCheckBox("요청 결과 저장(CSV/JSON)")
 
-        # --- 중앙 ---
-        splitter = QSplitter(Qt.Horizontal)
+        dg.addWidget(self.chk_debug, 0, 0)
+        dg.addWidget(self.chk_dual_auth, 0, 1)
+        dg.addWidget(self.chk_save_req, 0, 2)
+        root.addWidget(dbg_box)
 
-        # [좌측] 추천
-        gb_left = QGroupBox("🏆 추천")
-        v_left = QVBoxLayout()
-        self.table_top10 = QTableWidget()
-        self.table_top10.setColumnCount(3)
-        self.table_top10.setHorizontalHeaderLabels(["코드", "종목명", "점수"])
-        self.table_top10.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table_top10.setSelectionBehavior(QTableWidget.SelectRows)
-        v_left.addWidget(self.table_top10)
-        gb_left.setLayout(v_left)
-        splitter.addWidget(gb_left)
+        # 본문
+        body = QHBoxLayout()
+        root.addLayout(body)
 
-        # [중앙] 시세
-        gb_center = QGroupBox("📈 시세")
-        v_center = QVBoxLayout()
-        self.lbl_stock_name = QLabel("종목 선택")
-        self.lbl_stock_name.setStyleSheet("font-size: 16pt; font-weight: bold;")
-        self.lbl_current_price = QLabel("현재가: -")
-        self.lbl_current_price.setStyleSheet("font-size: 14pt; color: #a3be8c;")
-        self.lbl_rate = QLabel("등락률: -")
-        v_center.addWidget(self.lbl_stock_name)
-        v_center.addWidget(self.lbl_current_price)
-        v_center.addWidget(self.lbl_rate)
-        
-        self.chart_area = QLabel("차트 영역")
-        self.chart_area.setAlignment(Qt.AlignCenter)
-        self.chart_area.setStyleSheet("background: #2e3440; border: 1px solid #4c566a; min-height: 200px;")
-        v_center.addWidget(self.chart_area)
-        
-        gb_center.setLayout(v_center)
-        splitter.addWidget(gb_center)
+        # 좌측
+        left = QVBoxLayout()
+        body.addLayout(left, 4)
 
-        # [우측] 주문
-        gb_right = QGroupBox("⚡ 주문")
-        v_right = QVBoxLayout()
-        form = QFormLayout()
-        self.txt_code = QLineEdit()
-        self.txt_code.setPlaceholderText("종목코드")
-        form.addRow("코드:", self.txt_code)
-        self.combo_type = QComboBox()
-        self.combo_type.addItems(["지정가", "시장가"])
-        form.addRow("구분:", self.combo_type)
-        self.spin_qty = QLineEdit()
-        self.spin_qty.setPlaceholderText("수량")
-        form.addRow("수량:", self.spin_qty)
-        self.spin_price = QLineEdit()
-        self.spin_price.setPlaceholderText("단가")
-        form.addRow("단가:", self.spin_price)
-        v_right.addLayout(form)
-        
-        h_btns = QHBoxLayout()
-        self.btn_buy = QPushButton("매수")
-        self.btn_sell = QPushButton("매도")
-        h_btns.addWidget(self.btn_buy)
-        h_btns.addWidget(self.btn_sell)
-        v_right.addLayout(h_btns)
-        
-        self.table_orders = QTableWidget()
-        self.table_orders.setColumnCount(4)
-        self.table_orders.setHorizontalHeaderLabels(["주문번호", "종목", "구분", "수량"])
-        v_right.addWidget(self.table_orders)
-        
-        gb_right.setLayout(v_right)
-        splitter.addWidget(gb_right)
-        
-        splitter.setSizes([200, 400, 200])
-        layout.addWidget(splitter)
+        # 조회 박스
+        gb_q = QGroupBox("조회 패널 (ka10081)")
+        qg = QGridLayout(gb_q)
 
-    def init_signals(self):
-        self.table_top10.cellClicked.connect(self.on_table_cell_clicked)
-        self.btn_buy.clicked.connect(lambda: self.send_order("buy"))
-        self.btn_sell.clicked.connect(lambda: self.send_order("sell"))
-        self.txt_code.returnPressed.connect(self.on_code_entered)
-        self.load_mock_recommendations()
+        self.ed_code = QLineEdit(); self.ed_code.setPlaceholderText("종목코드 예: 005930")
+        self.btn_code = QPushButton("코드조회")
 
-    def on_code_entered(self):
-        code = self.txt_code.text().strip()
-        if len(code) == 6:
-            self.fetch_stock_price(code)
+        self.de_base = QDateEdit(QDate.currentDate())
+        self.de_base.setDisplayFormat("yyyy-MM-dd")
+        self.de_base.setCalendarPopup(True)
 
-    def start_background_worker(self):
-        if self.worker and not self.worker.isRunning():
-            self.worker.start()
+        self.sp_cnt = QSpinBox(); self.sp_cnt.setRange(1, 3000); self.sp_cnt.setValue(120)
+        self.cmb_adj = QComboBox(); self.cmb_adj.addItems(["수정주가(1)", "원주가(0)"])
+        self.chk_cont = QCheckBox("연속조회")
 
-    @Slot(dict, dict)
-    def on_data_update(self, kospi_data, account_data):
-        """데이터 수신 시 UI 업데이트 (필드명 문서 매칭)"""
-        # 1. KOSPI [ka20003]
-        # 문서 필드명: cur_prc(현재가), flu_rt(등락률)
-        if kospi_data:
-            price = kospi_data.get("cur_prc", "-")
-            rate = kospi_data.get("flu_rt", "0.0")
-            
-            # 값 포맷팅
-            self.lbl_kospi.setText(f"KOSPI: {price} ({rate}%)")
-            
-            try:
-                if float(rate) > 0:
-                    self.lbl_kospi.setStyleSheet("color: #bf616a; font-weight: bold; font-size: 14pt;")
-                else:
-                    self.lbl_kospi.setStyleSheet("color: #5e81ac; font-weight: bold; font-size: 14pt;")
-            except: pass
-        
-        # 2. 예수금 [kt00001]
-        # 문서 필드명: entr(예수금) -> 루트에 존재
-        if account_data:
-            deposit = account_data.get("entr", "0")
-            # 혹시 못가져오면 구형 필드명(dnca_tot_amt)도 체크
-            if deposit == "0" or not deposit:
-                deposit = account_data.get("dnca_tot_amt", "0")
+        self.btn_query = QPushButton("차트/데이터 조회")
+        self.btn_export = QPushButton("CSV 저장")
 
-            try:
-                deposit_val = int(deposit)
-                self.lbl_deposit.setText(f"예수금: {deposit_val:,} 원")
-            except:
-                self.lbl_deposit.setText(f"예수금: {deposit}")
+        r = 0
+        qg.addWidget(QLabel("종목"), r,0); qg.addWidget(self.ed_code, r,1); qg.addWidget(self.btn_code, r,2); r+=1
+        qg.addWidget(QLabel("기준일"), r,0); qg.addWidget(self.de_base, r,1); qg.addWidget(QLabel("조회일수"), r,2); qg.addWidget(self.sp_cnt, r,3); r+=1
+        qg.addWidget(QLabel("옵션"), r,0); qg.addWidget(self.cmb_adj, r,1); qg.addWidget(self.chk_cont, r,2); r+=1
+        qg.addWidget(self.btn_query, r,0,1,2); qg.addWidget(self.btn_export, r,2,1,2)
 
-    def fetch_stock_price(self, code):
-        if not self.api: return
-        try:
-            # ka10007: 시세표성정보
-            res = self.api._call_api("ka10007", "/api/dostk/mrkcond", body={"stk_cd": code})
-            if res and str(res.get("return_code")) == "0":
-                output = res.get("output", {})
-                # ka10007은 보통 output 안에 prc, flt_rt 사용
-                price = output.get("prc", "-")
-                rate = output.get("flt_rt", "0.0") 
-                name = output.get("stk_nm", "")
+        left.addWidget(gb_q)
 
-                if name: self.lbl_stock_name.setText(f"{name} ({code})")
-                
-                fmt_price = price
-                if str(price).lstrip('-').isdigit():
-                    fmt_price = f"{int(price):,}"
-                
-                self.lbl_current_price.setText(f"현재가: {fmt_price}원")
-                self.lbl_rate.setText(f"등락률: {rate}%")
-            else:
-                print(f"[Error] 시세 조회 실패: {res.get('return_msg', res)}")
-        except Exception as e:
-            print(f"[Critical] 시세 조회 중 에러: {e}")
+        # 주문 박스
+        gb_o = QGroupBox("주문 (kt10000/kt10001)")
+        og = QGridLayout(gb_o)
 
-    def send_order(self, order_type):
-        if not self.api: return
-        
-        code = self.txt_code.text().strip()
-        qty = self.spin_qty.text().strip()
-        price = self.spin_price.text().strip()
-        
-        if not code or not qty:
-            QMessageBox.warning(self, "입력 오류", "종목코드와 수량을 입력하세요.")
+        self.cmb_mkt = QComboBox(); self.cmb_mkt.addItems(["KRX", "NXT", "SOR"])
+        self.sp_qty = QSpinBox(); self.sp_qty.setRange(1, 1000000); self.sp_qty.setValue(10)
+        self.ed_price = QLineEdit(); self.ed_price.setPlaceholderText("가격(시장가=0)")
+        self.cmb_type = QComboBox(); self.cmb_type.addItems(["지정가(0)", "시장가(3)", "조건부지정가(5)"])
+        self.ed_cond = QLineEdit(); self.ed_cond.setPlaceholderText("조건단가(optional)")
+        self.btn_buy = QPushButton("매수"); self.btn_sell = QPushButton("매도")
+
+        r=0
+        og.addWidget(QLabel("거래소"), r,0); og.addWidget(self.cmb_mkt, r,1); r+=1
+        og.addWidget(QLabel("수량"), r,0); og.addWidget(self.sp_qty, r,1); r+=1
+        og.addWidget(QLabel("가격"), r,0); og.addWidget(self.ed_price, r,1); r+=1
+        og.addWidget(QLabel("주문타입"), r,0); og.addWidget(self.cmb_type, r,1); r+=1
+        og.addWidget(QLabel("조건값"), r,0); og.addWidget(self.ed_cond, r,1); r+=1
+        og.addWidget(self.btn_buy, r,0); og.addWidget(self.btn_sell, r,1)
+
+        left.addWidget(gb_o)
+        left.addStretch(1)
+
+        # 우측
+        right = QVBoxLayout()
+        body.addLayout(right, 6)
+
+        self.tbl = QTableWidget(0, 6)
+        self.tbl.setHorizontalHeaderLabels(["date","open","high","low","close","volume"])
+        self.tbl.horizontalHeader().setStretchLastSection(True)
+        self.tbl.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        self.txt_json = QTextEdit(); self.txt_json.setReadOnly(True)
+        self.txt_json.setPlaceholderText("API JSON / 요청·응답 디버그 전체 표시")
+
+        right.addWidget(self.tbl, 6)
+        right.addWidget(self.txt_json, 4)
+
+        self.txt_log = QTextEdit(); self.txt_log.setReadOnly(True)
+        root.addWidget(self.txt_log)
+
+    # ---------------------------------------------------------
+    def _connect(self):
+        self.btn_dash.clicked.connect(self._refresh_dashboard)
+        self.btn_query.clicked.connect(self._on_query)
+        self.btn_export.clicked.connect(self._on_export)
+        self.btn_buy.clicked.connect(lambda: self._on_order("BUY"))
+        self.btn_sell.clicked.connect(lambda: self._on_order("SELL"))
+
+    # ---------------------------------------------------------
+    # 대시보드
+    # ---------------------------------------------------------
+    def _refresh_dashboard(self):
+        self.lbl_dep.setText(f"예수금: - (token={'SET' if AUTH_TOKEN else 'EMPTY'})")
+        self.lbl_hold.setText("보유종목수: -")
+        self.lbl_pnl.setText("총평가/손익: -")
+        self._log("대시보드 갱신")
+
+    # ---------------------------------------------------------
+    # 조회
+    # ---------------------------------------------------------
+    def _on_query(self):
+        code = self.ed_code.text().strip()
+        if not code:
+            self._log("종목코드를 입력하세요.")
             return
 
-        trde_tp = "00" if self.combo_type.currentIndex() == 0 else "03"
-        if trde_tp == "03": price = "0"
+        base_dt = self.de_base.date().toString("yyyyMMdd")
+        upd = "1" if self.cmb_adj.currentText().startswith("수정") else "0"
+        want = self.sp_cnt.value()
+        use_cont = self.chk_cont.isChecked()
 
-        target_market = "0"
+        # 헤더 구성
+        token = _bearer(AUTH_TOKEN)
+        headers = {
+            "api-id": "ka10081",
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+        if token:
+            headers["authorization"] = token
+            if self.chk_dual_auth.isChecked():
+                headers["Authorization"] = token
+
+        url = f"{KIWOOM_HOST}/api/dostk/chart"
+        body = {
+    "stk_cd": code,
+    "base_dt": base_dt,
+    "term_cnt": str(want),         # 조회 개수 필수
+    "adj_prc_tp": upd              # 수정주가
+}
+
+
+        # 첫 요청
+        out_all = []
+        calls = []
+
+        res = debug_post(url, headers, body)
+        calls.append(self._trim(res))
+
+        items = []
+        if isinstance(res.get("json"), dict):
+            items = res["json"].get("data", [])
+        elif isinstance(res.get("json"), list):
+            items = res["json"]
+
+        out_all.extend(items or [])
+
+        cont_yn = res.get("resp_headers", {}).get("cont-yn", "N")
+        next_key = res.get("resp_headers", {}).get("next-key", None)
+
+        # 연속조회
+        while use_cont and cont_yn == "Y" and next_key and len(out_all) < want:
+            h2 = headers.copy()
+            h2["cont-yn"] = "Y"
+            h2["next-key"] = next_key
+
+            res2 = debug_post(url, h2, body)
+            calls.append(self._trim(res2))
+
+            items2 = []
+            if isinstance(res2.get("json"), dict):
+                items2 = res2["json"].get("data", [])
+            elif isinstance(res2.get("json"), list):
+                items2 = res2["json"]
+
+            out_all.extend(items2 or [])
+
+            cont_yn = res2.get("resp_headers", {}).get("cont-yn", "N")
+            next_key = res2.get("resp_headers", {}).get("next-key", None)
+
+        # 표 표시
+        norm = normalize_ohlcv(out_all[:want])
+        self._fill_table(norm)
+
+        preview = {"preview": norm[:5], "total": len(norm), "calls": calls}
+        self.txt_json.setText(pretty(preview))
+
+        if self.chk_save_req.isChecked():
+            self._save_debug_dump("ka10081", code, preview)
+
+        self._log(f"[조회완료] {code} count={len(norm)} status={res.get('status')}")
+
+    # ---------------------------------------------------------
+    # 주문
+    # ---------------------------------------------------------
+    def _on_order(self, side: str):
+        code = self.ed_code.text().strip()
+        if not code:
+            self._log("종목코드를 입력하세요.")
+            return
+
+        mkt = self.cmb_mkt.currentText().strip()
+        qty = str(self.sp_qty.value())
+        price = self.ed_price.text().strip() or "0"
+        if not price.isdigit():
+            self._log("가격은 숫자만 입력(시장가=0)")
+            return
+
+        typ_txt = self.cmb_type.currentText()
+        trde_tp = "0" if "지정가" in typ_txt else ("3" if "시장가" in typ_txt else "5")
+        cond = self.ed_cond.text().strip()
+
+        token = _bearer(AUTH_TOKEN)
+        headers = {
+            "api-id": "kt10000" if side == "BUY" else "kt10001",
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+        if token:
+            headers["authorization"] = token
+            if self.chk_dual_auth.isChecked():
+                headers["Authorization"] = token
+
+        url = f"{KIWOOM_HOST}/api/dostk/ordr"
+        body = {
+            "dmst_stex_tp": mkt,
+            "stk_cd": code,
+            "ord_qty": qty,
+            "ord_uv": price,
+            "trde_tp": trde_tp,
+            "cond_uv": cond or ""
+        }
+
+        res = debug_post(url, headers, body)
+        payload = self._trim(res)
+
+        self.txt_json.setText(pretty(payload))
+
+        if self.chk_save_req.isChecked():
+            self._save_debug_dump("order_"+side.lower(), code, payload)
+
+        self._log(f"[주문전송] {side} {code} x{qty} @{price} status={res.get('status')}")
+
+    # ---------------------------------------------------------
+    # 헬퍼: 응답에서 핵심만 남겨 정리
+    # ---------------------------------------------------------
+    def _trim(self, res: Dict[str, Any]):
+        return {
+            "status": res.get("status"),
+            "outgoing_url": res.get("outgoing_url"),
+            "outgoing_headers": res.get("outgoing_headers"),
+            "resp_headers": res.get("resp_headers"),
+            "json": res.get("json"),
+            "text": res.get("text"),
+            "error": res.get("error")
+        }
+
+    # ---------------------------------------------------------
+    # CSV 테이블 출력
+    # ---------------------------------------------------------
+    def _fill_table(self, rows: List[Dict[str, Any]]):
+        self.tbl.setRowCount(0)
+        for r in rows:
+            i = self.tbl.rowCount()
+            self.tbl.insertRow(i)
+            self.tbl.setItem(i, 0, QTableWidgetItem(str(r.get("date",""))))
+            self.tbl.setItem(i, 1, QTableWidgetItem(str(r.get("open",""))))
+            self.tbl.setItem(i, 2, QTableWidgetItem(str(r.get("high",""))))
+            self.tbl.setItem(i, 3, QTableWidgetItem(str(r.get("low",""))))
+            self.tbl.setItem(i, 4, QTableWidgetItem(str(r.get("close",""))))
+            self.tbl.setItem(i, 5, QTableWidgetItem(str(r.get("volume",""))))
+
+    # ---------------------------------------------------------
+    # 조회 결과 CSV 저장
+    # ---------------------------------------------------------
+    def _on_export(self):
+        """조회 결과 테이블을 CSV 파일로 저장"""
+        if self.tbl.rowCount() == 0:
+            self._log("저장할 데이터 없음.")
+            return
+
+        fn, _ = QFileDialog.getSaveFileName(
+            self,
+            "조회 결과 CSV 저장",
+            "chart_result.csv",
+            "CSV (*.csv)"
+        )
+        if not fn:
+            return
 
         try:
-            if order_type == "buy":
-                res = self.api.buy_order(target_market, code, qty, price, trde_tp)
-            else:
-                res = self.api.sell_order(target_market, code, qty, price, trde_tp)
-                
-            if res and str(res.get("return_code")) == "0":
-                output = res.get("output", {})
-                ord_no = output.get("ord_no", "접수") 
-                if not output:
-                    ord_no = res.get("ord_no", "접수")
-                    
-                QMessageBox.information(self, "주문 성공", f"주문번호: {ord_no}")
-                self.add_order_log(ord_no, code, order_type, qty)
-            else:
-                msg = res.get("return_msg", "오류")
-                QMessageBox.warning(self, "주문 실패", f"{msg}")
+            headers = ["date","open","high","low","close","volume"]
+            with open(fn, "w", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                w.writerow(headers)
+                for i in range(self.tbl.rowCount()):
+                    row = []
+                    for c in range(self.tbl.columnCount()):
+                        it = self.tbl.item(i,c)
+                        row.append(it.text() if it else "")
+                    w.writerow(row)
+            self._log(f"[CSV 저장완료] {fn}")
+
         except Exception as e:
-            QMessageBox.critical(self, "에러", str(e))
+            self._log(f"[CSV 저장오류] {e}")
 
-    def load_mock_recommendations(self):
-        self.table_top10.setRowCount(0)
-        data = [("005930", "삼성전자", "95.5"), ("000660", "SK하이닉스", "92.1")]
-        for r, (c, n, s) in enumerate(data):
-            self.table_top10.insertRow(r)
-            self.table_top10.setItem(r, 0, QTableWidgetItem(c))
-            self.table_top10.setItem(r, 1, QTableWidgetItem(n))
-            self.table_top10.setItem(r, 2, QTableWidgetItem(s))
+    # ---------------------------------------------------------
+    # 요청/응답 디버그 저장(JSON + CSV)
+    # ---------------------------------------------------------
+    def _save_debug_dump(self, tag: str, code: str, data: Dict[str, Any]):
+        """디버그 요청/응답 저장"""
 
-    def on_table_cell_clicked(self, row, col):
-        code = self.table_top10.item(row, 0).text()
-        self.txt_code.setText(code)
-        self.fetch_stock_price(code)
+        # JSON 저장
+        try:
+            fn_json, _ = QFileDialog.getSaveFileName(
+                self,
+                f"{tag} 저장(JSON)",
+                f"{tag}_{code}.json",
+                "JSON (*.json)"
+            )
+            if fn_json:
+                with open(fn_json, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                self._log(f"[JSON 저장완료] {fn_json}")
+        except Exception as e:
+            self._log(f"[JSON 저장오류] {e}")
 
-    def add_order_log(self, ord_no, code, type_str, qty):
-        row = self.table_orders.rowCount()
-        self.table_orders.insertRow(row)
-        self.table_orders.setItem(row, 0, QTableWidgetItem(str(ord_no)))
-        self.table_orders.setItem(row, 1, QTableWidgetItem(code))
-        self.table_orders.setItem(row, 2, QTableWidgetItem("매수" if type_str=="buy" else "매도"))
-        self.table_orders.setItem(row, 3, QTableWidgetItem(qty))
+        # 테이블 CSV 저장
+        try:
+            if self.tbl.rowCount() == 0:
+                return
+
+            fn_csv, _ = QFileDialog.getSaveFileName(
+                self,
+                f"{tag} CSV 저장",
+                f"{tag}_{code}.csv",
+                "CSV (*.csv)"
+            )
+            if fn_csv:
+                headers = ["date","open","high","low","close","volume"]
+                with open(fn_csv, "w", newline="", encoding="utf-8") as f:
+                    w = csv.writer(f)
+                    w.writerow(headers)
+                    for i in range(self.tbl.rowCount()):
+                        row = []
+                        for c in range(self.tbl.columnCount()):
+                            t = self.tbl.item(i,c)
+                            row.append(t.text() if t else "")
+                        w.writerow(row)
+
+                self._log(f"[CSV 저장완료] {fn_csv}")
+
+        except Exception as e:
+            self._log(f"[CSV 저장오류] {e}")
+
+    # ---------------------------------------------------------
+    # 로그 출력
+    # ---------------------------------------------------------
+    def _log(self, msg: str):
+        self.txt_log.append(msg)

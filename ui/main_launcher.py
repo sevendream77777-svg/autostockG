@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
             TrainingPage(),     # Index 2 (P1)
             AnalysisPage(),     # Index 3 (P2)
             PredictionPage(),   # Index 4 (P3)
-            TradingPage(),      # Index 5 (P4)
+            TradingPage(),    # Index 5 (P4)
             PortfolioPage(),    # Index 6 (P5)
             SettingsPage()      # Index 7 (P6)
         ]
