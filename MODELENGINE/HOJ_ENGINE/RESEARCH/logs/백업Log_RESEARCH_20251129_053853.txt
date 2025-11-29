@@ -1,0 +1,72 @@
+🚀 학습 프로세스 시작 (모드: RESEARCH)...
+=== 🚀 Unified HOJ Trainer V31 (RESEARCH) ===
+[CFG] mode=research  horizon=5  input_window=60  valid_days=365  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-28 | rows=6,079,116
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=60d | After rows=5,878,639 | Date: 2015-04-01~2025-11-12
+[SPLIT] Train=5,198,206, Valid=680,433
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.442844 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5198206, number of used features: 19
+[LightGBM] [Info] Start training from score 0.001966
+
+[0] valid_0-rmse: 0.087146
+[50] valid_0-rmse: 0.087891
+[100] valid_0-rmse: 0.089373
+[150] valid_0-rmse: 0.090074
+[200] valid_0-rmse: 0.090465
+[250] valid_0-rmse: 0.090574
+[300] valid_0-rmse: 0.090900
+[350] valid_0-rmse: 0.091374
+[400] valid_0-rmse: 0.091480
+[450] valid_0-rmse: 0.091561
+[500] valid_0-rmse: 0.091694
+[550] valid_0-rmse: 0.091879
+[600] valid_0-rmse: 0.091982
+[650] valid_0-rmse: 0.092012
+[700] valid_0-rmse: 0.092315
+[750] valid_0-rmse: 0.092452
+[800] valid_0-rmse: 0.092564
+[850] valid_0-rmse: 0.092580
+[900] valid_0-rmse: 0.092596
+[950] valid_0-rmse: 0.092628[LightGBM] [Info] Number of positive: 2336478, number of negative: 2861728
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.103367 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5198206, number of used features: 19
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.449478 -> initscore=-0.202781
+[LightGBM] [Info] Start training from score -0.202781
+
+[0] valid_0-auc: 0.553087
+[50] valid_0-auc: 0.571851
+[100] valid_0-auc: 0.569063
+[150] valid_0-auc: 0.568589
+[200] valid_0-auc: 0.565474
+[250] valid_0-auc: 0.566180
+[300] valid_0-auc: 0.566250
+[350] valid_0-auc: 0.566128
+[400] valid_0-auc: 0.565018
+[450] valid_0-auc: 0.566010
+[500] valid_0-auc: 0.565859
+[550] valid_0-auc: 0.565776
+[600] valid_0-auc: 0.566426
+[650] valid_0-auc: 0.566573
+[700] valid_0-auc: 0.566792
+[750] valid_0-auc: 0.566933
+[800] valid_0-auc: 0.567178
+[850] valid_0-auc: 0.567203
+[900] valid_0-auc: 0.566599
+[950] valid_0-auc: 0.565775[TRAIN] 모델 학습 완료
+
+[SUMMARY] 연구 결과 자동 요약
+----------------------------------------
+최근 검증 AUC 0.566, RMSE 0.0927.
+Window=60, Horizon=5 설정은 안정적입니다.
+----------------------------------------
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\RESEARCH\HOJ_ENGINE_RESEARCH_V31_h5_w60_n1000_251128.pkl
+📄 엔진 설명파일 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\HOJ_ENGINE_INFO\HOJ_ENGINE_RESEARCH_V31_h5_w60_n1000_251128.txt
+=== 🏁 Done. ===
+------------------------------------------------------------
+[SUCCESS] Process Finished

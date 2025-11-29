@@ -25,6 +25,11 @@ import lightgbm as lgb
 # ------------------------------------------------------------
 # 0) 경로 유틸
 # ------------------------------------------------------------
+# [이 부분을 import 아래, 함수 정의하는 곳 쯤에 추가해주세요]
+def df_hash(df):
+    # 판다스 내장 기능을 이용해 데이터프레임의 고유 지문(Hash)을 만듭니다.
+    return pd.util.hash_pandas_object(df).sum()
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 modelengine_dir = os.path.dirname(current_dir)
 root_dir = os.path.dirname(modelengine_dir)
@@ -293,6 +298,9 @@ def run_unified_training(
     mask_max = df_m["Date"].max().date() if len(df_m) else None
     print(f"[MASK] MaxPeriod={max_period}d | After rows={len(df_m):,} | Date: {mask_min}~{mask_max}")
 
+    df_m = df_m.sort_values(["Code", "Date"], kind="mergesort").reset_index(drop=True)
+    
+    print(f"[HASH] df_m = {df_hash(df_m)}")   # ← 이 한 줄
     # 4) 분할
     if mode == "research":
         tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)

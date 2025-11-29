@@ -404,8 +404,8 @@ if __name__ == "__main__":
 
     # 16~18시는 오염방지로 중단
     if dt.time(16,0) <= now_dt.time() < dt.time(18,0):
-        log("[WARN] 16~18시는 전날 영업일 기준으로 업데이트합니다.")
-        # continue without exit
+        log("[WARN] 16~18시는 오염 방지로 수집 중단")
+        sys.exit(0)
 
     # ======================================================================
     # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH START (target_date 재설계) <<<<<<<<<<<<<<<<<<<<<<<<<
@@ -432,6 +432,7 @@ if __name__ == "__main__":
                 break
 
         # 시간대 룰 적용
+        # 비영업일(토/일/공휴일)인 경우: 시간대 무관하게 today_biz(가장 최근 영업일)로 고정
         if not is_trading_day(today):
             target_date = today_biz
         elif dt.time(16,0) <= now_t < dt.time(18,0):
@@ -442,27 +443,40 @@ if __name__ == "__main__":
         else:
             target_date = today_biz
 
+        # 미래 날짜 방지
+        if target_date > today:
+            target_date = today_biz
+
     except Exception as e:
-        raise e
+        log(f"[ERROR] 날짜 판정 실패: {e}")
+        sys.exit(1)
+
+    # ======================================================================
+    # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH END <<<<<<<<<<<<<<<<<<<<<<<<<
+    # ======================================================================
 
 
-    # 업데이트할 날짜 목록 생성
-    if last_date >= target_date:
-        dates_to_update = []
-    else:
-        dates_to_update = []
-        d = last_date + dt.timedelta(days=1)
-        while d <= target_date:
-            dates_to_update.append(d)
-            d = d + dt.timedelta(days=1)
+    # STEP 2 출력: (원본 유지)
+    log(f"[STEP 2] 수집 기간: {target_date} ~ {target_date}")
 
+    # ======================================================================
+    # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH START (범위 업데이트) <<<<<<<<<<<<<<<<<<<<<<<<<
+    # ======================================================================
+
+    # last_date 이후 ~ target_date 까지 실제 업데이트할 날짜 목록 생성
+    dates_to_update = []
+    cur = last_date
+    while cur < target_date:
+        cur = cur + dt.timedelta(days=1)
+        if is_trading_day(cur):
+            dates_to_update.append(cur)
+
+    if not dates_to_update:
+        log("✅ [SKIP] 이미 최신 데이터가 RAW에 존재합니다.")
+        sys.exit(0)
 
     # 실제 업데이트 범위 로그(정확 표기)
-    if dates_to_update:
-        log(f"[STEP 2] 실제 업데이트 범위: {dates_to_update[0]} ~ {dates_to_update[-1]}")
-    else:
-        log("[SKIP] RAW 최신이므로 업데이트 범위 없음")
-
+    log(f"[STEP 2] 실제 업데이트 범위: {dates_to_update[0]} ~ {dates_to_update[-1]}")
 
     # ======================================================================
     # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH END <<<<<<<<<<<<<<<<<<<<<<<<<
@@ -519,7 +533,7 @@ if __name__ == "__main__":
                 log(f"[WARN] KIWOOM 보조 수집 실패 → {e}")
 
         # SAVE DAILY
-        out_path = os.path.join(DAILY_DIR, f"daily_{date.strftime('%y%m%d')}.parquet")
+        out_path = os.path.join(DAILY_DIR, f"daily_{to_ymd(date)}.parquet")
         daily_df.to_parquet(out_path)
         log(f"[SAVE] DAILY 저장 완료: {out_path}")
 

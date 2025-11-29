@@ -68,7 +68,7 @@ def log(msg: str):
     print(f"[{ts}] {msg}")
 
 def _invalid_ohlcv_mask(df: pd.DataFrame) -> pd.Series:
-    subset = df[OHLCV_COLS] if all(col in df.columns for col in df.columns) else df
+    subset = df[OHLCV_COLS] if all(col in df.columns for col in OHLCV_COLS) else df
     return subset.isna().any(axis=1) | (subset <= 0).any(axis=1)
 
 # ======================
@@ -97,15 +97,16 @@ def is_trading_day(date: dt.date) -> bool:
         nearest = _nearest_bizday_cached(date_ymd)
         if nearest == date_ymd:
             return True
-    except:
-        pass
+    except Exception as e:
+        log(f"[WARN] pykrx 날짜 확인 실패 - {e}. 주말 여부로만 판정.")
 
+    # pykrx 실패 시 FDR(코스피 지수)로 휴일 여부 보조 확인
     try:
         df_tmp = fdr.DataReader("KS11", date, date)
         if df_tmp is not None and not df_tmp.empty:
             return True
-    except:
-        pass
+    except Exception as e:
+        log(f"[WARN] FDR 휴일 확인 실패 - {e}. 요일만 사용.")
 
     return date.weekday() < 5
 
@@ -121,11 +122,14 @@ def get_next_bizdate(last_date: dt.date) -> dt.date:
 # SAVE / LOAD
 # ======================
 def load_raw_main() -> pd.DataFrame:
+    # find_latest_file을 사용하여 최신 날짜 태그 파일 로드
     latest_path = find_latest_file(STOCKS_DIR, "all_stocks_cumulative")
+    
     if latest_path and os.path.exists(latest_path):
         log(f"[INFO] 최신 RAW 파일 사용: {os.path.basename(latest_path)}")
         df = pd.read_parquet(latest_path)
     else:
+        # 태그 파일이 없으면 기존 레거시 파일 확인
         if os.path.exists(RAW_MAIN):
             log(f"[INFO] 태그 파일 없음. 기존 RAW_MAIN 사용: {os.path.basename(RAW_MAIN)}")
             df = pd.read_parquet(RAW_MAIN)
@@ -163,17 +167,18 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
     if tickers is None:
         try:
             tickers = stock.get_market_ticker_list(date=to_ymd(date), market="ALL")
-        except:
+        except Exception:
             tickers = []
         if not tickers:
             try:
                 tickers = load_raw_main()["Code"].unique().tolist()
-            except:
+            except Exception:
                 tickers = []
 
     rows = []
     bad_codes = []
     target = to_ymd(date)
+    timeout_sec = 2 
 
     for idx, code in enumerate(tickers, 1):
         if idx % 100 == 0:
@@ -192,7 +197,7 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
         }
 
         try:
-            r = requests.post(url, headers=headers, json=body, timeout=2)
+            r = requests.post(url, headers=headers, json=body, timeout=timeout_sec)
             r.raise_for_status()
             js = r.json()
 
@@ -200,7 +205,6 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
             if not chart:
                 bad_codes.append(code)
                 continue
-
             matched = None
             for item in chart:
                 if str(item.get("dt")) == target:
@@ -212,7 +216,7 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
             def _to_float(v):
                 try:
                     return float(str(v).replace("+", "").replace(",", "").strip())
-                except:
+                except Exception:
                     return float("nan")
 
             rows.append({
@@ -228,20 +232,20 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
                 "Market": ""
             })
 
-        except:
+        except Exception:
             bad_codes.append(code)
+            continue
 
     df = pd.DataFrame(rows)
     log(f"[KIWOOM] {len(df)}개 종목 수집, 실패 {len(bad_codes)}개")
     return df, bad_codes
 
 # =====================================================================================
-# [복구] pykrx 수집 함수
+# [복구] pykrx 수집 함수 (이게 없어서 에러났었음)
 # =====================================================================================
 def build_daily_from_pykrx(date: dt.date) -> Tuple[pd.DataFrame, List[str]]:
     for key in ["http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY"]:
         _os.environ[key] = ""
-
     date_ymd = to_ymd(date)
     log(f"[STEP] KRX 일괄 수집 시작: {date_ymd}")
 
@@ -249,17 +253,24 @@ def build_daily_from_pykrx(date: dt.date) -> Tuple[pd.DataFrame, List[str]]:
     if df is None or df.empty:
         raise RuntimeError(f"KRX 데이터 없음: {date_ymd}")
 
-    rename_map = {"시가": "Open", "고가": "High", "저가": "Low", "종가": "Close", "거래량": "Volume"}
-    df = df.rename(columns=rename_map)
+    eng_map = {"Open": "시가", "High": "고가", "Low": "저가", "Close": "종가", "Volume": "거래량"}
+    if set(eng_map.keys()).issubset(df.columns):
+        df = df.rename(columns=eng_map)
 
-    if "등락률" in df.columns:
-        df["Change"] = df["등락률"] / 100.0
+    rename_map = {
+        "시가": "Open", "고가": "High", "저가": "Low",
+        "종가": "Close", "거래량": "Volume", "등락률": "ChangePct"
+    }
+    df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+
+    if "ChangePct" in df.columns:
+        df["Change"] = df["ChangePct"] / 100.0
     else:
         df["Change"] = 0.0
 
     df = df.reset_index().rename(columns={"티커": "Code"})
 
-    def _get_name_safe(ticker):
+    def _get_name_safe(ticker: str) -> str:
         try:
             return stock.get_market_ticker_name(ticker)
         except:
@@ -268,21 +279,22 @@ def build_daily_from_pykrx(date: dt.date) -> Tuple[pd.DataFrame, List[str]]:
     df["Name"] = df["Code"].map(_get_name_safe)
     df["Date"] = date
 
-    keep_cols = ["Date", "Open", "High", "Low", "Close", "Volume", "Change", "Code", "Name"]
+    keep_cols = ["Date","Open","High","Low","Close","Volume","Change","Code","Name"]
     for col in keep_cols:
         if col not in df.columns:
             df[col] = pd.NA
     df = df[keep_cols]
 
     mask_bad = _invalid_ohlcv_mask(df)
-    suspicious = df.loc[mask_bad, "Code"].tolist()
-    log(f"[KRX] {len(df)}개 종목 수집, 의심 {len(suspicious)}개")
-    return df, suspicious
+    suspicious_codes = df.loc[mask_bad, "Code"].tolist()
+
+    log(f"[KRX] {len(df)}개 종목 수집, 의심 {len(suspicious_codes)}개")
+    return df, suspicious_codes
 
 # =====================================================================================
-# [복구] 보조 수집
+# [복구] Fallback 소스 함수들
 # =====================================================================================
-def fetch_ohlcv_from_naver(ticker, yyyymmdd):
+def fetch_ohlcv_from_naver(ticker: str, yyyymmdd: str) -> Optional[dict]:
     url = f"https://api.finance.naver.com/siseJson.naver?symbol={ticker}&requestType=1&startTime={yyyymmdd}&endTime={yyyymmdd}"
     try:
         r = requests.get(url, timeout=5)
@@ -298,11 +310,11 @@ def fetch_ohlcv_from_naver(ticker, yyyymmdd):
     except:
         return None
 
-def fetch_ohlcv_from_fdr(ticker, yyyymmdd):
+def fetch_ohlcv_from_fdr(ticker: str, yyyymmdd: str) -> Optional[dict]:
     try:
-        d0 = dt.datetime.strptime(yyyymmdd, "%Y%m%d").date()
-        d1 = d0 + dt.timedelta(days=1)
-        df = fdr.DataReader(ticker, d0, d1)
+        start = dt.datetime.strptime(yyyymmdd, "%Y%m%d").date()
+        end = start + dt.timedelta(days=1)
+        df = fdr.DataReader(ticker, start, end)
         if df is None or df.empty:
             return None
         row = df.iloc[0]
@@ -314,12 +326,13 @@ def fetch_ohlcv_from_fdr(ticker, yyyymmdd):
     except:
         return None
 
-def fetch_ohlcv_from_yahoo(ticker, yyyymmdd):
+def fetch_ohlcv_from_yahoo(ticker: str, yyyymmdd: str) -> Optional[dict]:
     try:
-        d0 = dt.datetime.strptime(yyyymmdd, "%Y%m%d").date()
-        d1 = d0 + dt.timedelta(days=1)
+        dt_date = dt.datetime.strptime(yyyymmdd, "%Y%m%d").date()
+        start = dt_date.strftime("%Y-%m-%d")
+        end = (dt_date + dt.timedelta(days=1)).strftime("%Y-%m-%d")
         for suffix in [".KS", ".KQ", ""]:
-            df = yf.download(f"{ticker}{suffix}", start=d0, end=d1, progress=False)
+            df = yf.download(f"{ticker}{suffix}", start=start, end=end, progress=False)
             if df is None or df.empty:
                 continue
             row = df.iloc[0]
@@ -332,13 +345,14 @@ def fetch_ohlcv_from_yahoo(ticker, yyyymmdd):
     except:
         return None
 
-FALLBACK_SOURCES = [
+FALLBACK_SOURCES: Iterable[Tuple[str, Callable[[str,str], Optional[dict]]]] = [
     ("fdr", fetch_ohlcv_from_fdr),
     ("yahoo", fetch_ohlcv_from_yahoo),
     ("naver", fetch_ohlcv_from_naver),
 ]
 
-def fill_missing_with_sources(daily_df, date, codes, sources=None):
+def fill_missing_with_sources(daily_df: pd.DataFrame, date: dt.date, codes: List[str],
+                              sources: Optional[Iterable[Tuple[str,Callable[[str,str],Optional[dict]]]]] = None):
     if not codes:
         return daily_df, []
     if sources is None:
@@ -350,31 +364,33 @@ def fill_missing_with_sources(daily_df, date, codes, sources=None):
     for source_name, fetcher in sources:
         if not unresolved:
             break
-        log(f"[{source_name.upper()}] 보조 수집 시작 ({len(unresolved)}개)")
+        log(f"[{source_name.upper()}] 보조 수집 시작, {len(unresolved)}개 남음")
 
         still = []
-        updated = {}
+        rows_update = {}
 
         for code in unresolved:
             o = fetcher(code, date_ymd)
             if not o:
                 still.append(code)
                 continue
-            updated[code] = o
+            rows_update[code] = o
 
-        for code, o in updated.items():
+        for code, o in rows_update.items():
             idx = daily_df.index[daily_df["Code"] == code].tolist()
             if idx:
-                for col in ["Open", "High", "Low", "Close", "Volume"]:
-                    daily_df.at[idx[0], col] = o[col]
-                daily_df.at[idx[0], "Change"] = 0.0
+                i = idx[0]
+                for col in ["Open","High","Low","Close","Volume"]:
+                    daily_df.at[i, col] = o[col]
+                daily_df.at[i, "Change"] = 0.0
 
         unresolved = still
-        log(f"[{source_name.upper()}] 남은 코드는 {len(unresolved)}개")
+        log(f"[{source_name.upper()}] 처리 후 남은 코드: {len(unresolved)}")
 
     return daily_df, unresolved
 
-def build_daily_from_fallback_sources(date, tickers):
+
+def build_daily_from_fallback_sources(date: dt.date, tickers: Iterable[str]) -> Tuple[pd.DataFrame, List[str]]:
     tickers = list(dict.fromkeys(tickers))
     base = pd.DataFrame({"Code": tickers})
     base["Date"] = date
@@ -382,11 +398,11 @@ def build_daily_from_fallback_sources(date, tickers):
         if col not in base.columns:
             base[col] = pd.NA
 
-    df, unresolved = fill_missing_with_sources(base, date, tickers)
-    mask_bad = _invalid_ohlcv_mask(df)
-    unresolved = list(dict.fromkeys(unresolved + df.loc[mask_bad, "Code"].tolist()))
-    log(f"[FALLBACK] 성공 {len(df) - len(unresolved)}건, 실패 {len(unresolved)}건")
-    return df, unresolved
+    daily_df, unresolved = fill_missing_with_sources(base, date, tickers, FALLBACK_SOURCES)
+    mask_bad = _invalid_ohlcv_mask(daily_df)
+    unresolved = list(dict.fromkeys(unresolved + daily_df.loc[mask_bad, "Code"].tolist()))
+    log(f"[FALLBACK] 성공 {len(daily_df) - len(unresolved)}건, 실패 {len(unresolved)}건")
+    return daily_df, unresolved
 
 
 # =====================================================================================
@@ -402,134 +418,115 @@ if __name__ == "__main__":
     last_date = raw_df["Date"].max()
     log(f"[STEP 1] RAW 최신 날짜: {last_date}")
 
-    # 16~18시는 오염방지로 중단
-    if dt.time(16,0) <= now_dt.time() < dt.time(18,0):
-        log("[WARN] 16~18시는 전날 영업일 기준으로 업데이트합니다.")
-        # continue without exit
-
-    # ======================================================================
-    # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH START (target_date 재설계) <<<<<<<<<<<<<<<<<<<<<<<<<
-    # ======================================================================
+    # 16~18시는 오염 방지로 중단
+    if dt.time(16, 0) <= now_dt.time() < dt.time(18, 0):
+        log("[WARN] 16~18시는 오염 방지로 수집 중단")
+        sys.exit(0)
 
     try:
         now_t = now_dt.time()
+        is_biz = is_trading_day(today)
 
-        # today가 휴일이면 최근 영업일로 조정
-        try:
-            nearest = stock.get_nearest_business_day_in_a_week(to_ymd(today))
-            today_biz = parse_date(nearest)
-        except:
-            tmp = today
-            while not is_trading_day(tmp):
-                tmp = tmp - dt.timedelta(days=1)
-            today_biz = tmp
+        # 1) 16:00 이전 → 무조건 전일(last_date)
+        if now_t < dt.time(16, 0):
+            target_date = last_date
 
-        # 전날 영업일 계산
-        prev_biz = today_biz
-        while True:
-            prev_biz = prev_biz - dt.timedelta(days=1)
-            if is_trading_day(prev_biz):
-                break
+        # 2) 16:00~18:00 → 위에서 차단됨 (pass)
 
-        # 시간대 룰 적용
-        if not is_trading_day(today):
-            target_date = today_biz
-        elif dt.time(16,0) <= now_t < dt.time(18,0):
-            log("[WARN] 16~18시는 전날 영업일 기준으로 업데이트합니다.")
-            target_date = prev_biz
-        elif now_t < dt.time(18,0):
-            target_date = prev_biz
+        # 3) 18:00 이후
         else:
-            target_date = today_biz
+            if is_biz:
+                target_date = today
+            else:
+                target_date = last_date
+
+        # 4) 미래 날짜 방지
+        if target_date > today:
+            log("[SAFEGUARD] 미래 날짜로 점프 차단 → last_date로 조정")
+            target_date = last_date
 
     except Exception as e:
-        raise e
+        log(f"[ERROR] 날짜 판정 실패: {e}")
+        sys.exit(1)
 
+    log(f"[STEP 2] 수집 기간: {target_date} ~ {target_date}")
+    date = target_date
 
-    # 업데이트할 날짜 목록 생성
-    if last_date >= target_date:
-        dates_to_update = []
-    else:
-        dates_to_update = []
-        d = last_date + dt.timedelta(days=1)
-        while d <= target_date:
-            dates_to_update.append(d)
-            d = d + dt.timedelta(days=1)
+    # -----------------------------------------------------------
+    # [수정] 이미 해당 날짜 데이터가 존재하면 SKIP (단, 장중 업데이트는 고려 안함)
+    # -----------------------------------------------------------
+    if target_date == last_date:
+        log(f"✅ [SKIP] 이미 최신 데이터({target_date})가 RAW 파일에 존재합니다.")
+        log("   (추가 수집 없이 종료합니다.)")
+        sys.exit(0)
+    # -----------------------------------------------------------
 
+    # ===========================
+    # ⭐⭐ 1순위: pykrx
+    # ===========================
+    try:
+        daily_df, bad_codes = build_daily_from_pykrx(date)
+        log("[OK] KRX(pykrx) 데이터 사용")
+    except Exception as e:
+        log(f"[WARN] KRX(pykrx) 실패 → {e}")
+        daily_df = None
+        bad_codes = []
 
-    # 실제 업데이트 범위 로그(정확 표기)
-    if dates_to_update:
-        log(f"[STEP 2] 실제 업데이트 범위: {dates_to_update[0]} ~ {dates_to_update[-1]}")
-    else:
-        log("[SKIP] RAW 최신이므로 업데이트 범위 없음")
-
-
-    # ======================================================================
-    # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH END <<<<<<<<<<<<<<<<<<<<<<<<<
-    # ======================================================================
-
-    # ----------------------- 메인 처리 루프 -----------------------
-    # 원본 daily 처리 블록을 그대로 유지하면서 for-loop 적용
-    for date in dates_to_update:
-        log(f"[LOOP] {date} 업데이트 시작")
-
-        # ===========================
-        # ⭐⭐ 1순위: pykrx
-        # ===========================
+    # ===========================
+    # ⭐⭐ 2순위: KIWOOM
+    # ===========================
+    if daily_df is None or daily_df.empty:
         try:
-            daily_df, bad_codes = build_daily_from_pykrx(date)
-            log("[OK] KRX(pykrx) 데이터 사용")
+            daily_df, bad_codes = build_daily_from_kiwoom(date)
+            log("[OK] KIWOOM 데이터 수집 성공. 2순위 소스로 사용.")
         except Exception as e:
-            log(f"[WARN] KRX(pykrx) 실패 → {e}")
+            log(f"[WARN] KIWOOM 실패 → {e}")
             daily_df = None
             bad_codes = []
 
-        # ===========================
-        # ⭐⭐ 2순위: KIWOOM
-        # ===========================
+    # ⭐⭐ 3순위: FDR/Yahoo/Naver 전체 수집
+    if daily_df is None or daily_df.empty:
+        tickers = raw_df["Code"].unique().tolist()
+        daily_df, bad_codes = build_daily_from_fallback_sources(date, tickers)
         if daily_df is None or daily_df.empty:
-            try:
-                daily_df, bad_codes = build_daily_from_kiwoom(date)
-                log("[OK] KIWOOM 데이터 수집 성공. 2순위 소스로 사용.")
-            except Exception as e:
-                log(f"[WARN] KIWOOM 실패 → {e}")
-                daily_df = None
-                bad_codes = []
+            log("[ERROR] FDR/Yahoo/Naver fallback 도 실패")
+            sys.exit(1)
+        else:
+            log("[OK] FDR/Yahoo/Naver fallback 사용")
 
-        # ⭐⭐ 3순위: fallback
-        if daily_df is None or daily_df.empty:
-            tickers = raw_df["Code"].unique().tolist()
-            daily_df, bad_codes = build_daily_from_fallback_sources(date, tickers)
-            if daily_df is None or daily_df.empty:
-                log("[ERROR] FDR/Yahoo/Naver fallback 실패")
-                continue
-            else:
-                log("[OK] FDR/Yahoo/Naver fallback 사용")
+    # ===========================
+    # ⭐⭐ 부족분 보조 수집
+    # ===========================
+    if bad_codes:
+        try:
+            # 자동 실행 환경에서는 y 입력 없이 자동 처리하거나, 기본값 사용
+            # ans = input(...) -> 강제 진행
+            pass 
+        except Exception:
+            pass
 
-        # 부족분 보조 수집
-        if bad_codes:
-            try:
-                kiw_df, _ = build_daily_from_kiwoom(date, tickers=bad_codes)
-                if kiw_df is not None and not kiw_df.empty:
-                    kiw_sub = kiw_df[kiw_df["Code"].isin(bad_codes)]
-                    if not kiw_sub.empty:
-                        daily_df = merge_daily_into_raw(daily_df, kiw_sub)
-                        log(f"[KIWOOM] 보조 수집으로 {len(kiw_sub)}개 덮어씀")
-            except Exception as e:
-                log(f"[WARN] KIWOOM 보조 수집 실패 → {e}")
+        # (1) Kiwoom으로 의심 코드 보완 시도
+        try:
+            kiw_df, _ = build_daily_from_kiwoom(date, tickers=bad_codes)
+            if kiw_df is not None and not kiw_df.empty:
+                kiw_sub = kiw_df[kiw_df["Code"].isin(bad_codes)]
+                if not kiw_sub.empty:
+                    daily_df = merge_daily_into_raw(daily_df, kiw_sub)
+                    log(f"[KIWOOM] 보조 수집으로 {len(kiw_sub)}개 덮어씀")
+        except Exception as e:
+            log(f"[WARN] KIWOOM 보조 수집 실패 → {e}")
 
-        # SAVE DAILY
-        out_path = os.path.join(DAILY_DIR, f"daily_{date.strftime('%y%m%d')}.parquet")
-        daily_df.to_parquet(out_path)
-        log(f"[SAVE] DAILY 저장 완료: {out_path}")
+    # ===========================
+    # SAVE
+    # ===========================
+    out_path = os.path.join(DAILY_DIR, f"daily_{to_ymd(date)}.parquet")
+    daily_df.to_parquet(out_path)
+    log(f"[SAVE] DAILY 저장 완료: {out_path}")
 
-        # RAW 병합
-        raw_df = merge_daily_into_raw(raw_df, daily_df)
-
-        # (변경) RAW 최신본 저장은 루프 종료 후 1회 수행
-
-    # 루프 종료 후 RAW 최신본을 1회 저장 (누적 병합 결과)
-    saved_path = save_dataframe_with_date(raw_df, STOCKS_DIR, "all_stocks_cumulative", date_col="Date")
+    merged = merge_daily_into_raw(raw_df, daily_df)
+    
+    # [수정] 날짜 태그 저장 로직 사용 (RAW_MAIN 덮어쓰기 대신)
+    saved_path = save_dataframe_with_date(merged, STOCKS_DIR, "all_stocks_cumulative", date_col="Date")
     if saved_path:
         log(f"[SAVE] RAW 최신본 저장: {os.path.basename(saved_path)}")
     else:

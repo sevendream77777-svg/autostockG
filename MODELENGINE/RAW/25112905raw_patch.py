@@ -446,23 +446,8 @@ if __name__ == "__main__":
         raise e
 
 
-    # 업데이트할 날짜 목록 생성
-    if last_date >= target_date:
-        dates_to_update = []
-    else:
-        dates_to_update = []
-        d = last_date + dt.timedelta(days=1)
-        while d <= target_date:
-            dates_to_update.append(d)
-            d = d + dt.timedelta(days=1)
-
-
     # 실제 업데이트 범위 로그(정확 표기)
-    if dates_to_update:
-        log(f"[STEP 2] 실제 업데이트 범위: {dates_to_update[0]} ~ {dates_to_update[-1]}")
-    else:
-        log("[SKIP] RAW 최신이므로 업데이트 범위 없음")
-
+    log(f"[STEP 2] 실제 업데이트 범위: {dates_to_update[0]} ~ {dates_to_update[-1]}")
 
     # ======================================================================
     # >>>>>>>>>>>>>>>>>>>>>>>>>> PATCH END <<<<<<<<<<<<<<<<<<<<<<<<<

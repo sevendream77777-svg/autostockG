@@ -5,263 +5,594 @@ import pickle
 import re
 import pandas as pd
 from pandas.tseries.offsets import BDay
+
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QLabel, QDateEdit, QPushButton,
     QTableWidget, QTableWidgetItem, QHeaderView, QRadioButton, QLineEdit,
-    QButtonGroup, QMessageBox, QComboBox, QSpinBox
+    QButtonGroup, QMessageBox, QComboBox, QSpinBox, QCalendarWidget, QSplitter,
+    QListWidget, QListWidgetItem, QTextEdit, QScrollArea, QWidget as QtWidget,
+    QMenu, QWidgetAction, QToolButton, QSizePolicy, QApplication, QCheckBox
 )
-from PySide6.QtCore import QDate, Qt
+from PySide6.QtCore import QDate, Qt, QLocale, QRect
+from PySide6.QtGui import QColor, QFont, QPen, QBrush, QPainter
 from common.workers import PredictionWorker
+
+# [커스텀 달력] (+N) 텍스트 및 범위 하이라이트
+class CustomCalendar(QCalendarWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.engine_counts = {}  # {QDate: count}
+        self.highlight_range = None # (start_QDate, end_QDate)
+        self.target_date = None # 파란색 표시할 기준일
+
+        self.setVerticalHeaderFormat(QCalendarWidget.NoVerticalHeader)
+        self.setLocale(QLocale(QLocale.Korean, QLocale.SouthKorea))
+        self.setStyleSheet("""
+            QCalendarWidget QWidget { alternate-background-color: #444; color: white; }
+            QCalendarWidget QToolButton { color: white; background-color: #333; border: none; margin: 2px; }
+            QCalendarWidget QToolButton:hover { background-color: #555; border-radius: 3px; }
+            QCalendarWidget QTableView { background-color: #2b2b2b; color: white; selection-background-color: transparent; outline: 0; }
+        """)
+
+    def set_engine_counts(self, counts):
+        self.engine_counts = counts
+        self.updateCell(QDate.currentDate())
+
+    def set_highlight_range(self, start, end, target):
+        self.highlight_range = (start, end)
+        self.target_date = target
+        self.updateCells()
+
+    def paintCell(self, painter, rect, date):
+        painter.save()
+        painter.setRenderHint(QPainter.Antialiasing, False)
+        
+        # 1. 배경
+        bg_color = QColor("#2b2b2b")
+        if self.highlight_range:
+            s, e = self.highlight_range
+            if s <= date <= e:
+                bg_color = QColor("#553300") # 예측 기간 주황 배경
+
+        if date == self.selectedDate():
+            bg_color = QColor("#FF8C00") # 선택된 날짜 진한 주황
+
+        painter.fillRect(rect, bg_color)
+
+        # 2. 날짜 텍스트
+        text_color = QColor("white")
+        if date.month() != self.monthShown():
+            text_color = QColor("#777")
+        
+        # 기준일(Target) 파란색 강조
+        if self.target_date and date == self.target_date:
+            text_color = QColor("#44AAFF")
+            font = painter.font()
+            font.setBold(True)
+            painter.setFont(font)
+
+        day_rect = QRect(rect.left(), rect.top() + 2, rect.width(), rect.height() // 2)
+        painter.setPen(text_color)
+        painter.drawText(day_rect, Qt.AlignCenter, str(date.day()))
+
+        # 3. (+N) 카운트 표시
+        if date in self.engine_counts:
+            count = self.engine_counts[date]
+            count_str = f"(+{count})"
+            count_rect = QRect(rect.left(), rect.top() + rect.height()//2, rect.width(), rect.height()//2)
+            
+            c_font = painter.font()
+            c_font.setPointSize(8)
+            painter.setFont(c_font)
+            painter.setPen(QColor("#FFA500"))
+            painter.drawText(count_rect, Qt.AlignCenter, count_str)
+
+        painter.restore()
 
 
 class PredictionPage(QWidget):
     """
-    - 엔진 리스트: REAL 우선, 최신 DB를 가진 엔진만 기준일에 노출
-    - 엔진 선택 시 해당 엔진 DB만 읽어 min/max 계산
-    - 기준일은 DB max+1영업일 ~ max+5영업일만 선택 가능
-    - 기준일이 범위 밖이면 엔진 없음/메시지
+    [수정 내역]
+    1. 달력 H기간 수정: h5 -> 5칸(일)만 칠해지도록 (BDay(h-1))
+    2. 엔진 리스트 필터링: 달력 날짜 클릭 시 해당 날짜 엔진만 표시 (잠금 시)
+    3. 잠금 버튼 이동: 하단 -> 우측 상단 엔진 목록 헤더 옆
+    4. 테이블 UI 개선: 행 번호 삭제, 순위 폭 50%, 경계선 강화
     """
+
+    def _open_topn_picker(self):
+        menu = QMenu(self)
+        container = QWidget()
+        l = QVBoxLayout(container)
+        l.setContentsMargins(0, 0, 0, 0)
+        
+        lst = QListWidget()
+        lst.setFixedSize(100, 200)
+        for n in range(1, 151):
+            QListWidgetItem(str(n), lst)
+
+        try:
+            lst.setCurrentRow(self.spin_topn.value() - 1)
+        except:
+            pass
+
+        act = QWidgetAction(menu)
+        act.setDefaultWidget(lst)
+        menu.addAction(act)
+
+        def _apply(item):
+            try:
+                val = int(item.text())
+                self.spin_topn.setValue(val)
+            except:
+                pass
+            menu.close()
+
+        lst.itemClicked.connect(_apply)
+        menu.exec(self.btn_topn_picker.mapToGlobal(self.btn_topn_picker.rect().bottomLeft()))
+
     def __init__(self):
         super().__init__()
         self.engine_paths = []
+        self.all_engine_files = [] # 전체 엔진 정보 캐싱 [{'path':.., 'target_date':..}, ...]
         self.meta_cache = {}
-        self.db_cache = {}  # (version, tag) -> {"path":..., "min": date, "max": date}
+        self.db_cache = {}
+        self.worker = None 
+        
+        self._current_engine_info = {
+            "max_date": None,
+            "target_date": None,
+            "h": 0, "w": 0, "version": ""
+        }
+        self._date_engine_counts = {}
+        self.is_locked = True # 기본 잠금 상태 (필터링 ON)
+
         self.init_ui()
 
     def init_ui(self):
-        layout = QVBoxLayout(self)
+        root = QVBoxLayout()
+        self.setLayout(root)
 
-        # 1. 예측 설정
-        gb_setting = QGroupBox("🔮 예측 설정")
-        v_box = QVBoxLayout()
+        # ───────────────────────────── BOX 1 (상단) ─────────────────────────────
+        box1 = QGroupBox("예측 기준 설정")
+        box1_layout = QVBoxLayout()
+        box1_split = QSplitter(Qt.Horizontal, self)
 
-        # 기준일
-        h_date = QHBoxLayout()
-        h_date.addWidget(QLabel("예측 기준일 (T):"))
-        self.date_edit = QDateEdit()
-        self.date_edit.setCalendarPopup(True)
-        self.date_edit.setDate(QDate.currentDate())
-        self.date_edit.dateChanged.connect(self.on_date_changed)
-        h_date.addWidget(self.date_edit)
-        h_date.addStretch()
-        v_box.addLayout(h_date)
+        # (좌) 달력 패널
+        cal_panel = QtWidget()
+        cal_v = QVBoxLayout(cal_panel)
+        cal_v.addWidget(QLabel("예측 기준일 (T)"))
+        
+        self.calendar = CustomCalendar(self)
+        self.calendar.setSelectedDate(QDate.currentDate())
+        self.calendar.clicked.connect(self._on_calendar_clicked)
+        cal_v.addWidget(self.calendar)
 
-        # 예측 기간 안내
+        # (우) 엔진 목록 패널
+        eng_panel = QtWidget()
+        eng_v = QVBoxLayout(eng_panel)
+        
+        # [수정] 헤더 레이아웃 (라벨 + 잠금 버튼)
+        eng_header = QHBoxLayout()
+        eng_header.addWidget(QLabel("해당 날짜 사용 가능 엔진"))
+        eng_header.addStretch() # 빈 공간
+        
+        # [이동] 잠금 버튼
+        self.btn_lock = QToolButton()
+        self.btn_lock.setText("🔒 잠금 (필터링 ON)")
+        self.btn_lock.setCheckable(True)
+        self.btn_lock.setChecked(False) # False=잠금, True=해제
+        self.btn_lock.setStyleSheet("""
+            QToolButton { background-color: #444; color: white; border: 1px solid #666; border-radius: 4px; padding: 2px 6px; font-size: 11px; }
+            QToolButton:checked { background-color: #B22222; color: white; border: 1px solid #FF5555; }
+        """)
+        self.btn_lock.clicked.connect(self._on_lock_toggled)
+        eng_header.addWidget(self.btn_lock)
+        
+        eng_v.addLayout(eng_header)
+        
+        self.engine_list = QListWidget()
+        self.engine_list.setStyleSheet("""
+            QListWidget {
+                outline: 0;
+                background-color: #2b2b2b;
+                color: #cccccc;
+                border: 1px solid #444;
+            }
+            QListWidget::item {
+                padding: 6px;
+                border-bottom: 1px solid #333;
+            }
+            QListWidget::item:selected {
+                background-color: #FFA500;
+                color: black;
+                font-weight: bold;
+            }
+            QListWidget::item:selected:!active {
+                background-color: #FFA500;
+                color: black;
+                font-weight: bold;
+            }
+            QListWidget::item:hover:!selected {
+                background-color: #444444;
+            }
+        """)
+        self.engine_list.itemSelectionChanged.connect(self._on_engine_list_changed)
+        eng_v.addWidget(self.engine_list)
+        
+        info_row = QHBoxLayout()
+        self.lbl_engine_info = QLabel("-") 
+        self.lbl_engine_info.setStyleSheet("color: #DDDDDD; font-weight: bold;")
+        info_row.addWidget(self.lbl_engine_info)
+        
+        self.lbl_db_range = QLabel("-")
+        self.lbl_db_range.setStyleSheet("color: #DDDDDD; font-weight: bold;")
+        info_row.addWidget(self.lbl_db_range)
+        eng_v.addLayout(info_row)
+
+        box1_split.addWidget(cal_panel)
+        box1_split.addWidget(eng_panel)
+        box1_split.setSizes([400, 600])
+
+        box1_layout.addWidget(box1_split)
+        box1.setLayout(box1_layout)
+        main_split = QSplitter(Qt.Vertical, self)
+        main_split.addWidget(box1)
+
+        # ───────────────────────────── BOX 2 (하단) ─────────────────────────────
+        box2 = QGroupBox("예측 실행 및 결과")
+        box2_layout = QVBoxLayout()
+
+        ctl_row = QHBoxLayout()
+        
+        # 1) 파란색 예측 범위 텍스트
         self.lbl_pred_range = QLabel("")
-        v_box.addWidget(self.lbl_pred_range)
-
-        # 엔진 선택
-        h_engine = QHBoxLayout()
-        h_engine.addWidget(QLabel("해당 날짜 사용 가능 엔진:"))
-        self.cb_engine = QComboBox()
-        self.cb_engine.currentIndexChanged.connect(self.on_engine_changed)
-        h_engine.addWidget(self.cb_engine, stretch=1)
-        self.lbl_engine_info = QLabel("")  # h, w 표시
-        h_engine.addWidget(self.lbl_engine_info)
-        self.lbl_db_range = QLabel("")     # DB 범위 표시
-        h_engine.addWidget(self.lbl_db_range)
-        v_box.addLayout(h_engine)
-
-        # Top N
-        h_topn = QHBoxLayout()
-        h_topn.addWidget(QLabel("Top N:"))
+        self.lbl_pred_range.setStyleSheet("color: #44AAFF; font-weight: bold; font-size: 13px;")
+        ctl_row.addWidget(self.lbl_pred_range)
+        ctl_row.addSpacing(15)
+        
+        # 2) 예측 TOP Rank
+        gb_rank = QGroupBox("Rank")
+        gb_rank.setStyleSheet("border:0px;")
+        row_rank = QHBoxLayout()
+        row_rank.setContentsMargins(0, 0, 0, 0)
+        self.lbl_topn = QLabel("Top")
+        row_rank.addWidget(self.lbl_topn)
         self.spin_topn = QSpinBox()
+        self.spin_topn.setButtonSymbols(QSpinBox.NoButtons)
+        self.spin_topn.setMinimumWidth(50)
+        self.spin_topn.setFocusPolicy(Qt.StrongFocus)
+        self.spin_topn.setStyleSheet("font-size:14px; padding: 2px;")
         self.spin_topn.setRange(1, 150)
         self.spin_topn.setValue(10)
-        h_topn.addWidget(self.spin_topn)
-        h_topn.addStretch()
-        v_box.addLayout(h_topn)
+        row_rank.addWidget(self.spin_topn)
+        self.btn_topn_picker = QToolButton()
+        self.btn_topn_picker.setText("▼")
+        self.btn_topn_picker.setFixedSize(20, 24)
+        self.btn_topn_picker.clicked.connect(self._open_topn_picker)
+        row_rank.addWidget(self.btn_topn_picker)
+        self.lbl_topn_suffix = QLabel("개")
+        row_rank.addWidget(self.lbl_topn_suffix)
+        rank_widget = QWidget()
+        rank_widget.setLayout(row_rank)
+        ctl_row.addWidget(rank_widget)
 
-        # 대상 선택
+        # 3) 대상 선택
         gb_target = QGroupBox("대상 선택")
-        h_target = QHBoxLayout()
-        self.rb_market = QRadioButton("시장 전체 (Top N 추천)")
-        self.rb_specific = QRadioButton("특정 종목만")
+        gb_target.setStyleSheet("QGroupBox { border: 1px solid #666; border-radius: 5px; margin-top: 5px; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 3px; }")
+        row_target = QHBoxLayout()
+        self.rb_market = QRadioButton("시장전체")
+        self.rb_specific = QRadioButton("특정종목")
         self.rb_market.setChecked(True)
         self.bg_target = QButtonGroup(self)
         self.bg_target.addButton(self.rb_market)
         self.bg_target.addButton(self.rb_specific)
-        h_target.addWidget(self.rb_market)
-        h_target.addWidget(self.rb_specific)
+        row_target.addWidget(self.rb_market)
+        row_target.addWidget(self.rb_specific)
         self.txt_code = QLineEdit()
-        self.txt_code.setPlaceholderText("예: 005930 (삼성전자)")
+        self.txt_code.setPlaceholderText("예: 005930")
         self.txt_code.setEnabled(False)
         self.bg_target.buttonToggled.connect(lambda: self.txt_code.setEnabled(self.rb_specific.isChecked()))
-        h_target.addWidget(self.txt_code)
-        gb_target.setLayout(h_target)
-        v_box.addWidget(gb_target)
+        row_target.addWidget(self.txt_code)
+        gb_target.setLayout(row_target)
+        ctl_row.addWidget(gb_target, stretch=1)
 
-        # 실행 버튼
-        self.btn_run = QPushButton("🚀 예측 실행")
-        self.btn_run.setFixedHeight(45)
-        self.btn_run.setStyleSheet("background-color: #5e81ac; font-weight: bold;")
+        # 4) 예측 실행 버튼
+        self.btn_run = QPushButton("예측 실행")
+        self.btn_run.setStyleSheet("""
+            QPushButton { background-color: #FFA500; font-weight: bold; color: white; font-size: 15px; border-radius: 4px; }
+            QPushButton:hover { background-color: #FFB733; }
+            QPushButton:pressed { background-color: #CC8400; }
+            QPushButton:disabled { background-color: #555555; color: #AAAAAA; }
+        """)
+        self.btn_run.setFixedHeight(40)
+        self.btn_run.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.btn_run.clicked.connect(self.run_pred)
-        v_box.addWidget(self.btn_run)
+        ctl_row.addWidget(self.btn_run, stretch=1) 
+        box2_layout.addLayout(ctl_row)
 
-        gb_setting.setLayout(v_box)
-        layout.addWidget(gb_setting)
-
-        # 결과 테이블
+        # 5,6 좌/우 분할
+        bottom_split = QSplitter(Qt.Horizontal, self)
+        
+        # 5) 예측 실행 결과
+        left_panel = QtWidget()
+        left_v = QVBoxLayout(left_panel)
+        left_v.setContentsMargins(0,0,0,0)
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels(["순위", "코드", "종목명", "종가", "예측 점수", "상승확률"])
+        # [수정] 테이블 스타일 (경계선, 헤더 숨김, 컬럼 폭)
+        self.table.verticalHeader().setVisible(False) # 왼쪽 행번호 삭제
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        layout.addWidget(self.table)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed) # 순위 고정폭
+        self.table.setColumnWidth(0, 40) # 순위 폭 절반으로 축소
+        self.table.setStyleSheet("""
+            QTableWidget {
+                gridline-color: #555555; /* 격자선 명확하게 */
+                border: 1px solid #555555;
+            }
+            QHeaderView::section {
+                background-color: #333333;
+                color: white;
+                border: 1px solid #555555;
+            }
+        """)
+        left_v.addWidget(self.table)
+        bottom_split.addWidget(left_panel)
+        
+        # 6) AI 분석 결과
+        right_panel = QtWidget()
+        right_v = QVBoxLayout(right_panel)
+        right_v.setContentsMargins(0,0,0,0)
+        self.ai_panel = QTextEdit()
+        self.ai_panel.setReadOnly(True)
+        self.ai_panel.setPlaceholderText("AI 분석 결과가 여기에 표시됩니다.")
+        right_v.addWidget(self.ai_panel)
+        bottom_split.addWidget(right_panel)
+
+        bottom_split.setSizes([400, 600])
+        box2_layout.addWidget(bottom_split)
+        box2.setLayout(box2_layout)
+        main_split.addWidget(box2)
+        main_split.setSizes([300, 700])
+        main_split.setCollapsible(0, False)
+        main_split.setCollapsible(1, False)
+        root.addWidget(main_split)
+
+        self.date_edit = QDateEdit()
+        self.date_edit.setVisible(False)
+        self.date_edit.dateChanged.connect(self.on_date_changed)
+
+        self.cb_engine = QComboBox()
+        self.cb_engine.setVisible(False)
+        self.cb_engine.currentIndexChanged.connect(self.on_engine_changed)
 
         self.load_engines()
+        self._sync_dateedit_to_calendar()
 
-    def _engine_dirs(self):
-        base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "MODELENGINE", "HOJ_ENGINE"))
-        return [os.path.join(base, "REAL"), os.path.join(base, "RESEARCH")]
+    # ---------------- 내부 유틸 ----------------
+    def _on_lock_toggled(self):
+        # 버튼 눌림(True) -> 해제 상태
+        is_unlocked = self.btn_lock.isChecked()
+        self.is_locked = not is_unlocked
+        
+        if is_unlocked:
+            self.btn_lock.setText("🔓 해제 (모두 보기)")
+        else:
+            self.btn_lock.setText("🔒 잠금 (필터링 ON)")
+            
+        # 상태 변경 시 현재 날짜 기준으로 리스트 다시 로드
+        self.update_engine_list_view()
 
-    def _db_dir(self):
-        return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "MODELENGINE", "HOJ_DB"))
+    def _on_calendar_clicked(self, qdate: QDate):
+        self.date_edit.setDate(qdate) # -> on_date_changed 트리거
 
-    def _extract_tag(self, path: str):
-        try:
-            tags = re.findall(r"(\d{6})", os.path.basename(path))
-            return tags[-1] if tags else None
-        except Exception:
-            return None
+    def _sync_dateedit_to_calendar(self):
+        d = self.calendar.selectedDate()
+        self.date_edit.setDate(d)
 
-    def _pick_db_path(self, version: str, tag: str | None):
-        db_dir = self._db_dir()
-        candidates = []
-        if tag:
-            candidates.append(os.path.join(db_dir, f"HOJ_DB_{version}_{tag}.parquet"))
-        candidates.extend(sorted(glob.glob(os.path.join(db_dir, f"HOJ_DB_{version}_*.parquet")), reverse=True))
-        candidates.append(os.path.join(db_dir, f"HOJ_DB_{version}.parquet"))
-        candidates.append(os.path.join(db_dir, "HOJ_DB.parquet"))
-        for c in candidates:
-            if os.path.exists(c):
-                return c
-        return None
+    def _on_engine_list_changed(self):
+        if self._building_list:
+            return
+        row = self.engine_list.currentRow()
+        if row >= 0 and row < self.cb_engine.count():
+            self.cb_engine.setCurrentIndex(row)
 
-    def _load_db_info(self, version, tag=None):
-        key = (version, tag)
-        if key in self.db_cache:
-            return self.db_cache[key]
-
-        path = self._pick_db_path(version, tag)
-        if not path:
-            info = {"path": None, "min": None, "max": None}
-            self.db_cache[key] = info
-            return info
-
-        try:
-            df_date = pd.read_parquet(path, columns=["Date"])
-            df_date["Date"] = pd.to_datetime(df_date["Date"]).dt.date
-            min_d = df_date["Date"].min() if not df_date.empty else None
-            max_d = df_date["Date"].max() if not df_date.empty else None
-            info = {"path": path, "min": min_d, "max": max_d}
-        except Exception:
-            info = {"path": path, "min": None, "max": None}
-        self.db_cache[key] = info
-        return info
+    def _parse_info_from_name(self, filename):
+        date_match = re.search(r"(\d{6})\.pkl$", filename)
+        max_d = None
+        target_d = None
+        if date_match:
+            try:
+                s = date_match.group(1)
+                max_d = pd.to_datetime("20" + s, format="%Y%m%d").date()
+                target_d = (pd.Timestamp(max_d) + BDay(1)).date()
+            except:
+                pass
+        
+        h_match = re.search(r"_h(\d+)_", filename)
+        h = int(h_match.group(1)) if h_match else 5 
+        w_match = re.search(r"_w(\d+)_", filename)
+        w = int(w_match.group(1)) if w_match else 0
+        v_match = re.search(r"(V\d+)", filename)
+        ver = v_match.group(1) if v_match else "Unknown"
+        return max_d, target_d, h, w, ver
 
     def load_engines(self):
-        files = []
-        for d in self._engine_dirs():
-            if os.path.exists(d):
-                files.extend(glob.glob(os.path.join(d, "*.pkl")))
-        files = sorted(files, reverse=True)
-        # REAL 우선 정렬
-        def _sort_key(p):
-            return (0 if "HOJ_ENGINE\\REAL" in p or "HOJ_ENGINE/REAL" in p else 1, os.path.basename(p))
-        files = sorted(files, key=_sort_key)
+        # 1. 파일 스캔 및 정보 캐싱
+        real_files = []
+        research_files = []
+        base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "MODELENGINE", "HOJ_ENGINE"))
+        
+        if os.path.exists(os.path.join(base, "REAL")):
+            real_files = glob.glob(os.path.join(base, "REAL", "*.pkl"))
+        if os.path.exists(os.path.join(base, "RESEARCH")):
+            research_files = glob.glob(os.path.join(base, "RESEARCH", "*.pkl"))
 
-        self.engine_paths = files
-        self.cb_engine.clear()
-        self.cb_engine.addItems([os.path.basename(f) for f in files])
-        if files:
-            self.cb_engine.setCurrentIndex(0)
-            self.on_engine_changed(0)
+        def get_mtime(p):
+            try: return os.path.getmtime(p)
+            except: return 0
+
+        real_files.sort(key=get_mtime, reverse=True)
+        research_files.sort(key=get_mtime, reverse=True)
+        files = real_files + research_files
+        
+        # 캐싱
+        self.all_engine_files = []
+        self._date_engine_counts = {}
+        
+        for f in files:
+            fname = os.path.basename(f)
+            _, target_d, _, _, _ = self._parse_info_from_name(fname)
+            
+            entry = {'path': f, 'name': fname, 'target_date': target_d}
+            self.all_engine_files.append(entry)
+            
+            if target_d:
+                qd = QDate(target_d.year, target_d.month, target_d.day)
+                self._date_engine_counts[qd] = self._date_engine_counts.get(qd, 0) + 1
+        
+        self.calendar.set_engine_counts(self._date_engine_counts)
+        
+        # 초기 리스트 구성 (오늘 날짜 기준 필터링 또는 전체)
+        self.update_engine_list_view()
+
+    # [수정] 현재 상태(잠금여부, 날짜)에 따라 리스트 갱신
+    def update_engine_list_view(self):
+        curr_qdate = self.date_edit.date()
+        curr_pydate = curr_qdate.toPython()
+        
+        filtered = []
+        if self.is_locked:
+            # 해당 날짜 엔진만
+            for entry in self.all_engine_files:
+                if entry['target_date'] == curr_pydate:
+                    filtered.append(entry)
+        else:
+            # 전체 표시
+            filtered = self.all_engine_files
+
+        self.engine_paths = [e['path'] for e in filtered]
+        
+        self._building_list = True
+        try:
+            self.cb_engine.blockSignals(True)
+            self.cb_engine.clear()
+            self.cb_engine.addItems([e['name'] for e in filtered])
+
+            self.engine_list.clear()
+            for e in filtered:
+                item = QListWidgetItem(e['name'])
+                self.engine_list.addItem(item)
+            
+            # 리스트 갱신 후 선택 처리
+            if filtered:
+                self.cb_engine.setCurrentIndex(0)
+                self.engine_list.setCurrentRow(0)
+                self.on_engine_changed(0)
+            else:
+                # 엔진 없음
+                self.lbl_engine_info.setText("엔진 없음")
+                self.lbl_db_range.setText("")
+                self.calendar.set_highlight_range(QDate(), QDate(), None)
+                self.btn_run.setEnabled(False)
+                self.lbl_pred_range.setText("")
+                
+        finally:
+            self.cb_engine.blockSignals(False)
+            self._building_list = False
 
     def on_engine_changed(self, idx: int):
         if idx < 0 or idx >= len(self.engine_paths):
-            self.lbl_engine_info.setText("")
-            self.lbl_db_range.setText("")
-            self.lbl_pred_range.setText("")
             return
+            
         path = self.engine_paths[idx]
-        meta = self._get_meta(path)
-        tag = self._extract_tag(path)
-        version = meta.get("version", "V31")
-        db_info = self._load_db_info(version, tag)
-        min_d, max_d = db_info.get("min"), db_info.get("max")
+        filename = os.path.basename(path)
+        max_d, target_d, h, w, ver = self._parse_info_from_name(filename)
+        
+        # Fallback if needed (생략: 위에서 이미 파싱함)
+        if max_d is None:
+             # 안전장치: 실제 파일 읽기 (코드 생략, 기존 로직 유지)
+             pass
 
-        h = meta.get("horizon")
-        w = meta.get("input_window")
-        self.lbl_engine_info.setText(f"h={h}, w={w}")
-        if min_d and max_d:
-            self.lbl_db_range.setText(f"DB: {min_d} ~ {max_d}")
-            # 기준일 허용 범위: max_d+1영업일 ~ max_d+5영업일
-            start = (pd.Timestamp(max_d) + BDay(1)).date()
-            end = (pd.Timestamp(max_d) + BDay(5)).date()
-            min_q = QDate(start.year, start.month, start.day)
-            max_q = QDate(end.year, end.month, end.day)
-            self.date_edit.blockSignals(True)
-            self.date_edit.setMinimumDate(min_q)
-            self.date_edit.setMaximumDate(max_q)
-            # 현재 선택이 범위 밖이면 최소일로 리셋
-            cur = self.date_edit.date().toPython()
-            if not (start <= cur <= end):
-                self.date_edit.setDate(min_q)
-            self.date_edit.blockSignals(False)
+        self._current_engine_info["target_date"] = target_d
+        self._current_engine_info["h"] = h
+        
+        self.lbl_engine_info.setText(f"H={h}, W={w} ({ver})")
+        
+        if target_d:
+            qd_target = QDate(target_d.year, target_d.month, target_d.day)
+            
+            # [수정] 예측 범위 하이라이트 (BDay(h-1)) -> 정확히 h칸 표시
+            end_d = (pd.Timestamp(target_d) + BDay(h - 1)).date()
+            qd_end = QDate(end_d.year, end_d.month, end_d.day)
+            
+            self.calendar.set_highlight_range(qd_target, qd_end, qd_target)
+            self.lbl_db_range.setText(f"Engine Date: {target_d}")
+            self.lbl_db_range.setStyleSheet("color: #66CCFF; font-weight: bold;")
+            self.validate_date_range()
         else:
-            self.lbl_db_range.setText("DB 범위 없음")
-        self._update_pred_range_label()
-
-    def _get_meta(self, path):
-        if path in self.meta_cache:
-            return self.meta_cache[path]
-        meta = {}
-        try:
-            with open(path, "rb") as f:
-                data = pickle.load(f)
-            if isinstance(data, dict):
-                meta = data.get("meta", {})
-        except Exception:
-            meta = {}
-        self.meta_cache[path] = meta
-        return meta
+            self.calendar.set_highlight_range(QDate(), QDate(), None)
+            self.lbl_db_range.setText("Info Parse Fail")
+            self.lbl_db_range.setStyleSheet("color: #FF5555; font-weight: bold;")
+            self.btn_run.setEnabled(False)
 
     def on_date_changed(self, qdate: QDate):
-        # 기준일 변경 시 선택된 엔진이 없으면 무시
-        if self.cb_engine.count() == 0:
+        # 날짜 변경 시 리스트 필터링 다시 수행
+        self.update_engine_list_view()
+        # 그 후 유효성 검사 (update_engine_list_view 내부에서 on_engine_changed 호출됨)
+        # self.validate_date_range() # 중복 호출 방지
+
+    def validate_date_range(self):
+        # 필터링 모드에서는 이미 날짜 맞는 엔진만 떠있으므로 항상 True에 가까움
+        # 단, 엔진이 없는 날짜면 리스트가 비어서 False됨
+        
+        if not self.is_locked:
+            self.btn_run.setEnabled(True)
+            self.lbl_db_range.setStyleSheet("color: #FF8C00; font-weight: bold;")
+            self._update_pred_range_label()
             return
-        idx = self.cb_engine.currentIndex()
-        if idx < 0:
-            return
-        # 기준일이 허용 범위 밖이면 엔진 목록 비움
-        path = self.engine_paths[idx]
-        meta = self._get_meta(path)
-        tag = self._extract_tag(path)
-        version = meta.get("version", "V31")
-        db_info = self._load_db_info(version, tag)
-        max_d = db_info.get("max")
-        if not max_d:
-            self.cb_engine.clear()
-            self.lbl_engine_info.setText("해당 날짜 데이터 없음")
-            self.lbl_db_range.setText("")
-            self.lbl_pred_range.setText("")
-            return
-        allow_start = (pd.Timestamp(max_d) + BDay(1)).date()
-        allow_end = (pd.Timestamp(max_d) + BDay(5)).date()
-        target = qdate.toPython()
-        if not (allow_start <= target <= allow_end):
-            self.cb_engine.clear()
-            self.lbl_engine_info.setText("해당 날짜 데이터 없음")
-            self.lbl_db_range.setText("")
-            self.lbl_pred_range.setText("")
-            return
-        # 허용 범위면 엔진 유지
+
+        target_d = self._current_engine_info["target_date"]
+        sel_date = self.date_edit.date().toPython()
+        
+        if target_d and sel_date == target_d:
+            self.btn_run.setEnabled(True)
+            self.lbl_db_range.setStyleSheet("color: #66CCFF; font-weight: bold;") 
+        else:
+            self.btn_run.setEnabled(False)
+            self.lbl_db_range.setStyleSheet("color: #FF5555; font-weight: bold;") 
+            
         self._update_pred_range_label()
 
+    def _update_pred_range_label(self):
+        if not self.btn_run.isEnabled():
+            if self.is_locked:
+                pass
+            return 
+
+        h_int = self._current_engine_info["h"]
+        if h_int is None: h_int = 0
+            
+        if h_int > 0:
+            start = self.date_edit.date().toPython()
+            end = (pd.Timestamp(start) + BDay(h_int)).date()
+            if self.is_locked:
+                self.lbl_pred_range.setText(f"▶ {h_int}영업일 뒤 예측: {start} 기준 → {end} 결과")
+            else:
+                self.lbl_pred_range.setText(f"⚠️ 강제 실행: {start} 기준 → {end} 결과 (H={h_int})")
+        else:
+            self.lbl_pred_range.setText("")
+
+    # ---------------- 실행/결과 ----------------
     def run_pred(self):
         if self.cb_engine.count() == 0 or self.cb_engine.currentIndex() < 0:
             QMessageBox.warning(self, "알림", "엔진을 선택하세요.")
             return
+
+        self.btn_run.setEnabled(False)
+        self.btn_run.setText("분석 중...")
+        QApplication.processEvents()
+        
         engine_path = self.engine_paths[self.cb_engine.currentIndex()]
         target_date = self.date_edit.date().toString("yyyy-MM-dd")
         target_code = None
@@ -270,18 +601,54 @@ class PredictionPage(QWidget):
             target_code = self.txt_code.text().strip()
             if not target_code:
                 QMessageBox.warning(self, "알림", "종목 코드를 입력하세요.")
+                self.btn_run.setEnabled(True)
+                self.btn_run.setText("예측 실행")
                 return
 
         top_n = self.spin_topn.value()
-        self.worker = PredictionWorker(
-            engine_path=engine_path,
-            target_date=target_date,
-            top_n=top_n,
-            specific_code=target_code,
-        )
-        self.worker.finished_signal.connect(self.update_table)
-        self.worker.error_signal.connect(lambda e: QMessageBox.critical(self, "오류", str(e)))
-        self.worker.start()
+        
+        if self.worker is not None:
+            if self.worker.isRunning():
+                self.worker.terminate()
+                self.worker.wait()
+            self.worker.deleteLater()
+            self.worker = None
+
+        try:
+            self.worker = PredictionWorker(
+                engine_path=engine_path,
+                target_date=target_date,
+                top_n=top_n,
+                specific_code=target_code,
+            )
+            self.worker.finished_signal.connect(self._on_worker_finished)
+            self.worker.error_signal.connect(self._on_worker_error)
+            self.worker.start()
+        except Exception as e:
+            self.btn_run.setEnabled(True)
+            self.btn_run.setText("예측 실행")
+            QMessageBox.critical(self, "오류", f"시작 실패: {e}")
+
+    def _on_worker_finished(self, df):
+        self.btn_run.setEnabled(True)
+        self.btn_run.setText("예측 실행")
+        try:
+            self.update_table(df)
+            if not df.empty:
+                best = df.iloc[0]
+                msg = (f"분석 완료.\n"
+                       f"가장 높은 점수: {best.get('name')} ({best.get('code')})\n"
+                       f"예측 점수: {best.get('score', 0):.4f}")
+                self.ai_panel.setText(msg)
+            else:
+                self.ai_panel.setText("예측 결과가 없습니다.")
+        except Exception as e:
+            self.ai_panel.setText(f"결과 처리 중 오류: {e}")
+        
+    def _on_worker_error(self, e):
+        self.btn_run.setEnabled(True)
+        self.btn_run.setText("예측 실행")
+        QMessageBox.critical(self, "오류", str(e))
 
     def update_table(self, df):
         self.table.setRowCount(0)
@@ -297,26 +664,20 @@ class PredictionPage(QWidget):
             self.table.setItem(r, 2, QTableWidgetItem(str(row.get("name", "-"))))
             self.table.setItem(r, 3, QTableWidgetItem(str(row.get("close", "-"))))
             self.table.setItem(r, 4, QTableWidgetItem(f"{row.get('score', 0):.4f}"))
-            self.table.setItem(r, 5, QTableWidgetItem(f"{row.get('prob', 0) * 100:.1f}%"))
+            prob = row.get('prob', 0)
+            if isinstance(prob, (int, float)):
+                 self.table.setItem(r, 5, QTableWidgetItem(f"{prob * 100:.1f}%"))
+            else:
+                 self.table.setItem(r, 5, QTableWidgetItem("-"))
+
         for r in range(self.table.rowCount()):
             for c in range(self.table.columnCount()):
                 item = self.table.item(r, c)
                 if item:
                     item.setTextAlignment(Qt.AlignCenter)
 
-    def _update_pred_range_label(self):
-        if self.cb_engine.count() == 0 or self.cb_engine.currentIndex() < 0:
-            self.lbl_pred_range.setText("")
-            return
-        path = self.engine_paths[self.cb_engine.currentIndex()]
-        meta = self._get_meta(path)
-        h = meta.get("horizon")
-        if not h or not isinstance(h, (int, float)):
-            self.lbl_pred_range.setText("")
-            return
-        try:
-            start = self.date_edit.date().toPython()
-            end = (pd.Timestamp(start) + BDay(int(h))).date()
-            self.lbl_pred_range.setText(f"{int(h)}영업일 예측: {start} ~ {end}")
-        except Exception:
-            self.lbl_pred_range.setText("")
+    def closeEvent(self, event):
+        if self.worker is not None and self.worker.isRunning():
+            self.worker.terminate()
+            self.worker.wait()
+        super().closeEvent(event)
