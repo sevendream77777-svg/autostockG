@@ -11,6 +11,8 @@ import pandas as pd
 from datetime import datetime
 import google.generativeai as genai  # Gemini API
 import re # [추가]: 정규표현식 사용을 위해 import
+import json
+from pathlib import Path
 
 # [Patch] 엑셀 서식 관련 라이브러리 추가
 from openpyxl import load_workbook
@@ -350,79 +352,81 @@ def main(rank_by="combo", topk=10, version="V31"):
     full_report_str = "\n".join(report_content)
 
     # ------------------------------------------------------------
+    # 5-1. JSON 저장 (엔진 메타 + Top10 + AI 리포트)
+    # ------------------------------------------------------------
+    def _json_safe(x):
+        if isinstance(x, np.generic):
+            return x.item()
+        if isinstance(x, Path):
+            return str(x)
+        return x
+
+    engine_meta = payload.get("meta", {}) if isinstance(payload, dict) else {}
+    engine_info = {
+        "engine_path": str(eng_path),
+        "db_path": str(db_path),
+        **engine_meta,
+        "features": payload.get("features", []) if isinstance(payload, dict) else [],
+        "feature_importances": [],
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "prediction_date": str(max_date.date()),
+        "rank_by": rank_by,
+        "topk": int(topk),
+    }
+
+    if payload.get("model_reg") is not None and hasattr(payload["model_reg"], "feature_importances_"):
+        fi = list(zip(engine_info["features"], payload["model_reg"].feature_importances_))
+        fi = sorted(fi, key=lambda x: x[1], reverse=True)
+        engine_info["feature_importances"] = [
+            {"name": str(n), "importance": float(v)} for n, v in fi
+        ]
+
+    top10_records = []
+    for idx, row in df_out.reset_index(drop=True).iterrows():
+        rec = {"rank": idx + 1}
+        for col in df_out.columns:
+            rec[col] = _json_safe(row[col])
+        top10_records.append(rec)
+
+    json_payload = {
+        "engine_meta": engine_info,
+        "top10": top10_records,
+        "ai_report": ai_result_text.strip(),
+        "full_report": full_report_str,
+    }
+
+    info_dir = r"F:\autostockG\MODELENGINE\INFO\hoj_engine_info"
+    os.makedirs(info_dir, exist_ok=True)
+    json_name = os.path.basename(eng_path).replace(".pkl", ".json")
+    json_path = os.path.join(info_dir, json_name)
+
+    # 기존 파일이 있으면 병합(메타/Top10/AI 갱신)
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+            if isinstance(existing, dict):
+                existing["engine_meta"] = json_payload.get("engine_meta", existing.get("engine_meta"))
+                existing["top10"] = json_payload.get("top10", existing.get("top10"))
+                existing["ai_report"] = json_payload.get("ai_report", existing.get("ai_report"))
+                existing["full_report"] = json_payload.get("full_report", existing.get("full_report"))
+                json_payload = existing
+        except Exception as e:
+            print(f"[WARN] 기존 JSON 로드 실패, 새로 생성합니다: {e}")
+
+    try:
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(json_payload, f, ensure_ascii=False, indent=2)
+        print(f"[SAVE]   JSON: {json_name} (엔진/Top10/AI 통합)")
+    except Exception as e:
+        print(f"[Error] JSON 저장 실패: {e}")
+
+    # ------------------------------------------------------------
     # 6. 화면 출력
     # ------------------------------------------------------------
     print(full_report_str)
     print(f"\n[ENGINE] {os.path.basename(eng_path)}")
     print(f"[DB]     {os.path.basename(db_path)}")
-
-    # ------------------------------------------------------------
-    # 7. 파일 저장 (CSV + TXT 리포트)
-    # ------------------------------------------------------------
-    out_dir = get_path("OUTPUT")
-    os.makedirs(out_dir, exist_ok=True)
-    
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    
-    # (1) CSV 저장 (데이터용)
-    csv_name = f"recommendation_HOJ_V34_{max_date.date()}_{timestamp}_{rank_by}.csv"
-    csv_path = os.path.join(out_dir, csv_name)
-    df_out.to_csv(csv_path, index=False, encoding="utf-8-sig")
-
-    # (2) TXT 리포트 저장 (보기 편한 용도, AI의견 포함)
-    txt_name = f"Report_HOJ_V34_{max_date.date()}_{timestamp}.txt"
-    txt_path = os.path.join(out_dir, txt_name)
-    
-    with open(txt_path, "w", encoding="utf-8") as f:
-        f.write(full_report_str)
-        f.write(f"\n\n[File Info]\nCSV Data: {csv_name}\nEngine: {os.path.basename(eng_path)}")
-
-    print(f"[SAVE]   CSV: {csv_name}")
-    print(f"[SAVE]   TXT: {txt_name} (AI 분석 포함)")
-
-    # ------------------------------------------------------------
-    # 8. [패치] 엑셀 리포트 자동 생성 (Format + AI Text)
-    # ------------------------------------------------------------
-    excel_name = f"Final_Report_HOJ_{max_date.date()}_{timestamp}.xlsx"
-    excel_path = os.path.join(out_dir, excel_name)
-    
-    try:
-        print(f"\n[*] Generating Formatted Excel: {excel_name}...")
-        
-        # (1) Pandas로 데이터 쓰기
-        with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
-            # Sheet 1: Top 10 추천
-            df_out.to_excel(writer, sheet_name='Top 10 추천', index=False)
-            
-            # Sheet 2: AI 해석 (텍스트)
-            df_report = pd.DataFrame({'AI 분석 리포트': [full_report_str]})
-            df_report.to_excel(writer, sheet_name='AI 해석', index=False)
-
-        # (2) OpenPyXL로 서식 다듬기
-        wb = load_workbook(excel_path)
-        
-        # Sheet 1 서식 (컬럼 너비 자동, 헤더 스타일)
-        if 'Top 10 추천' in wb.sheetnames:
-            ws = wb['Top 10 추천']
-            auto_adjust_column_width(ws)
-            
-        # Sheet 2 서식 (줄바꿈, 너비 확장)
-        if 'AI 해석' in wb.sheetnames:
-            ws = wb['AI 해석']
-            cell = ws['A2'] # 본문 셀
-            cell.alignment = Alignment(wrap_text=True, vertical='top') # 줄바꿈 허용
-            ws.column_dimensions['A'].width = 100 # 넓게 잡기
-            
-            # 행 높이 늘리기 (내용 길이에 비례)
-            line_count = full_report_str.count('\n') + (len(full_report_str) // 100)
-            ws.row_dimensions[2].height = max(line_count * 15, 400)
-
-        wb.save(excel_path)
-        print(f"[SAVE]   Excel: {excel_name} (서식 적용 완료)")
-        
-    except Exception as e:
-        print(f"[Error] 엑셀 생성 실패: {e}")
-
 
 # ============================================================
 # CLI
