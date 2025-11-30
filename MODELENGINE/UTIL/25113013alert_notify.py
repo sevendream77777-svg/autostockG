@@ -16,70 +16,57 @@ alert_notify.py
 """
 # ==== import bootstrap (PUT THIS AT TOP) ====
 import sys, os
+sys.path.append(r"F:\autostockG\MODELENGINE")
+sys.path.append(r"F:\autostockG\MODELENGINE\Send")
 sys.path.append(r"F:\autostockG\MODELENGINE")        # 패키지 루트
 sys.path.append(r"F:\autostockG\MODELENGINE\Send")   # 모듈 직접
 
-# ------------------------------
-# Kakao: KakaoNotifier 기반 텍스트 전송 전용 래퍼
-# ------------------------------
-from typing import Optional
-
-_KAKAO_NOTIFIER = None
+# 카카오 (kakao_notifier로 교체)
 try:
-    # 프로젝트 루트/UTIL 등에 배치된 kakao_notifier.py 우선
-    from kakao_notifier import KakaoNotifier  # 텍스트 전송 전용 클래스
-    _KAKAO_NOTIFIER = KakaoNotifier
-except Exception:
-    try:
-        # 대안 경로(기존 api 패키지 구조일 경우)
-        from api.kakao_api.kakao_notifier import KakaoNotifier
-        _KAKAO_NOTIFIER = KakaoNotifier
-    except Exception:
-        _KAKAO_NOTIFIER = None
-
-def send_kakao_message(text: Optional[str] = None, image_path: Optional[str] = None) -> bool:
-    """
-    텍스트 전송 전용 래퍼.
-    이미지(image_path)는 무시한다(카카오는 텍스트만 전송).
-    """
-    if not _KAKAO_NOTIFIER:
-        print("❌ KakaoNotifier 모듈을 찾을 수 없습니다.")
+    from kakao_notifier import KakaoNotifier
+    _kakao = KakaoNotifier()
+    def send_kakao_message(text=None, image_path=None):
+        # 카카오는 현재 TEXT ONLY (나에게 보내기 기준)
+        if not text:
+            print("[KAKAO] 이미지 전송은 지원하지 않습니다.")
+            return False
+        return _kakao.send_message(text)
+except Exception as _e:
+    # 최후방어: 카카오 모듈 불가 시 더미 함수
+    def send_kakao_message(text=None, image_path=None):
+        print(f"[KAKAO] 모듈 오류: {_e}")
         return False
-    if not text:
-        print("❌ Kakao 텍스트가 비어 있음.")
-        return False
-    notifier = _KAKAO_NOTIFIER()
-    return bool(notifier.send_message(text))
 
-# ------------------------------
-# Telegram/SMS: 이름 불일치에 대비한 안전 로드
-# (send_telegram_message / send_telegram, send_sms_message / send_sms)
-# ------------------------------
+# 텔레그램 (기존 파일은 send_telegram 이라는 이름일 수 있음)
 try:
     from Send import telegram_send as _tg
 except ModuleNotFoundError:
     import telegram_send as _tg
 send_telegram_message = getattr(_tg, "send_telegram_message", getattr(_tg, "send_telegram", None))
 if not callable(send_telegram_message):
-    # 필요 시 ImportError 대신 False 반환형 래퍼로 대체
-    def send_telegram_message(text: Optional[str] = None, image_path: Optional[str] = None) -> bool:
-        print("❌ telegram_send: 전송 함수 없음.")
-        return False
+    raise ImportError("telegram_send: send_telegram_message 함수가 없습니다.")  # :contentReference[oaicite:0]{index=0}
 
+# SMS (기존 파일은 send_sms 라는 이름일 수 있음)
 try:
     from Send import sms_send as _sm
 except ModuleNotFoundError:
     import sms_send as _sm
 send_sms_message = getattr(_sm, "send_sms_message", getattr(_sm, "send_sms", None))
 if not callable(send_sms_message):
-    def send_sms_message(text: Optional[str] = None, image_path: Optional[str] = None) -> bool:
-        print("❌ sms_send: 전송 함수 없음.")
-        return False
+    raise ImportError("sms_send: send_sms_message 함수가 없습니다.")  # :contentReference[oaicite:1]{index=1}
 # ============================================
 
-import glob, json, argparse, math
+
+import os, glob, json, argparse, math
 from datetime import datetime, timedelta
-from typing import List, Tuple
+from typing import List, Tuple, Optional
+
+# === 전송 모듈(프로젝트 내 Send/...) ===
+# send_* 시그니처는 다음을 가정: send_xxx_message(text:Optional[str]=None, image_path:Optional[str]=None) -> bool
+from Send.telegram_send import send_telegram_message
+from Send.sms_send import send_sms_message
+
+# === 이미지 렌더링 ===
 from PIL import Image, ImageDraw, ImageFont
 
 # 폰트 후보 (Noto Sans CJK JP 우선)
@@ -129,12 +116,14 @@ def next_business_days(start_next_day: datetime, n: int) -> List[datetime]:
     days = []
     cur = start_next_day
     while len(days) < n:
+        # 월=0 ... 일=6
         if cur.weekday() < 5:  # 0~4만 영업일
             days.append(cur)
         cur += timedelta(days=1)
     return days
 
 def infer_engine_basename(json_path: str) -> str:
+    # 예: ...\HOJ_ENGINE_REAL_V31_h5_w60_n1000_251128.json -> 같은 이름 .png
     base = os.path.splitext(os.path.basename(json_path))[0]
     return base
 
@@ -149,7 +138,7 @@ def pct_str(v) -> str:
 # --------------------------------------------------------------------------------------
 # 텍스트 생성
 # --------------------------------------------------------------------------------------
-def make_header_and_period(meta: dict) -> Tuple[str, str]:
+def make_header_and_period(meta: dict, use_holidays: bool = False) -> Tuple[str, str]:
     """
     meta.prediction_date(YYYY-MM-DD), meta.horizon(int) 기준으로
     영업일 1일차~마지막 날짜 계산(토/일 제외).
@@ -164,6 +153,7 @@ def make_header_and_period(meta: dict) -> Tuple[str, str]:
         return ("", "")
 
     d0 = to_dt(start_base) + timedelta(days=1)  # 다음날부터 시작
+    # 휴장일 세부 반영은 추후 holiday 리스트/pykrx 캘린더 연결 시 확장
     biz_days = next_business_days(d0, horizon)
     d_start, d_end = biz_days[0], biz_days[-1]
     human = f"{from_dt(d_start)}({weekday_kr(d_start)}) ~ {from_dt(d_end)}({weekday_kr(d_end)})"
@@ -182,6 +172,7 @@ def make_text_message(data: dict, human_period: str) -> str:
     ai    = data.get("ai_report", "")
 
     header, _ = make_header_and_period(meta)
+    # TOP10 테이블(간결)
     lines = ["\n📊 오늘의 추천 종목 (TOP 10)"]
     for r in top10[:10]:
         name = str(r.get("종목명",""))
@@ -204,6 +195,7 @@ def render_card_image(data: dict, out_path: str, human_period: str, dark: bool=F
     img = Image.new("RGB", (W, H), (245,247,250) if not dark else (12,24,39))
     draw = ImageDraw.Draw(img)
 
+    # 팔레트
     if not dark:
         card_bg = (255,255,255); head_bg=(18,38,64); head_fg=(255,255,255)
         chip_bg=(36,128,220); text_main=(20,24,35); text_sub=(90,100,120); sep=(230,234,240); pos=(33,158,90)
@@ -211,6 +203,7 @@ def render_card_image(data: dict, out_path: str, human_period: str, dark: bool=F
         card_bg = (22,36,56); head_bg=(11,22,36); head_fg=(235,242,255)
         chip_bg=(58,129,245); text_main=(232,238,250); text_sub=(165,178,196); sep=(48,63,86); pos=(85,200,130)
 
+    # 폰트
     f_h1 = load_font(56); f_h2 = load_font(36); f_chip = load_font(34)
     f_name = load_font(40); f_small = load_font(30); f_kv = load_font(34)
 
@@ -221,16 +214,19 @@ def render_card_image(data: dict, out_path: str, human_period: str, dark: bool=F
     top10 = data.get("top10", [])
     ai    = data.get("ai_report","")
 
+    # 헤더
     head_h=220; head=[card[0],card[1],card[2],card[1]+head_h]
     draw.rounded_rectangle(head, radius=40, fill=head_bg)
     draw.text((card[0]+40, card[1]+40), f"G2G GARAGE : HOJ 실전엔진 {meta.get('version','')}", fill=head_fg, font=f_h1)
     draw.text((card[0]+42, card[1]+120), f"{meta.get('horizon','')}일 예측", fill=head_fg, font=f_h2)
     draw.text((card[0]+42, card[1]+168), f"예측기간  {human_period}", fill=head_fg, font=f_h2)
 
+    # 타이틀 칩
     chip_y=head[3]+30; chip=[card[0]+30,chip_y,card[0]+30+500,chip_y+64]
     draw.rounded_rectangle(chip, radius=24, fill=chip_bg)
     draw.text((chip[0]+22, chip[1]+12), "오늘의 추천 종목 (TOP 10)", fill=(255,255,255), font=f_chip)
 
+    # 리스트
     row_h=132; start_y=chip[3]+20; col_l=card[0]+40; col_r=card[2]-40
     for i, r in enumerate(top10[:10], start=1):
         y1=start_y+(i-1)*row_h
@@ -248,10 +244,12 @@ def render_card_image(data: dict, out_path: str, human_period: str, dark: bool=F
         draw.text((right_x, y1+46), "수익률", fill=text_sub,  font=f_small); draw.text((right_x+140, y1+46), ret,  fill=text_main, font=f_kv)
         draw.text((right_x, y1+86), "기대값", fill=text_sub,  font=f_small); draw.text((right_x+140, y1+86), ev,   fill=pos,       font=f_kv)
 
+    # AI 요약
     if ai:
         y0 = start_y + min(len(top10),10)*row_h + 14
         draw.line([(col_l, y0),(col_r, y0)], fill=sep, width=2)
         draw.text((col_l, y0+18), "🤖 AI 분석 요약", fill=text_main, font=f_chip)
+        # 단순 워드랩
         wrap_w = col_r - col_l
         words = str(ai).split()
         line=""; y=y0+84
@@ -279,8 +277,10 @@ def build_payload(json_path: str, dark: bool=False):
     if not human_period:
         raise ValueError("prediction_date/horizon 정보가 부족합니다.")
 
+    # 텍스트
     text = make_text_message(data, human_period)
 
+    # 이미지 경로 (JSON과 동일 파일명)
     base = infer_engine_basename(json_path)
     out_path = os.path.join(BEST_TOP_DIR, base + ".png")
     render_card_image(data, out_path, human_period, dark=dark)
@@ -297,12 +297,13 @@ def send_channels(text: Optional[str], image_path: Optional[str], channels: List
             continue
 
         if ch == "kakao":
-            # 카카오는 텍스트 전송 전용 (이미지는 무시)
-            if mode == "image":
-                print("❌ Kakao: 이미지 전송은 지원하지 않습니다(텍스트 전용).")
-                ok = False
-            else:
+            # 카카오는 텍스트/이미지 동시 지원. 내부 API 형식에 맞춰 send_kakao_message에서 처리.
+            if mode == "text":
                 ok = send_kakao_message(text=text, image_path=None)
+            elif mode == "image":
+                ok = send_kakao_message(text=None, image_path=image_path)
+            else:  # both
+                ok = send_kakao_message(text=text, image_path=image_path)
 
         elif ch == "telegram":
             if mode == "text":
@@ -313,6 +314,7 @@ def send_channels(text: Optional[str], image_path: Optional[str], channels: List
                 ok = send_telegram_message(text=text, image_path=image_path)
 
         elif ch == "sms":
+            # SMS는 이미지 미지원
             if mode == "image":
                 ok = False
             else:
@@ -346,10 +348,12 @@ def main():
     json_path = args.json.strip()
     if not json_path:
         json_path = find_latest_json()
+    # glob 패턴 지원
     matches = glob.glob(json_path)
     if not matches:
         raise FileNotFoundError(f"JSON 경로가 올바르지 않습니다: {json_path}")
 
+    # 여러 개면 최신 1개만 처리(필요시 확장 가능)
     json_path = sorted(matches, key=lambda x: os.path.getmtime(x))[-1]
 
     text, image_path, human_period = build_payload(json_path, dark=args.dark)

@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QFont
 from common.workers import TrainingWorker
 
-class TrainingPage(QWidget):
+class P2_Training(QWidget):
     def __init__(self):
         super().__init__()
         self.base_path = self.find_modelengine_path()

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+# Source: :contentReference[oaicite:0]{index=0}
 import sys, os, ctypes
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QStackedWidget, QLabel, QListWidget, QListWidgetItem, QSizePolicy, QFrame, QGridLayout
+    QStackedWidget, QLabel, QListWidget, QListWidgetItem, QSizePolicy
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QGuiApplication
+from PySide6.QtGui import QIcon, QFont
 
 # ------------------------------------------------------------
 # 경로 설정
@@ -19,7 +20,7 @@ if project_root not in sys.path:
 if ui_dir not in sys.path:
     sys.path.append(ui_dir)
 
-# 페이지 모듈 로드
+# 페이지 모듈
 try:
     from pages.p0_index import P0_Index
     from pages.p1_data_pipeline import P1_DataPipeline
@@ -38,28 +39,21 @@ except ImportError as e:
 from common.styles import build_qss
 
 # ------------------------------------------------------------
-# NavCard (반응형 카드 위젯)
+# NavCard
 # ------------------------------------------------------------
-class NavCard(QWidget):
+from PySide6.QtWidgets import QFrame, QGridLayout
+
+class NavCard(QFrame):
     def __init__(self, color_bg: str, icon_text: str, title_text: str):
         super().__init__()
         self.base_color = color_bg
-        self._scale = 1.0
+        self.setObjectName("NavCard")
+        self.setProperty("selected", False)
+        self.setProperty("hover", False)
 
-        # 카드 사이의 간격: 아래쪽 4px 여백 (간격 조정)
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 4) 
-        self.layout.setSpacing(0)
-
-        # 실제 색상이 들어가는 카드 본체
-        self.inner_card = QFrame()
-        self.inner_card.setObjectName("NavCard")
-        self.layout.addWidget(self.inner_card)
-
-        # 카드 내부 내용물 (여백 최적화)
-        lay = QGridLayout(self.inner_card)
-        # 내용이 잘리지 않도록 내부 여백을 줄임 (상하 6px)
-        lay.setContentsMargins(10, 6, 10, 6) 
+        lay = QGridLayout(self)
+        # 여백/간격 최소화: 박스 안에 글씨만 보이도록
+        lay.setContentsMargins(12, 10, 12, 10)
         lay.setHorizontalSpacing(8)
         lay.setVerticalSpacing(2)
 
@@ -69,38 +63,58 @@ class NavCard(QWidget):
 
         self.title = QLabel(title_text)
         self.title.setObjectName("NavTitle")
-        self.title.setWordWrap(False)
+        self.title.setWordWrap(False)          # 제목은 한 줄
         self.title.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
 
         self.subtitle = QLabel()
         self.subtitle.setObjectName("NavSubtitle")
-        self.subtitle.setWordWrap(True)
+        self.subtitle.setWordWrap(True)        # 설명은 자동 줄바꿈
         self.subtitle.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
+        # 아이콘+제목 같은 줄, 설명은 다음 줄(2줄 구조)
         lay.addWidget(self.icon,     0, 0, 1, 1)
         lay.addWidget(self.title,    0, 1, 1, 1)
         lay.addWidget(self.subtitle, 1, 0, 1, 2)
 
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        # ------------------------------------------------
+        # 🔥 반응형 스케일 파라미터 — 반드시 먼저 선언
+        # ------------------------------------------------
+        self._scale = 1.0
+
+        # ------------------------------------------------
+        # 🔥 기본 스타일 적용 (테두리/내부선 제거)
+        # ------------------------------------------------
         self._apply_card_style(self.base_color)
 
+        # 기준 높이(오토핏 기반, resize 시 동적으로 재계산)
+        self.setMinimumHeight(68)
+        self.setFixedHeight(92)
+
     def _apply_card_style(self, bg_hex: str):
-        self.inner_card.setStyleSheet(
-            "background-color: {bg};"
-            "border: none;"
-            "border-radius: 10px;"
-            .format(bg=bg_hex)
-        )
-        
-        # 폰트 크기 반응형
-        icon_sz = int(18 * self._scale)
-        title_sz = int(14 * self._scale)
-        sub_sz = int(11 * self._scale)
-        
-        self.icon.setStyleSheet(f"font-size: {icon_sz}px; background: transparent;")
-        self.title.setStyleSheet(f"font-size: {title_sz}px; font-weight:700; padding-left:4px; background: transparent;")
-        self.subtitle.setStyleSheet(f"font-size: {sub_sz}px; background: transparent;")
+        # 내부 검정 줄/선 제거: border/hover border 모두 제거
+        self.setStyleSheet(f"""
+            QFrame#NavCard {{
+                background-color: {bg_hex};
+                border: none;                    /* 테두리 제거 */
+                border-radius: 10px;
+            }}
+            QFrame#NavCard:hover {{
+                border: none;                    /* 호버 테두리 제거 */
+            }}
+            QLabel#NavIcon {{
+                font-size: {int(18 * self._scale)}px;
+            }}
+            QLabel#NavTitle {{
+                font-size: {int(14 * self._scale)}px;
+                font-weight: 600;
+                padding-left: 6px;               /* 아이콘과 간격 */
+            }}
+        """)
 
     def setSelected(self, selected: bool):
+        # 선택 시 배경만 아주 살짝 어둡게(테두리 없이)
         def _mix(c1, c2, ratio):
             def to_rgb(h):
                 h = h.lstrip("#"); return tuple(int(h[i:i+2],16) for i in (0,2,4))
@@ -113,13 +127,20 @@ class NavCard(QWidget):
             return to_hex((r,g,b))
 
         if selected:
-            self._apply_card_style(_mix(self.base_color, "#000000", 0.15))
+            self._apply_card_style(_mix(self.base_color, "#000000", 0.08))
         else:
             self._apply_card_style(self.base_color)
 
     def setScale(self, scale: float):
-        self._scale = max(0.85, min(scale, 1.5)) 
+        # 창 높이에 연동되는 스케일
+        self._scale = max(0.85, min(scale, 1.6))
+        # 텍스트/아이콘 스케일 재적용
         self._apply_card_style(self.base_color)
+        # 내용 높이에 맞추어 오토핏(설명 줄바꿈 고려)
+        base = 64
+        extra = int(18 * (self._scale - 1.0))   # 스케일 증가 시 보정
+        h = max(self.minimumHeight(), base + extra)
+        self.setFixedHeight(h)
 
 # ------------------------------------------------------------
 # MainWindow
@@ -128,26 +149,11 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("G2Garage - Trading System")
-        
-        # [작업표시줄 가림 방지]
-        screen = QGuiApplication.primaryScreen()
-        screen_geom = screen.availableGeometry() 
-        
-        initial_w = 1280
-        initial_h = 800
-        
-        if initial_h > screen_geom.height():
-            initial_h = screen_geom.height() - 40 
-        
-        x = screen_geom.x() + (screen_geom.width() - initial_w) // 2
-        y = screen_geom.y() + (screen_geom.height() - initial_h) // 2
-        
-        self.setGeometry(x, y, initial_w, initial_h)
+        self.setGeometry(100, 100, 1280, 800)
 
         self._theme_name = "nord"
         self._theme_primary = None
         self._theme_text = None
-        self._overrides = None
 
         icon_path = os.path.join(project_root, 'image', 'G2G.ico')
         if os.path.exists(icon_path):
@@ -156,7 +162,6 @@ class MainWindow(QMainWindow):
         central = QWidget(); self.setCentralWidget(central)
         hbox = QHBoxLayout(central); hbox.setContentsMargins(0,0,0,0); hbox.setSpacing(0)
 
-        # 사이드 메뉴 리스트
         self.nav_list = QListWidget()
         self.nav_list.setObjectName("SideNav")
         self.nav_list.setFixedWidth(280)
@@ -173,9 +178,11 @@ class MainWindow(QMainWindow):
 
         self.nav_list.setCurrentRow(0)
         self._sync_selection(0)
+
         self.nav_list.currentRowChanged.connect(self._on_nav_changed)
 
-        self.apply_theme(self._theme_name, self._theme_primary, self._theme_text, overrides=self._overrides)
+        # 초기 테마 적용
+        self.apply_theme(self._theme_name, self._theme_primary, self._theme_text)
 
     # --------------------------------------------------------
     def _setup_pages(self):
@@ -188,7 +195,7 @@ class MainWindow(QMainWindow):
             ("자료 전송", "📤", "#14B8A6", "각종 자료 전송", P5_Send),
             ("실전 매매", "🚀", "#60A5FA", "Top10 추천 & 주문", P6_Trading),
             ("포트폴리오", "💼", "#9CA3AF", "잔고, 수익률 관리", P7_Portfolio),
-            ("설정",     "⚙️", "#6C7280", "환경 설정", P_Setup),
+            ("설정",     "⚙️", "#94A3B8", "환경 설정", P_Setup),
         ]
         for _, _, _, _, cls in self.pages_info:
             try:
@@ -198,6 +205,7 @@ class MainWindow(QMainWindow):
                 err.setStyleSheet("color:#ff6b6b; font-size: 15px; padding: 16px;")
                 self.stack.addWidget(err)
 
+        # 설정 페이지가 테마 이벤트 발신
         try:
             settings_widget = self.stack.widget(len(self.pages_info)-1)
             if hasattr(settings_widget, "themeChanged"):
@@ -211,43 +219,16 @@ class MainWindow(QMainWindow):
         self.nav_items = []
         for name, icon, color, subtitle, _ in self.pages_info:
             item = QListWidgetItem()
+            # 최초에는 카드의 sizeHint 사용(오토핏)
             card = NavCard(color, icon, name)
             card.subtitle.setText(subtitle)
 
+            item.setSizeHint(card.sizeHint())
             self.nav_list.addItem(item)
             self.nav_list.setItemWidget(item, card)
 
             self.cards.append(card)
             self.nav_items.append(item)
-
-    # --------------------------------------------------------
-    # [100% 확신 수정] 창 높이(contentsRect) 기준 계산으로 초기화 오류 해결
-    # --------------------------------------------------------
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        
-        # [핵심] nav_list.height()가 아니라, 메인 윈도우의 실제 높이를 사용해야 
-        # 프로그램 시작 시 0으로 계산되는 문제를 막을 수 있습니다.
-        total_h = self.contentsRect().height()
-        count = len(self.nav_items)
-        if count == 0: return
-
-        # 여유 공간 확보 (스크롤바 생김 방지용 미세 조정)
-        available_h = total_h - 4
-        
-        # N등분 계산
-        item_h = int(available_h / count)
-        
-        # 최소 높이 60px (이보다 작아지면 글자가 잘리므로 방어)
-        if item_h < 60:
-            item_h = 60
-
-        # 폰트 스케일 계산 (88px 기준)
-        scale = item_h / 88.0
-        
-        for item, card in zip(self.nav_items, self.cards):
-            item.setSizeHint(QSize(self.nav_list.width(), item_h))
-            card.setScale(scale)
 
     # --------------------------------------------------------
     def _on_nav_changed(self, row: int):
@@ -258,22 +239,32 @@ class MainWindow(QMainWindow):
         for i, c in enumerate(self.cards):
             c.setSelected(i == row)
 
-    def apply_theme(self, theme_name: str, primary_color: str | None, text_color: str | None, overrides: dict | None = None):
+    # --------------------------------------------------------
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        h = max(640, self.height())
+        scale = h / 800.0
+        # 카드 스케일 적용 + 아이템 높이도 카드 sizeHint로 동기화
+        for i, c in enumerate(getattr(self, "cards", [])):
+            c.setScale(scale)
+            if i < len(self.nav_items):
+                self.nav_items[i].setSizeHint(c.sizeHint())
+
+    # --------------------------------------------------------
+    def apply_theme(self, theme_name: str, primary_color: str | None, text_color: str | None):
         self._theme_name = theme_name
         self._theme_primary = primary_color
         self._theme_text = text_color
-        self._overrides = overrides
-        qss = build_qss(theme_name, primary_color, text_color, overrides=overrides)
+        qss = build_qss(theme_name, primary_color, text_color)
         self.setStyleSheet(qss)
 
     def apply_theme_from_settings(self, payload: dict):
         theme = payload.get("theme", "nord")
         primary = payload.get("primary")
         text = payload.get("text")
-        keys = ["bg","surface","surface_alt","border","muted","text","subtext","primary","primary_alt","accent","danger","shadow"]
-        overrides = {k: v for k, v in payload.items() if k in keys and v}
-        self.apply_theme(theme, primary, text, overrides=overrides if overrides else None)
+        self.apply_theme(theme, primary, text)
 
+# ------------------------------------------------------------
 if __name__ == "__main__":
     myappid = 'g2garage.autostock.trading.1.0'
     try:
@@ -282,6 +273,11 @@ if __name__ == "__main__":
         pass
 
     app = QApplication(sys.argv)
+
+    icon_path = os.path.join(project_root, 'image', 'G2G.ico')
+    if os.path.exists(icon_path):
+        app.setWindowIcon(QIcon(icon_path))
+
     w = MainWindow()
     w.show()
     sys.exit(app.exec())

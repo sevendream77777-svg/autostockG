@@ -1,134 +1,104 @@
-# ui/common/styles.py
+# -*- coding: utf-8 -*-
+# common/styles.py
+from __future__ import annotations
 
-def get_modern_qss():
-    # [수정] SVG 인코딩 문제 해결 (공백 -> %20 변환, viewBox 기준 스케일링)
-    # 체크 아이콘 (Check)
-    chk_icon = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpolyline%20points='20%206%209%2017%204%2012'/%3E%3C/svg%3E"
-    
-    # 라디오 아이콘 (Circle)
-    rad_icon = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='white'%3E%3Ccircle%20cx='12'%20cy='12'%20r='6'/%3E%3C/svg%3E"
+def get_theme_nord_dark():
+    return {
+        "bg": "#2E3440", "surface": "#3B4252", "surface_alt": "#434C5E",
+        "border": "#4C566A", "muted": "#D8DEE9", "text": "#ECEFF4",
+        "subtext": "#BFC7D5", "primary": "#5E81AC", "primary_alt": "#81A1C1",
+        "accent": "#A3BE8C", "danger": "#E06C75", "shadow": "rgba(0,0,0,0.25)",
+    }
+
+def get_theme_black_vscode():
+    return {
+        "bg": "#1E1E1E", "surface": "#252526", "surface_alt": "#2C2C2C",
+        "border": "#3C3C3C", "muted": "#C8CCD0", "text": "#E7E7E7",
+        "subtext": "#A8ACB0", "primary": "#007ACC", "primary_alt": "#3498DB",
+        "accent": "#16A085", "danger": "#E06C75", "shadow": "rgba(0,0,0,0.35)",
+    }
+
+def _form_controls_qss(p):
+    chk_icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"
+    rad_icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3C/svg%3E"
 
     return f"""
     QWidget {{
-        background-color: #2e3440;
-        color: #e5e9f0;
-        font-family: 'Segoe UI';
-        font-size: 10pt;
+        background-color: {p['bg']}; color: {p['text']};
+        font-family: 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo'; font-size: 10pt;
     }}
-
-    /* -------------------------
-       CHECKBOX 기본 스타일
-       ------------------------- */
-    QCheckBox {{
-        spacing: 6px;
-        color: #e5e9f0;
-    }}
-
-    QCheckBox::indicator {{
-        width: 18px;
-        height: 18px;
-        border-radius: 3px;
-        border: 2px solid #88c0d0;
-        background-color: #3b4252;
-    }}
-
-    QCheckBox::indicator:checked {{
-        background-color: #81a1c1;
-        border-color: #a3be8c;
-        image: url("{chk_icon}");
-    }}
-
-    QCheckBox::indicator:hover {{
-        border-color: #81a1c1;
-    }}
-
-    /* -------------------------
-       disabled 표시 유지 (전체선택 시 문제 해결)
-       ------------------------- */
-    QCheckBox::indicator:disabled {{
-        background-color: #4c566a;
-        border-color: #616e88;
-        opacity: 1;
-    }}
-
-    QCheckBox::indicator:disabled:checked {{
-        background-color: #5e81ac;
-        border-color: #a3be8c;
-        image: url("{chk_icon}");
-        opacity: 1;
-    }}
-
-    /* -------------------------
-       RADIO BUTTON
-       ------------------------- */
-    QRadioButton {{
-        spacing: 6px;
-        color: #e5e9f0;
-    }}
-
-    QRadioButton::indicator {{
-        width: 16px;
-        height: 16px;
-    }}
-
-    QRadioButton::indicator:unchecked {{
-        border: 2px solid #88c0d0;
-        border-radius: 8px;
-        background-color: #3b4252;
-    }}
-
-    QRadioButton::indicator:checked {{
-        border: 2px solid #a3be8c;
-        background-color: #5e81ac;
-        border-radius: 8px;
-        image: url("{rad_icon}");
-    }}
-
-    QRadioButton::indicator:disabled {{
-        background-color: #4c566a;
-        border-color: #616e88;
-    }}
-
-    QRadioButton:disabled {{
-        color: #7f8fa6;
-    }}
-
-    /* -------------------------
-       BUTTON
-       ------------------------- */
     QPushButton {{
-        background-color: #4c566a;
-        border: 1px solid #5e81ac;
-        padding: 5px 10px;
-        border-radius: 4px;
-        color: #e5e9f0;
+        background-color: {p['surface_alt']}; border: 1px solid {p['primary']};
+        padding: 6px 12px; border-radius: 6px; color: {p['text']};
     }}
-
-    QPushButton:hover {{
-        background-color: #5e81ac;
-    }}
-
-    QPushButton:pressed {{
-        background-color: #81a1c1;
-    }}
-
-    /* -------------------------
-       INPUT
-       ------------------------- */
-
+    QPushButton:hover {{ background-color: {p['primary']}; }}
+    QPushButton:pressed {{ background-color: {p['primary_alt']}; }}
+    QPushButton:disabled {{ color: {p['subtext']}; border-color: {p['border']}; background-color: {p['surface']}; }}
     QLineEdit, QComboBox, QDateEdit {{
-        background-color: #3b4252;
-        border: 1px solid #5e81ac;
-        padding: 4px;
-        border-radius: 4px;
-        color: #eceff4;
+        background-color: {p['surface']}; border: 1px solid {p['border']};
+        padding: 6px 8px; border-radius: 6px; color: {p['text']};
+        selection-background-color: {p['primary_alt']}; selection-color: #000000;
     }}
-
+    QComboBox QAbstractItemView {{
+        background: {p['surface']}; color: {p['text']};
+        border: 1px solid {p['border']};
+        selection-background-color: {p['primary_alt']}; selection-color: #000000;
+    }}
     QTextEdit {{
-        background-color: #3b4252;
-        border: 1px solid #4c566a;
-        padding: 4px;
-        border-radius: 4px;
-        color: #eceff4;
+        background-color: {p['surface']}; border: 1px solid {p['border']};
+        padding: 8px; border-radius: 8px; color: {p['text']};
     }}
+    QCheckBox {{ spacing: 8px; color: {p['text']}; }}
+    QCheckBox::indicator {{
+        width: 18px; height: 18px; border-radius: 4px;
+        border: 2px solid {p['primary']}; background-color: {p['surface_alt']};
+    }}
+    QCheckBox::indicator:checked {{
+        background-color: {p['primary']}; border-color: {p['accent']}; image: url("{chk_icon}");
+    }}
+    QRadioButton {{ spacing: 8px; color: {p['text']}; }}
+    QRadioButton::indicator {{ width: 18px; height: 18px; }}
+    QRadioButton::indicator:unchecked {{
+        border: 2px solid {p['primary']}; border-radius: 9px; background-color: {p['surface_alt']};
+    }}
+    QRadioButton::indicator:checked {{
+        border: 2px solid {p['accent']}; background-color: {p['primary']};
+        border-radius: 9px; image: url("{rad_icon}");
+    }}
+    QGroupBox {{
+        border: 1px solid {p['border']}; border-radius: 8px;
+        margin-top: 14px; padding-top: 10px; background: {p['surface']};
+    }}
+    QGroupBox::title {{
+        subcontrol-origin: margin; left: 12px; padding: 0 6px; color: {p['muted']};
+    }}
+    QScrollBar:vertical {{ background: {p['surface']}; width: 10px; margin: 0px; }}
+    QScrollBar::handle:vertical {{ background: {p['border']}; min-height: 24px; border-radius: 4px; }}
+    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height:0; }}
+    QScrollBar:horizontal {{ height: 10px; background: {p['surface']}; }}
+    QScrollBar::handle:horizontal {{ background: {p['border']}; min-width: 24px; border-radius: 4px; }}
     """
+
+def get_nav_card_qss(p):
+    return f"""
+    #SideNav {{ background-color: {p['bg']}; border: none; padding: 12px; }}
+    QListWidget {{ outline: none; background: transparent; border: none; }}
+    
+    /* [중요 수정] item의 margin을 0으로 만들어야 정확한 높이 계산이 가능합니다. */
+    QListWidget::item {{ background: transparent; border: none; margin: 0px; padding: 0px; }}
+    
+    QListWidget::item:selected {{ background: transparent; border: none; }}
+    QLabel#NavTitle, QLabel#NavSubtitle, QLabel#NavIcon {{ background: transparent; }}
+    QLabel#NavSubtitle {{ font-size: 11px; color: {p['subtext']}; }}
+    #MainWindowContent {{ background-color: {p['surface']}; }}
+    """
+
+def build_qss(theme: str, primary_color: str | None = None, text_color: str | None = None, overrides: dict | None = None) -> str:
+    if theme == "black": pal = get_theme_black_vscode()
+    else: pal = get_theme_nord_dark()
+    if primary_color: pal["primary"] = primary_color; pal["primary_alt"] = primary_color
+    if text_color: pal["text"] = text_color
+    if overrides:
+        for k, v in overrides.items():
+            if k in pal and v: pal[k] = v
+    return _form_controls_qss(pal) + get_nav_card_qss(pal)

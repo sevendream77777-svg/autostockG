@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 
-class AnalysisPage(QWidget):
+class P3_Analysis(QWidget):
     """
     엔진 분석 페이지:
     - 좌측: REAL/RESEARCH 엔진 리스트

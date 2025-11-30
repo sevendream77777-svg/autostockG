@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
 from PySide6.QtCore import QDate, Qt
 from common.workers import DataUpdateWorker, ManualDownloadWorker
 
-class DataPage(QWidget):
+class P1_DataPipeline(QWidget):
     def __init__(self):
         super().__init__()
         # MODELENGINE 경로 자동 탐색
