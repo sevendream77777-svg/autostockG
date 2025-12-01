@@ -1,13 +1,10 @@
 # ============================================================
-# daily_recommender.py (KOR FINAL)  + SLE 통합 패치 (A+B+요약, 단일 JSON)
+# daily_recommender.py (KOR FINAL)
 # ------------------------------------------------------------
-# - 모든 출력/JSON 컬럼을 한국어 기반으로 통일 (원본 유지)
-# - 엑셀 기능 완전 제거 (원본 유지)
-# - AI 분석은 옵션(--ai 1)일 때만 실행 (원본 유지)
-# - 자동 엔진 탐색 / 자동 DB 선택 / JSON 병합 100% 유지 (원본 유지)
-# - [추가] SLE(정성 위험) A+B per-stock + 전체 요약(20~30자) 단일 JSON 저장
-#   * 저장 경로: F:\autostockG\MODELENGINE\INFO\sle_info
-#   * 파일명: <엔진파일명>.pkl → <엔진파일명>_SLE.json
+# - 모든 출력/JSON 컬럼을 한국어 기반으로 통일
+# - 엑셀 기능 완전 제거
+# - AI 분석은 옵션(--ai 1)일 때만 실행
+# - 자동 엔진 탐색 / 자동 DB 선택 / JSON 병합 100% 유지
 # ============================================================
 
 import os, sys, argparse, pickle, warnings, json, re
@@ -19,7 +16,7 @@ import pandas as pd
 from textwrap import dedent
 
 # ------------------------------------------------------------
-# 프로젝트 경로 설정 (원본 유지)
+# 프로젝트 경로 설정
 # ------------------------------------------------------------
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir  = os.path.dirname(current_dir)   
@@ -35,7 +32,7 @@ except Exception:
     from UTIL.version_utils import find_latest_file
 
 # ------------------------------------------------------------
-# Gemini (옵션)  (원본 유지)
+# Gemini (옵션)
 # ------------------------------------------------------------
 def _load_api_key() -> Optional[str]:
     key_path = r"C:\공유주방\!개인폴더\!이호정이사\각종key_appkey_decret\googlegemini_api.txt"
@@ -57,94 +54,7 @@ def _safe_import_gemini():
         return False
 
 # ------------------------------------------------------------
-# [추가] SLE 프롬프트 로드 (가능하면 외부 모듈 사용)
-# ------------------------------------------------------------
-SLE_TEST_PROMPT = None  # B형(테스트 포맷) 기본값
-try:
-    # 우선권: MODELENGINE 경로
-    from MODELENGINE.SLE_ENGINE.sle_prompt import SLE_TEST_PROMPT as _PROMPT_B
-    SLE_TEST_PROMPT = _PROMPT_B
-except Exception:
-    try:
-        # 대안: 상대경로
-        sys.path.append(os.path.join(root_dir, "MODELENGINE", "SLE_ENGINE"))
-        from sle_prompt import SLE_TEST_PROMPT as _PROMPT_B2
-        SLE_TEST_PROMPT = _PROMPT_B2
-    except Exception:
-        SLE_TEST_PROMPT = None  # 없으면 내부 기본 프롬프트로 대체
-
-# B형 기본 프롬프트(내장 백업) — 외부 파일 없을 때만 사용
-_DEFAULT_PROMPT_B = """
-당신은 주식 종목의 단기 움직임을 분석하는 AI 애널리스트입니다.
-아래 정보를 바탕으로 JSON만 출력하세요.
-
-입력:
-- 종목명: <종목명>
-- 종목코드: <종목코드>
-- HOJ 동시적용 기대수익(%): <HOJ combo score>
-
-출력(JSON ONLY):
-{
-  "종목명": "...",
-  "종목코드": "...",
-  "combo": <숫자>,
-  "score": {
-    "변동성": <0~100>,
-    "단기모멘텀": <0~100>,
-    "매물대흐름": <0~100>,
-    "수급안정성": <0~100>,
-    "종합위험도": <0~100>
-  },
-  "comment": {
-    "변동성": "...",
-    "단기모멘텀": "...",
-    "매물대흐름": "...",
-    "수급안정성": "...",
-    "종합위험도": "..."
-  },
-  "summary": "최종 20~30자 결론"
-}
-""".strip()
-
-# A형 프롬프트(9개 리스크 항목 고정)
-_PROMPT_A = """
-다음 입력을 바탕으로 정성 리스크를 JSON으로만 출력하세요.
-정량(차트/지표/가격)은 언급하지 말고, 정성 리스크만 판단합니다.
-
-입력:
-- 종목코드: {ticker}
-- 종목명: {name}
-- HOJ combo score(%): {combo}
-
-JSON 스키마(절대 변경 금지):
-{{
-  "ticker": "<종목코드>",
-  "name": "<종목명>",
-  "risk_detail_scores": {{
-      "상장폐지위험": 0~100,
-      "재무건전성": 0~100,
-      "규제정책": 0~100,
-      "경영진리스크": 0~100,
-      "희석리스크": 0~100,
-      "뉴스감성": 0~100,
-      "세력이탈": 0~100,
-      "업종경쟁": 0~100,
-      "기타이상징후": 0~100
-  }},
-  "risk_total_score": 0~100,
-  "final_score": "<HOJ combo score * (1 - risk_total_score/100)>",
-  "summary_one_line": "최종 판단을 1문장으로 요약"
-}}
-
-작성 규칙:
-- 각 항목 0~100점 (높을수록 위험 큼)
-- 전체 길이 600~900자 내
-- 모호/과장 금지, 사실 기반 간결한 서술
-- JSON 외 텍스트 출력 금지
-""".strip()
-
-# ------------------------------------------------------------
-# 유틸 함수 (원본 유지)
+# 유틸 함수
 # ------------------------------------------------------------
 def pick_close_col(df: pd.DataFrame) -> str:
     cand = ["Close","close","ClosePrice","종가","가격","Adj Close","AdjClose"]
@@ -178,7 +88,7 @@ def _dict_merge_safe(base: Dict[str, Any], add: Dict[str, Any]) -> Dict[str, Any
     return out
 
 # ------------------------------------------------------------
-# 엔진 자동 선택 (원본 유지)
+# 엔진 자동 선택
 # ------------------------------------------------------------
 def find_engine_real() -> str:
     TARGET_H = 5
@@ -235,7 +145,7 @@ def find_engine_real() -> str:
         full_path = os.path.join(real_dir, fn)
         try: mt = os.path.getmtime(full_path)
         except: mt = 0
-
+        
         return d, mt, (h or -1), (w or -1), (n or -1)
 
     valid = []
@@ -254,7 +164,7 @@ def find_engine_real() -> str:
     return os.path.join(real_dir, best)
 
 # ------------------------------------------------------------
-# DB 로드 (원본 유지)
+# DB 로드
 # ------------------------------------------------------------
 def get_unified_db_path(version: str) -> str:
     base = get_path("HOJ_DB")
@@ -269,14 +179,14 @@ def get_unified_db_path(version: str) -> str:
 
 def load_latest_db(version: str) -> Tuple[pd.DataFrame, str]:
     p = get_unified_db_path(version)
-    if os.path.exists(p) is False:
+    if not os.path.exists(p):
         raise FileNotFoundError("DB 파일 없음: " + p)
     df = pd.read_parquet(p)
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
     return df, p
 
 # ------------------------------------------------------------
-# 엔진 로더 (원본 유지)
+# 엔진 로더
 # ------------------------------------------------------------
 def load_engine(engine_path: str) -> Dict[str, Any]:
     if not os.path.exists(engine_path):
@@ -294,7 +204,7 @@ def load_engine(engine_path: str) -> Dict[str, Any]:
     return data
 
 # ------------------------------------------------------------
-# 공용 예측 코어 (원본 유지 + 필터 추가)
+# 공용 예측 코어
 # ------------------------------------------------------------
 def run_prediction_core(
     engine_path: str,
@@ -326,36 +236,6 @@ def run_prediction_core(
     if missing:
         raise KeyError(f"필수 피처 누락: {missing[:5]} ...")
 
-    # 종가 컬럼찾기
-    close_col = pick_close_col(daily)
-
-    # ======================================================
-    # >>>>>>>>>>>>>>> [ADD FILTER: STEP 1] <<<<<<<<<<<<<<<<<
-    # ======================================================
-    # 1) 종가 0 제거 (상폐·정지)
-    daily = daily[daily[close_col] > 0]
-
-    # 2) 거래량 0·초저유동성 제거
-    if "Volume" in daily.columns:
-        daily = daily[daily["Volume"] > 0]
-        daily = daily[daily["Volume"] > 5000]   # 최소 기준
-
-    # 3) 20일 변동성 최소 기준 (정지·flat 차단)
-    if "volatility_20" in daily.columns:
-        daily = daily[daily["volatility_20"] > 0.5]
-
-    # 4) MA20 = MA60 동일(flat) 제거
-    if "MA20" in daily.columns and "MA60" in daily.columns:
-        daily = daily[daily["MA20"] != daily["MA60"]]
-
-    # 5) 시가총액 최소 기준 (초소형주 제거)
-    if "MarketCap" in daily.columns:
-        daily = daily[daily["MarketCap"] > 200_000_00000]
-
-    # ======================================================
-    # >>>>>>>>>>>>>>> [FILTER END] <<<<<<<<<<<<<<<<<<<<<<<<<<
-    # ======================================================
-
     X = daily[features].copy()
     mask = X.notnull().all(axis=1)
     daily = daily[mask]
@@ -363,6 +243,7 @@ def run_prediction_core(
 
     name_col = "Name" if "Name" in daily.columns else ("name" if "name" in daily.columns else None)
     code_col = "Code" if "Code" in daily.columns else ("code" if "code" in daily.columns else None)
+    close_col = pick_close_col(daily)
 
     prob = model_cls.predict_proba(X)[:,1] if model_cls else np.zeros(len(X))
     ret  = model_reg.predict(X) if model_reg else np.zeros(len(X))
@@ -390,7 +271,7 @@ def run_prediction_core(
     return df_out.reset_index(drop=True), payload, db_path, td
 
 # ------------------------------------------------------------
-# Gemini 분석 (원본 유지)
+# Gemini 분석
 # ------------------------------------------------------------
 def get_gemini_analysis(df_out: pd.DataFrame, do_ai: bool) -> str:
     if not do_ai:
@@ -406,25 +287,10 @@ def get_gemini_analysis(df_out: pd.DataFrame, do_ai: bool) -> str:
         import google.generativeai as genai
         genai.configure(api_key=GEMINI_API_KEY)
 
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
 
-        prompt = f"""아래는 오늘의 가장 높은 종목 예측 결과입니다.
-[요구사항]
-당신은 주식 전문가입니다.
-1) 각 종목을 순서대로 개별 분석하세요.
-2) 각 종목당 순서대로 번호와 종목명을 쓰고 해당종목의  2~3줄을 작성, 반드시 다음 내용을 포함:
-   - 종목의 현재 상태(예측된 상승확률/예측수익률 기반)
-   - 리스크 요인 1~2개
-   - 단기 관찰 포인트
-   - 보수적/공격적 관점 요약
-3) 문장은 짧게, 절대 장황하게 설명 금지.
-4) 마지막에 [종합 해설]을 전종목 대상으로 5~8줄로 작성:
-   - Top10 전체 흐름
-   - 섹터/업종 경향
-   - 시장 심리·수급 기반 위험요소
-   - 내일 전략 2~3개
-   - 보수적/공격적 전략 분리
-5) 표, 코드블록 사용 금지. 문장으로만 작성.
+        prompt = f"""
+아래는 오늘의 Top 리스트입니다. 상승 가능성이 높은 3개 종목과 간단 사유를 제시하세요.
 
 {df_out.to_string(index=False)}
 """
@@ -435,7 +301,7 @@ def get_gemini_analysis(df_out: pd.DataFrame, do_ai: bool) -> str:
         return f"[AI] 오류: {e}"
 
 # ------------------------------------------------------------
-# JSON 저장 (원본 유지)
+# JSON 저장
 # ------------------------------------------------------------
 def save_json_payload(
     engine_path: str,
@@ -485,57 +351,24 @@ def save_json_payload(
         "ai_report": ai_text,
     }
 
-    try:
-        tmp_path = json_path + ".tmp"
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(new_payload, f, ensure_ascii=False, indent=2, default=_json_safe)
-        os.replace(tmp_path, json_path)
-    except Exception as e:
-        print(f"[ERROR] JSON 저장 실패: {e}")
-        return None
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                old = json.load(f)
+        except:
+            old = {}
+        data_to_save = _dict_merge_safe(old, new_payload)
+    else:
+        data_to_save = new_payload
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data_to_save, f, ensure_ascii=False, indent=2)
 
     print(f"[SAVE] JSON: {json_path}")
     return json_path
 
-
-# ============================================================
-# [추가] SLE 실행/저장 블록 (원본 유지, 주석 그대로)
-# ============================================================
-
-def _genai_call(prompt_text: str) -> Optional[str]:
-    """Gemini 호출 (텍스트 반환). 실패 시 None"""
-    if not _safe_import_gemini() or not GEMINI_API_KEY:
-        return None
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        resp = model.generate_content(prompt_text)
-        return getattr(resp, "text", None)
-    except Exception:
-        return None
-
-def _parse_json_safe(text: Optional[str]) -> Any:
-    if not text:
-        return {"error": "no_text"}
-    m = re.search(r"\{[\s\S]*\}", text)
-    raw = m.group(0) if m else text
-    try:
-        return json.loads(raw)
-    except Exception:
-        return {"error": "json_parse_error", "raw": (text[:5000] if text else "")}
-
-def _build_prompt_A(ticker: str, name: str, combo: float) -> str:
-    return _PROMPT_A.format(ticker=ticker, name=name, combo=combo)
-
-def _build_prompt_B(ticker: str, name: str, combo: float) -> str:
-    base = SLE_TEST_PROMPT if SLE_TEST_PROMPT else _DEFAULT_PROMPT_B
-    p = base.replace("<종목명>", str(name)).replace("<종목코드>", str(ticker)).replace("<HOJ combo score>", str(combo))
-    p += f"\n\n[부록]\n종목명={name}, 종목코드={ticker}, combo={combo}"
-    return p
-
 # ------------------------------------------------------------
-# 메인 (원본 유지)
+# 메인
 # ------------------------------------------------------------
 def main(
     rank_by="combo",
@@ -582,8 +415,9 @@ def main(
     print(f"[ENGINE] {os.path.basename(eng)}")
     print(f"[DB]     {os.path.basename(db_path)}")
 
+
 # ------------------------------------------------------------
-# CLI (원본 유지)
+# CLI
 # ------------------------------------------------------------
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -592,7 +426,7 @@ if __name__ == "__main__":
     ap.add_argument("--version", default="V31")
     ap.add_argument("--engine", type=str, default=None)
     ap.add_argument("--date", type=str, default=None)
-    ap.add_argument("--ai", type=int, default=1)
+    ap.add_argument("--ai", type=int, default=0)
 
     args = ap.parse_args()
     main(

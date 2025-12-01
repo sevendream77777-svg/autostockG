@@ -2,15 +2,11 @@
 import sys, os, ctypes
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QStackedWidget, QLabel, QListWidget, QListWidgetItem,
-    QSizePolicy, QFrame, QGridLayout
+    QStackedWidget, QLabel, QListWidget, QListWidgetItem, QSizePolicy, QFrame, QGridLayout
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, QTimer
 from PySide6.QtGui import QIcon, QGuiApplication
 
-# ----------------------------------------------------------
-# 경로 설정
-# ----------------------------------------------------------
 current_path = os.path.abspath(__file__)
 ui_dir = os.path.dirname(current_path)
 project_root = os.path.dirname(ui_dir)
@@ -20,15 +16,19 @@ if project_root not in sys.path:
 if ui_dir not in sys.path:
     sys.path.append(ui_dir)
 
-from pages.p0_index import P0_Index
-from pages.p1_data_pipeline import P1_DataPipeline
-from pages.p2_training import P2_Training
-from pages.p3_analysis import P3_Analysis
-from pages.p4_prediction import PredictionPage as P4_Prediction
-from pages.p5_send import P5SendPage
-from pages.p6_trading import TradingPage as P6_Trading
-from pages.p7_portfolio import PortfolioPage as P7_Portfolio
-from pages.p_setup import SettingsPage as P_Setup
+try:
+    from pages.p0_index import P0_Index
+    from pages.p1_data_pipeline import P1_DataPipeline
+    from pages.p2_training import P2_Training
+    from pages.p3_analysis import P3_Analysis
+    from pages.p4_prediction import PredictionPage as P4_Prediction
+    from pages.p5_send import P5SendPage
+    from pages.p6_trading import TradingPage as P6_Trading
+    from pages.p7_portfolio import PortfolioPage as P7_Portfolio
+    from pages.p_setup import SettingsPage as P_Setup
+except ImportError as e:
+    print(f"\n[CRITICAL ERROR] 페이지 모듈 로드 실패: {e}")
+    import traceback; traceback.print_exc(); sys.exit(1)
 
 from common.styles import build_qss
 
@@ -40,6 +40,7 @@ class NavCard(QWidget):
     def __init__(self, color_bg: str, icon_text: str, title_text: str):
         super().__init__()
         self.base_color = color_bg
+        self._scale = 1.0
 
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -50,8 +51,8 @@ class NavCard(QWidget):
         self.layout.addWidget(self.inner_card)
 
         lay = QGridLayout(self.inner_card)
-        lay.setContentsMargins(6, 6, 6, 6)
-        lay.setSpacing(2)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(0)
 
         self.icon = QLabel(icon_text)
         self.icon.setObjectName("NavIcon")
@@ -73,24 +74,42 @@ class NavCard(QWidget):
 
         self._apply_card_style(self.base_color)
 
-    def _apply_card_style(self, bg_hex):
+    def _apply_card_style(self, bg_hex: str):
         self.inner_card.setStyleSheet(f"""
             background-color: {bg_hex};
+            border: none;
             border-radius: 10px;
         """)
 
-        self.icon.setStyleSheet("font-size: 18px; padding-left:4px;")
-        self.title.setStyleSheet("font-size: 15px; font-weight:700; padding-left:4px;")
-        self.subtitle.setStyleSheet("font-size: 11px; padding-left:4px; padding-bottom:4px;")
+        icon_sz = int(18 * self._scale)
+        title_sz = int(14 * self._scale)
+        sub_sz = int(11 * self._scale)
+
+        self.icon.setStyleSheet(f"font-size: {icon_sz}px; padding-left:6px;")
+        self.title.setStyleSheet(f"font-size: {title_sz}px; font-weight:700; padding-left:6px;")
+        self.subtitle.setStyleSheet(f"font-size: {sub_sz}px; padding-left:6px; padding-bottom:4px;")
 
     def setSelected(self, selected: bool):
         if selected:
-            self.inner_card.setStyleSheet("""
-                background-color: rgba(0,0,0,35);
-                border-radius: 10px;
-            """)
+            self._apply_card_style(self._mix(self.base_color, "#000000", 0.15))
         else:
             self._apply_card_style(self.base_color)
+
+    def _mix(self, c1, c2, ratio):
+        def to_rgb(h):
+            h = h.lstrip("#")
+            return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+        def to_hex(rgb):
+            return "#{:02X}{:02X}{:02X}".format(*rgb)
+        r1, g1, b1 = to_rgb(c1); r2, g2, b2 = to_rgb(c2)
+        r = int(r1*(1-ratio) + r2*ratio)
+        g = int(g1*(1-ratio) + g2*ratio)
+        b = int(b1*(1-ratio) + b2*ratio)
+        return to_hex((r, g, b))
+
+    def setScale(self, scale: float):
+        self._scale = max(0.6, min(scale, 1.6))
+        self._apply_card_style(self.base_color)
 
 
 # ============================================================
@@ -101,12 +120,17 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("G2Garage - Trading System")
 
-        screen = QGuiApplication.primaryScreen().availableGeometry()
-        self.setGeometry(
-            screen.x() + (screen.width() - 1280)//2,
-            screen.y() + (screen.height() - 800)//2,
-            1280, 800
-        )
+        screen = QGuiApplication.primaryScreen()
+        screen_geom = screen.availableGeometry()
+
+        initial_w = 1280
+        initial_h = 800
+        if initial_h > screen_geom.height():
+            initial_h = screen_geom.height() - 40
+
+        x = screen_geom.x() + (screen_geom.width() - initial_w) // 2
+        y = screen_geom.y() + (screen_geom.height() - initial_h) // 2
+        self.setGeometry(x, y, initial_w, initial_h)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -115,13 +139,21 @@ class MainWindow(QMainWindow):
         hbox.setSpacing(0)
 
         # ------------------------------------------------------
-        # 사이드 메뉴 (반응형)
+        # 사이드 메뉴
         # ------------------------------------------------------
         self.nav_list = QListWidget()
         self.nav_list.setObjectName("SideNav")
+        self.nav_list.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.nav_list.setMinimumWidth(144)
+        self.nav_list.setMaximumWidth(10000)
+
         self.nav_list.setSpacing(0)
         self.nav_list.setContentsMargins(0, 0, 0, 0)
         self.nav_list.viewport().setContentsMargins(0, 0, 0, 0)
+
+        self.nav_list.setStyleSheet("padding:0px; margin:0px; border:0px;")
+        self.nav_list.viewport().setStyleSheet("padding:0px; margin:0px; border:0px;")
 
         self.nav_list.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.nav_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -129,24 +161,25 @@ class MainWindow(QMainWindow):
         hbox.addWidget(self.nav_list)
 
         # ------------------------------------------------------
-        # 메인 화면
+        # 중앙 페이지
         # ------------------------------------------------------
         self.stack = QStackedWidget()
         self.stack.setObjectName("MainWindowContent")
         hbox.addWidget(self.stack)
 
         hbox.setStretch(0, 1)
-        hbox.setStretch(1, 5)
+        hbox.setStretch(1, 4)
 
         self._setup_pages()
         self._setup_nav()
 
         self.nav_list.setCurrentRow(0)
         self._sync_selection(0)
-
         self.nav_list.currentRowChanged.connect(self._on_nav_changed)
 
         self.apply_theme("nord", None, None)
+
+        QTimer.singleShot(0, lambda: self.resizeEvent(None))
 
     # ----------------------------------------------------------
     def _setup_pages(self):
@@ -163,7 +196,12 @@ class MainWindow(QMainWindow):
         ]
 
         for _, _, _, _, cls in self.pages_info:
-            self.stack.addWidget(cls())
+            try:
+                self.stack.addWidget(cls())
+            except Exception as e:
+                err = QLabel(f"❌ 페이지 로드 오류: {e}")
+                err.setStyleSheet("color:#ff5555; padding:16px; font-size:14px;")
+                self.stack.addWidget(err)
 
     # ----------------------------------------------------------
     def _setup_nav(self):
@@ -172,9 +210,7 @@ class MainWindow(QMainWindow):
 
         for name, icon, color, subtitle, _ in self.pages_info:
             item = QListWidgetItem()
-
-            # 최소 높이만 제안 (강제 X)
-            item.setSizeHint(QSize(160, 70))
+            item.setSizeHint(QSize(200, 85))
 
             card = NavCard(color, icon, name)
             card.subtitle.setText(subtitle)
@@ -186,32 +222,26 @@ class MainWindow(QMainWindow):
             self.nav_items.append(item)
 
     # ----------------------------------------------------------
-    # 반응형 (C 옵션: 70~150px 범위 자동)
+    # 반응형 사이즈 계산
     # ----------------------------------------------------------
     def resizeEvent(self, event):
         super().resizeEvent(event)
 
-        total_w = self.width()
-        nav_w = int(total_w * 0.18)  # 가로 자동 비율
-        nav_w = max(150, min(nav_w, 300))
-        self.nav_list.setFixedWidth(nav_w)
+        # ⬇⬇⬇ 가로 고정폭(원하면 숫자만 바꾸면 됨)
+        nav_width = 220
+        self.nav_list.setFixedWidth(nav_width)
 
-        # 세로 자동 조절
+        # 세로 자동(강제 없음)
         vh = self.nav_list.viewport().height()
         if vh <= 0:
             vh = self.nav_list.height()
 
-        count = len(self.nav_items)
-        if count == 0:
-            return
-
-        # C옵션: 70~150px 자동분배
-        base_h = vh // count
-        base_h = max(70, min(base_h, 150))
-
-        # 적용
+        # 카드 스케일 조절만 유지
         for item, card in zip(self.nav_items, self.cards):
-            item.setSizeHint(QSize(nav_w, base_h))
+            card.setScale(1.0)
+
+        self.nav_list.updateGeometry()
+        self.nav_list.repaint()
 
     # ----------------------------------------------------------
     def _on_nav_changed(self, row: int):
@@ -233,12 +263,11 @@ if __name__ == "__main__":
     myappid = 'g2garage.autostock.trading.1.0'
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    except:
+    except Exception:
         pass
 
     app = QApplication(sys.argv)
-
-    icon_path = os.path.join(project_root, "image", "G2G.ico")
+    icon_path = os.path.join(project_root, 'image', 'G2G.ico')
     if os.path.exists(icon_path):
         app.setWindowIcon(QIcon(icon_path))
 

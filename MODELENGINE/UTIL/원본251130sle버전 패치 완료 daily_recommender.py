@@ -1,3 +1,4 @@
+
 # ============================================================
 # daily_recommender.py (KOR FINAL)  + SLE 통합 패치 (A+B+요약, 단일 JSON)
 # ------------------------------------------------------------
@@ -294,7 +295,7 @@ def load_engine(engine_path: str) -> Dict[str, Any]:
     return data
 
 # ------------------------------------------------------------
-# 공용 예측 코어 (원본 유지 + 필터 추가)
+# 공용 예측 코어 (원본 유지)
 # ------------------------------------------------------------
 def run_prediction_core(
     engine_path: str,
@@ -326,36 +327,6 @@ def run_prediction_core(
     if missing:
         raise KeyError(f"필수 피처 누락: {missing[:5]} ...")
 
-    # 종가 컬럼찾기
-    close_col = pick_close_col(daily)
-
-    # ======================================================
-    # >>>>>>>>>>>>>>> [ADD FILTER: STEP 1] <<<<<<<<<<<<<<<<<
-    # ======================================================
-    # 1) 종가 0 제거 (상폐·정지)
-    daily = daily[daily[close_col] > 0]
-
-    # 2) 거래량 0·초저유동성 제거
-    if "Volume" in daily.columns:
-        daily = daily[daily["Volume"] > 0]
-        daily = daily[daily["Volume"] > 5000]   # 최소 기준
-
-    # 3) 20일 변동성 최소 기준 (정지·flat 차단)
-    if "volatility_20" in daily.columns:
-        daily = daily[daily["volatility_20"] > 0.5]
-
-    # 4) MA20 = MA60 동일(flat) 제거
-    if "MA20" in daily.columns and "MA60" in daily.columns:
-        daily = daily[daily["MA20"] != daily["MA60"]]
-
-    # 5) 시가총액 최소 기준 (초소형주 제거)
-    if "MarketCap" in daily.columns:
-        daily = daily[daily["MarketCap"] > 200_000_00000]
-
-    # ======================================================
-    # >>>>>>>>>>>>>>> [FILTER END] <<<<<<<<<<<<<<<<<<<<<<<<<<
-    # ======================================================
-
     X = daily[features].copy()
     mask = X.notnull().all(axis=1)
     daily = daily[mask]
@@ -363,6 +334,7 @@ def run_prediction_core(
 
     name_col = "Name" if "Name" in daily.columns else ("name" if "name" in daily.columns else None)
     code_col = "Code" if "Code" in daily.columns else ("code" if "code" in daily.columns else None)
+    close_col = pick_close_col(daily)
 
     prob = model_cls.predict_proba(X)[:,1] if model_cls else np.zeros(len(X))
     ret  = model_reg.predict(X) if model_reg else np.zeros(len(X))
@@ -408,23 +380,8 @@ def get_gemini_analysis(df_out: pd.DataFrame, do_ai: bool) -> str:
 
         model = genai.GenerativeModel("gemini-2.0-flash")
 
-        prompt = f"""아래는 오늘의 가장 높은 종목 예측 결과입니다.
-[요구사항]
-당신은 주식 전문가입니다.
-1) 각 종목을 순서대로 개별 분석하세요.
-2) 각 종목당 순서대로 번호와 종목명을 쓰고 해당종목의  2~3줄을 작성, 반드시 다음 내용을 포함:
-   - 종목의 현재 상태(예측된 상승확률/예측수익률 기반)
-   - 리스크 요인 1~2개
-   - 단기 관찰 포인트
-   - 보수적/공격적 관점 요약
-3) 문장은 짧게, 절대 장황하게 설명 금지.
-4) 마지막에 [종합 해설]을 전종목 대상으로 5~8줄로 작성:
-   - Top10 전체 흐름
-   - 섹터/업종 경향
-   - 시장 심리·수급 기반 위험요소
-   - 내일 전략 2~3개
-   - 보수적/공격적 전략 분리
-5) 표, 코드블록 사용 금지. 문장으로만 작성.
+        prompt = f"""
+아래는 오늘의 Top 리스트입니다. 상승 가능성이 높은 3개 종목과 간단 사유를 제시하세요.
 
 {df_out.to_string(index=False)}
 """
@@ -485,21 +442,24 @@ def save_json_payload(
         "ai_report": ai_text,
     }
 
-    try:
-        tmp_path = json_path + ".tmp"
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(new_payload, f, ensure_ascii=False, indent=2, default=_json_safe)
-        os.replace(tmp_path, json_path)
-    except Exception as e:
-        print(f"[ERROR] JSON 저장 실패: {e}")
-        return None
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                old = json.load(f)
+        except:
+            old = {}
+        data_to_save = _dict_merge_safe(old, new_payload)
+    else:
+        data_to_save = new_payload
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data_to_save, f, ensure_ascii=False, indent=2, default=_json_safe)
 
     print(f"[SAVE] JSON: {json_path}")
     return json_path
 
-
 # ============================================================
-# [추가] SLE 실행/저장 블록 (원본 유지, 주석 그대로)
+# [추가] SLE 실행/저장 블록
 # ============================================================
 
 def _genai_call(prompt_text: str) -> Optional[str]:
@@ -518,6 +478,7 @@ def _genai_call(prompt_text: str) -> Optional[str]:
 def _parse_json_safe(text: Optional[str]) -> Any:
     if not text:
         return {"error": "no_text"}
+    # 추출: 코드블록 포함 대비
     m = re.search(r"\{[\s\S]*\}", text)
     raw = m.group(0) if m else text
     try:
@@ -530,12 +491,93 @@ def _build_prompt_A(ticker: str, name: str, combo: float) -> str:
 
 def _build_prompt_B(ticker: str, name: str, combo: float) -> str:
     base = SLE_TEST_PROMPT if SLE_TEST_PROMPT else _DEFAULT_PROMPT_B
+    # 단순 치환 방식 (프롬프트가 자리표시자를 가진 경우 대비)
     p = base.replace("<종목명>", str(name)).replace("<종목코드>", str(ticker)).replace("<HOJ combo score>", str(combo))
+    # 일부 프롬프트는 자리표시자가 없을 수 있어, 보강정보 부록 추가
     p += f"\n\n[부록]\n종목명={name}, 종목코드={ticker}, combo={combo}"
     return p
 
+def run_sle_per_stock_A_B(ticker: str, name: str, combo: float) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """A형(9리스크) + B형(테스트 포맷) 모두 호출"""
+    # A형
+    prompt_a = _build_prompt_A(ticker, name, combo)
+    text_a = _genai_call(prompt_a)
+    res_a = _parse_json_safe(text_a)
+
+    # A형 final_score 최소 보정 (문서 규칙: combo × (1 - risk/100))
+    try:
+        r = float(res_a.get("risk_total_score", 0))
+        c = float(combo)
+        res_a["final_score"] = c * (1 - max(0.0, min(100.0, r)) / 100.0)
+    except Exception:
+        pass
+
+    # B형
+    prompt_b = _build_prompt_B(ticker, name, combo)
+    text_b = _genai_call(prompt_b)
+    res_b = _parse_json_safe(text_b)
+
+    return res_a, res_b
+
+def save_sle_unified_json(
+    engine_path: str,
+    pred_dt: datetime,
+    sle_A_results: List[Dict[str, Any]],
+    sle_B_results: List[Dict[str, Any]],
+    summary_one_line: str,
+) -> str:
+    out_dir = r"F:\autostockG\MODELENGINE\INFO\sle_info"
+    os.makedirs(out_dir, exist_ok=True)
+
+    fname = os.path.basename(engine_path).replace(".pkl", "_SLE.json")
+    fpath = os.path.join(out_dir, fname)
+
+    payload = {
+        "engine": os.path.basename(engine_path),
+        "date": pred_dt.strftime("%Y-%m-%d"),
+        "sle_A_results": sle_A_results,
+        "sle_B_results": sle_B_results,
+        "summary_one_line": summary_one_line
+    }
+
+    with open(fpath, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    print("[SLE] Saved:", fpath)
+    return str(fpath)
+
+def _build_prompt_summary(sle_A_results: List[Dict[str, Any]], sle_B_results: List[Dict[str, Any]]) -> str:
+    # 전체 요약(20~30자) 전용 경량 프롬프트
+    lines = []
+    try:
+        for a in sle_A_results:
+            t = a.get("ticker","")
+            n = a.get("name","")
+            r = a.get("risk_total_score","")
+            lines.append(f"{t}/{n}: risk_total={r}")
+    except Exception:
+        pass
+    txt = "\n".join(lines[:20])
+    return f"""
+다음은 10개 종목의 정성 위험 요약입니다.
+한 줄(20~30자)로 전체 결론만 한국어로 출력하세요.
+JSON 없이 텍스트 한 문장만 출력.
+
+데이터:
+{txt}
+""".strip()
+
+def run_sle_summary(sle_A_results: List[Dict[str, Any]], sle_B_results: List[Dict[str, Any]]) -> str:
+    t = _build_prompt_summary(sle_A_results, sle_B_results)
+    txt = _genai_call(t)
+    if not txt:
+        return "요약 생성 실패"
+    # 20~30자 제한은 생성 모델 특성상 완벽 보장은 어려움 → 잘라서 방어
+    s = txt.strip().splitlines()[0].strip()
+    return s[:40]  # 살짝 여유
+
 # ------------------------------------------------------------
-# 메인 (원본 유지)
+# 메인 (원본 + SLE 통합 추가)
 # ------------------------------------------------------------
 def main(
     rank_by="combo",
@@ -561,6 +603,33 @@ def main(
         version_override=version,
     )
 
+    # ---------- [추가] SLE 실행 (A→B→summary, 종목별) ----------
+    sle_A_results: List[Dict[str, Any]] = []
+    sle_B_results: List[Dict[str, Any]] = []
+
+    # df_out: ["종목명","종목코드","현재가","상승확률(%)","예측수익률(%)","동시적용 기대수익(%)"]
+    for _, row in df_out.iterrows():
+        name = str(row.get("종목명",""))
+        ticker = str(row.get("종목코드",""))
+        combo = float(row.get("동시적용 기대수익(%)", 0.0))
+
+        a, b = run_sle_per_stock_A_B(ticker=ticker, name=name, combo=combo)
+        sle_A_results.append(a)
+        sle_B_results.append(b)
+
+    summary_line = run_sle_summary(sle_A_results, sle_B_results)
+
+    # 파일명: <엔진>.pkl → <엔진>_SLE.json
+    save_sle_unified_json(
+        engine_path=eng,
+        pred_dt=pred_dt,
+        sle_A_results=sle_A_results,
+        sle_B_results=sle_B_results,
+        summary_one_line=summary_line
+    )
+    # ---------- [추가 끝] ---------------------------------------
+
+    # 원본 AI 분석은 기존 위치/로직 유지
     ai_text = get_gemini_analysis(df_out, bool(ai_flag))
 
     save_json_payload(
@@ -582,6 +651,7 @@ def main(
     print(f"[ENGINE] {os.path.basename(eng)}")
     print(f"[DB]     {os.path.basename(db_path)}")
 
+
 # ------------------------------------------------------------
 # CLI (원본 유지)
 # ------------------------------------------------------------
@@ -592,7 +662,7 @@ if __name__ == "__main__":
     ap.add_argument("--version", default="V31")
     ap.add_argument("--engine", type=str, default=None)
     ap.add_argument("--date", type=str, default=None)
-    ap.add_argument("--ai", type=int, default=1)
+    ap.add_argument("--ai", type=int, default=0)
 
     args = ap.parse_args()
     main(

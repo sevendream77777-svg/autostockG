@@ -13,12 +13,12 @@ class P0_Index(QWidget):
         layout.setSpacing(20)
 
         header = QLabel("AutoStockG Dashboard")
-        header.setStyleSheet("font-size: 36px; font-weight: bold; color: #2c3e50;")
+        header.setStyleSheet("font-size: 36px; font-weight: bold; color: #E2E8F0;")
         header.setAlignment(Qt.AlignCenter)
         layout.addWidget(header)
 
         desc = QLabel("데이터 수집부터 AI 예측, 자동 매매까지 통합된 관리 시스템")
-        desc.setStyleSheet("font-size: 18px; color: #7f8c8d; margin-bottom: 30px;")
+        desc.setStyleSheet("font-size: 18px; color: #AEBBCC; margin-bottom: 30px;")
         desc.setAlignment(Qt.AlignCenter)
         layout.addWidget(desc)
 

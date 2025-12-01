@@ -126,11 +126,11 @@ class DailyRunner(QThread):
         args = [
             sys.executable, script,
             "--engine", self.engine_path,
+            "--date", self.target_date,
             "--rank_by", self.rank_by,
             "--topk", str(self.top_n),
             "--ai", str(self.ai_flag)
         ]
-
 
         try:
             proc = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="ignore")
@@ -715,7 +715,7 @@ class PredictionPage(QWidget):
             
         if h_int > 0:
             start = self.date_edit.date().toPython()
-            end = (pd.Timestamp(start) + BDay(max(h_int - 1, 0))).date()
+            end = (pd.Timestamp(start) + BDay(h_int)).date()
             if self.is_locked:
                 self.lbl_pred_range.setText(f"▶ {h_int}영업일 뒤 예측: {start} 기준 → {end} 결과")
             else:
@@ -733,22 +733,30 @@ class PredictionPage(QWidget):
         self.btn_run.setText("분석 중...")
         QApplication.processEvents()
         
-        try:
-            engine_path = self.engine_paths[self.cb_engine.currentIndex()]
+        engine_path = self.engine_paths[self.cb_engine.currentIndex()]
+        target_date = self.date_edit.date().toString("yyyy-MM-dd")
+        target_code = None  # 현재 버전: 시장 전체 기준 (특정 종목은 후속 확장)
 
-            # target_date 제거(달력 미사용)
+        top_n = self.spin_topn.value()
+
+        # 동시 실행 방지: 실행 중이면 무시
+        if self.runner is not None and self.runner.isRunning():
+            QMessageBox.information(self, "알림", "이미 실행 중입니다.")
+            self.btn_run.setEnabled(True)
+            self.btn_run.setText("예측 실행")
+            return
+
+        try:
             self.runner = DailyRunner(
                 engine_path=engine_path,
-                target_date="",
-                top_n = self.spin_topn.value(),
+                target_date=target_date,
+                top_n=top_n,
                 rank_by="combo",   # 기본: combo, 필요 시 UI 옵션과 연결
                 ai_flag=0          # 기본 비활성
             )
-
             self.runner.finished_signal.connect(self._on_worker_finished)
             self.runner.error_signal.connect(self._on_worker_error)
             self.runner.start()
-
         except Exception as e:
             self.btn_run.setEnabled(True)
             self.btn_run.setText("예측 실행")

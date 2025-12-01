@@ -18,7 +18,6 @@ import pickle
 import argparse
 from datetime import datetime, timedelta
 
-import json
 import numpy as np
 import pandas as pd
 import lightgbm as lgb
@@ -401,40 +400,40 @@ def run_unified_training(
     # 7) 저장
     save_engine(payload, mode)
 
+    # ------------------------------------------------------------
+    # >>> ADD START — 8) HOJ_ENGINE_INFO 설명파일 저장
+    # ------------------------------------------------------------
+    try:
+        info_dir = os.path.join(
+            r"F:\autostockG\MODELENGINE\HOJ_ENGINE",
+            "HOJ_ENGINE_INFO"
+        )
+        os.makedirs(info_dir, exist_ok=True)
+
+        engine_filename = (
+            f"HOJ_ENGINE_{mode.upper()}_V31"
+            f"_h{horizon}"
+            f"_w{input_window}"
+            f"_n{n_estimators}"
+            f"_{max_date.strftime('%y%m%d')}.pkl"
+        )
+
+        info_path = os.path.join(
+            info_dir,
+            engine_filename.replace(".pkl", ".txt")
+        )
+
+        with open(info_path, "w", encoding="utf-8") as f:
+            f.write(base_summary)
+
+        print(f"📄 엔진 설명파일 저장 완료: {info_path}")
+
+    except Exception as e:
+        print(f"엔진 설명파일 저장 오류: {e}")
     # ============================================================
     # >>> ADD END
     # ============================================================
 
-# ====== ADD ENGINE_TRAINING_INFO JSON UPDATE ======
-    try:
-        json_dir = r'F:\autostockG\MODELENGINE\INFO\hoj_engine_info'
-        os.makedirs(json_dir, exist_ok=True)
-        json_path = os.path.join(json_dir, f'HOJ_ENGINE_{mode.upper()}_V31_h{horizon}_w{input_window}_n{n_estimators}_{max_date.strftime("%y%m%d")}.json')
-        info = {}
-        if os.path.exists(json_path):
-            try:
-                info = json.load(open(json_path, 'r', encoding='utf-8'))
-            except:
-                info = {}
-        info.setdefault('engine_meta', {})
-        info.setdefault('top10', [])
-        info.setdefault('ai_report', '')
-        info['engine_training_info'] = {
-            'auc': float(auc) if 'auc' in locals() else None,
-            'rmse': float(rmse) if 'rmse' in locals() else None,
-            'train_samples': int(len(data)),
-            'train_date_range': f"{data['Date'].min().date()} ~ {data['Date'].max().date()}",
-            'valid_start': str(valid_start) if mode=='research' else None,
-            'valid_end': str(valid_end) if mode=='research' else None,
-            'max_period': int(max_period),
-            'feature_count': int(len(features)),
-        }
-        with open(json_path, 'w', encoding='utf-8') as jf:
-            json.dump(info, jf, ensure_ascii=False, indent=2)
-        print(f'📄 JSON 저장/업데이트 완료: {json_path}')
-    except Exception as e:
-        print('JSON 업데이트 오류:', e)
-# ====== END ADD ======
     print("=== 🏁 Done. ===")
 
 # ------------------------------------------------------------

@@ -1,0 +1,8 @@
+🚀 학습 프로세스 시작 (모드: REAL)...
+=== 🚀 Unified HOJ Trainer V31 (REAL) ===
+[CFG] mode=real  horizon=1  input_window=20  valid_days=0  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-28 | rows=6,079,116
+
+[SKIP] 동일 설정/날짜 엔진 있음: HOJ_ENGINE_REAL_V31_h1_w20_n1000_251128.pkl
+------------------------------------------------------------
+[SUCCESS] Process Finished

@@ -1,0 +1,27 @@
+🚀 학습 프로세스 시작 (모드: REAL)...
+=== 🚀 Unified HOJ Trainer V31 (REAL) ===
+[CFG] mode=real  horizon=10  input_window=60  valid_days=0  n_estimators=1000
+[DATA] DB max(Date) = 2025-11-28 | rows=6,079,116
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=60d | After rows=5,850,117 | Date: 2015-04-01~2025-10-29
+[HASH] df_m = 1284533520026201255
+[SPLIT] REAL: 전체 5,850,117 학습
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.406741 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5850117, number of used features: 19
+[LightGBM] [Info] Start training from score 0.004421
+[LightGBM] [Info] Number of positive: 2623875, number of negative: 3226242
+[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.112832 seconds.
+You can set `force_col_wise=true` to remove the overhead.
+[LightGBM] [Info] Total Bins 4845
+[LightGBM] [Info] Number of data points in the train set: 5850117, number of used features: 19
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.448517 -> initscore=-0.206666
+[LightGBM] [Info] Start training from score -0.206666
+[TRAIN] 모델 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_h10_w60_n1000_251128.pkl
+📄 JSON 저장/업데이트 완료: F:\autostockG\MODELENGINE\INFO\hoj_engine_info\HOJ_ENGINE_REAL_V31_h10_w60_n1000_251128.json
+=== 🏁 Done. ===
+------------------------------------------------------------
+[SUCCESS] Process Finished

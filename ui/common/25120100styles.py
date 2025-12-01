@@ -26,7 +26,6 @@ def _form_controls_qss(p):
     QWidget {{
         background-color: {p['bg']}; color: {p['text']};
         font-family: 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo'; font-size: 10pt;
-        padding: 0px;  /* 전역 패딩 0으로 강제 */
     }}
     QPushButton {{
         background-color: {p['surface_alt']}; border: 1px solid {p['primary']};
@@ -82,13 +81,12 @@ def _form_controls_qss(p):
 
 def get_nav_card_qss(p):
     return f"""
-    #SideNav {{ background-color: {p['bg']}; border: none; padding: 0px; }}
-
-    /* 추가됨 — 숨겨진 QListWidget·viewport 여백 완전 제거 */
-    QListWidget {{ padding:0px; margin:0px; border:0px; }}
-    QListWidget::viewport {{ padding:0px; margin:0px; border:0px; }}
-
+    #SideNav {{ background-color: {p['bg']}; border: none; padding: 12px; }}
+    QListWidget {{ outline: none; background: transparent; border: none; }}
+    
+    /* [중요 수정] item의 margin을 0으로 만들어야 정확한 높이 계산이 가능합니다. */
     QListWidget::item {{ background: transparent; border: none; margin: 0px; padding: 0px; }}
+    
     QListWidget::item:selected {{ background: transparent; border: none; }}
     QLabel#NavTitle, QLabel#NavSubtitle, QLabel#NavIcon {{ background: transparent; }}
     QLabel#NavSubtitle {{ font-size: 11px; color: {p['subtext']}; }}
@@ -96,16 +94,11 @@ def get_nav_card_qss(p):
     """
 
 def build_qss(theme: str, primary_color: str | None = None, text_color: str | None = None, overrides: dict | None = None) -> str:
-    if theme == "black":
-        pal = get_theme_black_vscode()
-    else:
-        pal = get_theme_nord_dark()
-    if primary_color:
-        pal["primary"] = primary_color; pal["primary_alt"] = primary_color
-    if text_color:
-        pal["text"] = text_color
+    if theme == "black": pal = get_theme_black_vscode()
+    else: pal = get_theme_nord_dark()
+    if primary_color: pal["primary"] = primary_color; pal["primary_alt"] = primary_color
+    if text_color: pal["text"] = text_color
     if overrides:
         for k, v in overrides.items():
-            if k in pal and v:
-                pal[k] = v
+            if k in pal and v: pal[k] = v
     return _form_controls_qss(pal) + get_nav_card_qss(pal)

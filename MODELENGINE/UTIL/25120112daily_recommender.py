@@ -485,18 +485,21 @@ def save_json_payload(
         "ai_report": ai_text,
     }
 
-    try:
-        tmp_path = json_path + ".tmp"
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(new_payload, f, ensure_ascii=False, indent=2, default=_json_safe)
-        os.replace(tmp_path, json_path)
-    except Exception as e:
-        print(f"[ERROR] JSON 저장 실패: {e}")
-        return None
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                old = json.load(f)
+        except:
+            old = {}
+        data_to_save = _dict_merge_safe(old, new_payload)
+    else:
+        data_to_save = new_payload
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data_to_save, f, ensure_ascii=False, indent=2, default=_json_safe)
 
     print(f"[SAVE] JSON: {json_path}")
     return json_path
-
 
 # ============================================================
 # [추가] SLE 실행/저장 블록 (원본 유지, 주석 그대로)

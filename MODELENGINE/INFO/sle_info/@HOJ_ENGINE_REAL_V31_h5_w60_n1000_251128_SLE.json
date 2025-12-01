@@ -1,0 +1,79 @@
+{
+  "engine": "HOJ_ENGINE_REAL_V31_h5_w60_n1000_251128.pkl",
+  "date": "2025-11-28",
+  "sle_A_results": [
+    {
+      "error": "no_text",
+      "final_score": 6.5
+    },
+    {
+      "error": "no_text",
+      "final_score": 4.69
+    },
+    {
+      "error": "no_text",
+      "final_score": 4.37
+    },
+    {
+      "error": "no_text",
+      "final_score": 4.26
+    },
+    {
+      "error": "no_text",
+      "final_score": 3.12
+    },
+    {
+      "error": "no_text",
+      "final_score": 3.02
+    },
+    {
+      "error": "no_text",
+      "final_score": 2.44
+    },
+    {
+      "error": "no_text",
+      "final_score": 2.13
+    },
+    {
+      "error": "no_text",
+      "final_score": 1.83
+    },
+    {
+      "error": "no_text",
+      "final_score": 1.68
+    }
+  ],
+  "sle_B_results": [
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    },
+    {
+      "error": "no_text"
+    }
+  ],
+  "summary_one_line": "요약 생성 실패"
+}

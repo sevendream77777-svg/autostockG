@@ -83,11 +83,7 @@ def _form_controls_qss(p):
 def get_nav_card_qss(p):
     return f"""
     #SideNav {{ background-color: {p['bg']}; border: none; padding: 0px; }}
-
-    /* 추가됨 — 숨겨진 QListWidget·viewport 여백 완전 제거 */
-    QListWidget {{ padding:0px; margin:0px; border:0px; }}
-    QListWidget::viewport {{ padding:0px; margin:0px; border:0px; }}
-
+    QListWidget {{ outline: none; background: transparent; border: none; padding: 0px; }}
     QListWidget::item {{ background: transparent; border: none; margin: 0px; padding: 0px; }}
     QListWidget::item:selected {{ background: transparent; border: none; }}
     QLabel#NavTitle, QLabel#NavSubtitle, QLabel#NavIcon {{ background: transparent; }}

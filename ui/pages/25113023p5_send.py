@@ -16,11 +16,7 @@ BEST_TOP_DIR = r"F:\autostockG\MODELENGINE\INFO\best_top"
 # 경로 교정: alert_notify.py 최종 위치
 ALERT_SCRIPT = r"F:\autostockG\MODELENGINE\UTIL\alert_notify.py"
 
-# ============================================================
-# ★ 수정된 부분: 클래스명 변경 (유일한 수정)
-# ============================================================
-class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
-# ============================================================
+class P5_Send(QWidget):
     def __init__(self):
         super().__init__()
         self.current_img_path = ""
@@ -141,12 +137,11 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
         split_layout.addWidget(splitter)
         split_group.setLayout(split_layout)
         layout.addWidget(split_group)
-
-        # 아래 두 줄 추가 (상단 그룹은 고정, 하단 3분할은 확장)
+       # 아래 두 줄 추가 (상단 그룹은 고정, 하단 3분할은 확장)
         group_json.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         group_opt.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # 전체 레이아웃 스트레치: title(0), json(1), opt(2) 고정 / split(3) 확장
+     # 전체 레이아웃 스트레치: title(0), json(1), opt(2) 고정 / split(3) 확장
         layout.setStretch(0, 0)
         layout.setStretch(1, 0)
         layout.setStretch(2, 0)
@@ -164,6 +159,8 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
 
     # ============================================
     # 미리보기 생성(alert_notify.py 호출)
+    #  - 이미지/텍스트 파일 생성
+    #  - 텍스트는 --dump-text 로 stdout도 수신 → 가운데 패널 표시
     # ============================================
     def make_preview(self):
         json_path = self.combo_json.currentData()
@@ -171,8 +168,7 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
             self.txt_log.append("[오류] JSON 선택되지 않음")
             return
 
-        # 텍스트 미리보기(지원 옵션으로 교체)
-        cmd = ["python", ALERT_SCRIPT, "--json", json_path, "--text-only"]
+        cmd = ["python", ALERT_SCRIPT, "--json", json_path, "--make-only", "--dump-text"]
         self.txt_log.append("▶ 미리보기 생성 중...")
         self.txt_log.append(" ".join(cmd))
 
@@ -182,10 +178,11 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
             self.txt_log.append(f"[오류] 실행 중 오류 발생: {e}")
             return
 
+        # 가운데 텍스트: stdout을 그대로 출력(알림 텍스트)
         msg_text = result.stdout.strip()
         if msg_text:
             self.txt_message.setPlainText(msg_text)
-
+        # 추가: stdout이 비면 best_top/<base>.txt 읽어 보강
         if not msg_text:
             base = os.path.splitext(os.path.basename(json_path))[0]
             txt_path = os.path.join(BEST_TOP_DIR, base + ".txt")
@@ -195,29 +192,28 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
             if msg_text:
                 self.txt_message.setPlainText(msg_text)
 
-        # 이미지 생성(옵션 없이 한 번 더 실행)
-        try:
-            subprocess.run(["python", ALERT_SCRIPT, "--json", json_path], capture_output=True, text=True, shell=False)
-        except Exception as e:
-            self.txt_log.append(f"[오류] 이미지 생성 호출 실패: {e}")
 
+        # 이미지 로드
         base = os.path.splitext(os.path.basename(json_path))[0]
         img_path = os.path.join(BEST_TOP_DIR, base + ".png")
         self.current_img_path = img_path if os.path.exists(img_path) else ""
 
         if self.current_img_path:
             pix = QPixmap(self.current_img_path)
-            self.lbl_img.setPixmap(pix)
+            self.lbl_img.setPixmap(pix)  # 스크롤 영역이 알아서 처리
             self.txt_log.append(f"[완료] 이미지 생성됨: {self.current_img_path}")
         else:
             self.lbl_img.setText("생성된 이미지 없음")
             self.txt_log.append("[오류] 이미지 생성 실패")
 
+        # 로그에 표준출력/표준에러는 참고용으로만 추가
         if result.stderr:
             self.txt_log.append(result.stderr)
 
     # ============================================
     # 전송 실행(alert_notify.py 호출)
+    #  - 먼저 미리보기 갱신(텍스트/이미지 최신 상태)
+    #  - 이후 실제 전송 실행
     # ============================================
     def run_send(self):
         json_path = self.combo_json.currentData()
@@ -225,6 +221,7 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
             self.txt_log.append("[오류] JSON 선택되지 않음")
             return
 
+        # 모드
         if self.rb_text.isChecked():
             mode = "text"
         elif self.rb_image.isChecked():
@@ -232,6 +229,7 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
         else:
             mode = "both"
 
+        # 채널
         channels = []
         if self.cb_kakao.isChecked(): channels.append("kakao")
         if self.cb_tg.isChecked():    channels.append("telegram")
@@ -241,8 +239,10 @@ class P5SendPage(QWidget):   # ← 기존: class P5_Send(QWidget)
             self.txt_log.append("[오류] 최소 1개 채널 선택해야 함")
             return
 
+        # 1) 최신 미리보기 갱신
         self.make_preview()
 
+        # 2) 실제 전송 실행
         cmd = [
             "python", ALERT_SCRIPT,
             "--json", json_path,

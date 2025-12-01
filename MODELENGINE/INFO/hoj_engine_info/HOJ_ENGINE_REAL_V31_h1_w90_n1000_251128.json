@@ -1,0 +1,15 @@
+{
+  "engine_meta": {},
+  "top10": [],
+  "ai_report": "",
+  "engine_training_info": {
+    "auc": null,
+    "rmse": null,
+    "train_samples": 5815943,
+    "train_date_range": "2015-05-15 ~ 2025-11-26",
+    "valid_start": null,
+    "valid_end": null,
+    "max_period": 90,
+    "feature_count": 20
+  }
+}

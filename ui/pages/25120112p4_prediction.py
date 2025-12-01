@@ -1,12 +1,8 @@
-
 # ui/pages/p4_prediction.py
 import glob
 import os
 import pickle
 import re
-import subprocess
-import sys
-import json
 import pandas as pd
 from pandas.tseries.offsets import BDay
 
@@ -17,144 +13,9 @@ from PySide6.QtWidgets import (
     QListWidget, QListWidgetItem, QTextEdit, QScrollArea, QWidget as QtWidget,
     QMenu, QWidgetAction, QToolButton, QSizePolicy, QApplication, QCheckBox
 )
-from PySide6.QtCore import QDate, Qt, QLocale, QRect, QThread, Signal
+from PySide6.QtCore import QDate, Qt, QLocale, QRect
 from PySide6.QtGui import QColor, QFont, QPen, QBrush, QPainter
-
-# ──────────────────────────────────────────────────────────────────────────────
-# 내부 QThread: daily_recommender.py 실행 → JSON 로드 → DF 반환
-# ──────────────────────────────────────────────────────────────────────────────
-class DailyRunner(QThread):
-    finished_signal = Signal(object)  # pandas.DataFrame
-    error_signal = Signal(str)
-
-    def __init__(self, engine_path: str, target_date: str, top_n: int,
-                 rank_by: str = "combo", ai_flag: int = 0, parent=None):
-        super().__init__(parent)
-        self.engine_path = engine_path
-        self.target_date = target_date  # "yyyy-mm-dd"
-        self.top_n = int(top_n)
-        self.rank_by = rank_by
-        self.ai_flag = int(ai_flag)
-
-    def _project_root(self):
-        # ui/pages/p4_prediction.py → .../(project root)
-        return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-
-    def _info_dir(self):
-        return os.path.join(self._project_root(), "MODELENGINE", "INFO", "hoj_engine_info")
-
-    def _util_dir(self):
-        return os.path.join(self._project_root(), "MODELENGINE", "UTIL")
-
-    def _json_path_for_engine(self):
-        name = os.path.splitext(os.path.basename(self.engine_path))[0] + ".json"
-        return os.path.join(self._info_dir(), name)
-
-    def _load_json_df(self, json_path: str) -> pd.DataFrame:
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        top10 = data.get("top10", [])
-        if not isinstance(top10, list):
-            top10 = []
-
-        # 컬럼 맵핑: code,name,close,score,prob
-        rows = []
-        for item in top10[: self.top_n]:
-            code = item.get("종목코드") or item.get("code") or "-"
-            name = item.get("종목명") or item.get("name") or "-"
-            close = item.get("현재가") or item.get("close")
-            # score 우선순위: combo → ret
-            score = (
-                item.get("동시적용 기대수익(%)")
-                if item.get("동시적용 기대수익(%)") is not None
-                else item.get("예측수익률(%)")
-            )
-            prob_pct = item.get("상승확률(%)")
-            # prob 0~1로 스케일
-            prob = None
-            try:
-                if prob_pct is None:
-                    prob = 0.0
-                else:
-                    prob = float(prob_pct) / 100.0 if float(prob_pct) > 1.0 else float(prob_pct)
-                    # 만약 이미 0~1이면 그대로, 1초과면 %에서 변환
-            except Exception:
-                prob = 0.0
-
-            try:
-                close = float(close) if close is not None else None
-            except Exception:
-                close = None
-
-            try:
-                score = float(score) if score is not None else 0.0
-            except Exception:
-                score = 0.0
-
-            rows.append({"code": str(code), "name": str(name), "close": close, "score": score, "prob": prob})
-
-        df = pd.DataFrame(rows, columns=["code", "name", "close", "score", "prob"])
-        # 정렬: score desc, prob desc
-        if not df.empty:
-            df = df.sort_values(["score", "prob"], ascending=[False, False]).reset_index(drop=True)
-        return df
-
-    def _ensure_json(self, json_path: str):
-        # JSON이 없거나 비정상이면 daily_recommender.py 실행
-        need_run = True
-        if os.path.exists(json_path):
-            try:
-                with open(json_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                # 최소 필드 검증
-                if isinstance(data.get("top10", None), list) and len(data.get("top10", [])) > 0:
-                    need_run = False
-            except Exception:
-                need_run = True
-
-        if not need_run:
-            return
-
-        util_dir = self._util_dir()
-        script = os.path.join(util_dir, "daily_recommender.py")
-        if not os.path.exists(script):
-            self.error_signal.emit(f"daily_recommender.py가 없습니다: {script}")
-            return
-
-        # 안전한 실행 인자
-        args = [
-            sys.executable, script,
-            "--engine", self.engine_path,
-            "--rank_by", self.rank_by,
-            "--topk", str(self.top_n),
-            "--ai", str(self.ai_flag)
-        ]
-
-
-        try:
-            proc = subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="ignore")
-            if proc.returncode != 0:
-                self.error_signal.emit(f"daily 실행 실패({proc.returncode})\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}")
-                return
-        except Exception as e:
-            self.error_signal.emit(f"daily 실행 예외: {e}")
-            return
-
-    def run(self):
-        try:
-            json_path = self._json_path_for_engine()
-            # 필요 시 생성
-            self._ensure_json(json_path)
-            if not os.path.exists(json_path):
-                self.error_signal.emit(f"JSON 생성 실패: {os.path.basename(json_path)} 미존재")
-                return
-
-            df = self._load_json_df(json_path)
-            self.finished_signal.emit(df)
-        except Exception as e:
-            self.error_signal.emit(str(e))
-
+from common.workers import PredictionWorker
 
 # [커스텀 달력] (+N) 텍스트 및 범위 하이라이트
 class CustomCalendar(QCalendarWidget):
@@ -236,7 +97,6 @@ class PredictionPage(QWidget):
     2. 엔진 리스트 필터링: 달력 날짜 클릭 시 해당 날짜 엔진만 표시 (잠금 시)
     3. 잠금 버튼 이동: 하단 -> 우측 상단 엔진 목록 헤더 옆
     4. 테이블 UI 개선: 행 번호 삭제, 순위 폭 50%, 경계선 강화
-    5. (핵심) 예측 실행은 DailyRunner(QThread)로 daily_recommender.py 실행/JSON 로드로 단일화
     """
 
     def _open_topn_picker(self):
@@ -276,8 +136,8 @@ class PredictionPage(QWidget):
         self.all_engine_files = [] # 전체 엔진 정보 캐싱 [{'path':.., 'target_date':..}, ...]
         self.meta_cache = {}
         self.db_cache = {}
-        self.runner = None  # ← 내부 QThread
-
+        self.worker = None 
+        
         self._current_engine_info = {
             "max_date": None,
             "target_date": None,
@@ -715,7 +575,7 @@ class PredictionPage(QWidget):
             
         if h_int > 0:
             start = self.date_edit.date().toPython()
-            end = (pd.Timestamp(start) + BDay(max(h_int - 1, 0))).date()
+            end = (pd.Timestamp(start) + BDay(h_int)).date()
             if self.is_locked:
                 self.lbl_pred_range.setText(f"▶ {h_int}영업일 뒤 예측: {start} 기준 → {end} 결과")
             else:
@@ -733,22 +593,37 @@ class PredictionPage(QWidget):
         self.btn_run.setText("분석 중...")
         QApplication.processEvents()
         
+        engine_path = self.engine_paths[self.cb_engine.currentIndex()]
+        target_date = self.date_edit.date().toString("yyyy-MM-dd")
+        target_code = None
+
+        if self.rb_specific.isChecked():
+            target_code = self.txt_code.text().strip()
+            if not target_code:
+                QMessageBox.warning(self, "알림", "종목 코드를 입력하세요.")
+                self.btn_run.setEnabled(True)
+                self.btn_run.setText("예측 실행")
+                return
+
+        top_n = self.spin_topn.value()
+        
+        if self.worker is not None:
+            if self.worker.isRunning():
+                self.worker.terminate()
+                self.worker.wait()
+            self.worker.deleteLater()
+            self.worker = None
+
         try:
-            engine_path = self.engine_paths[self.cb_engine.currentIndex()]
-
-            # target_date 제거(달력 미사용)
-            self.runner = DailyRunner(
+            self.worker = PredictionWorker(
                 engine_path=engine_path,
-                target_date="",
-                top_n = self.spin_topn.value(),
-                rank_by="combo",   # 기본: combo, 필요 시 UI 옵션과 연결
-                ai_flag=0          # 기본 비활성
+                target_date=target_date,
+                top_n=top_n,
+                specific_code=target_code,
             )
-
-            self.runner.finished_signal.connect(self._on_worker_finished)
-            self.runner.error_signal.connect(self._on_worker_error)
-            self.runner.start()
-
+            self.worker.finished_signal.connect(self._on_worker_finished)
+            self.worker.error_signal.connect(self._on_worker_error)
+            self.worker.start()
         except Exception as e:
             self.btn_run.setEnabled(True)
             self.btn_run.setText("예측 실행")
@@ -759,7 +634,7 @@ class PredictionPage(QWidget):
         self.btn_run.setText("예측 실행")
         try:
             self.update_table(df)
-            if df is not None and not df.empty:
+            if not df.empty:
                 best = df.iloc[0]
                 msg = (f"분석 완료.\n"
                        f"가장 높은 점수: {best.get('name')} ({best.get('code')})\n"
@@ -787,27 +662,11 @@ class PredictionPage(QWidget):
             self.table.setItem(r, 0, QTableWidgetItem(str(i + 1)))
             self.table.setItem(r, 1, QTableWidgetItem(str(row.get("code", "-"))))
             self.table.setItem(r, 2, QTableWidgetItem(str(row.get("name", "-"))))
-            # 종가 포맷
-            close_val = row.get("close", "-")
-            try:
-                if close_val is None or pd.isna(close_val):
-                    close_str = "-"
-                else:
-                    close_str = f"{float(close_val):,.0f}"
-            except Exception:
-                close_str = str(close_val)
-            self.table.setItem(r, 3, QTableWidgetItem(close_str))
-            # 점수
-            try:
-                score_val = float(row.get("score", 0))
-                score_str = f"{score_val:.2f}"
-            except Exception:
-                score_str = str(row.get("score", "-"))
-            self.table.setItem(r, 4, QTableWidgetItem(score_str))
-            # 확률(%)
+            self.table.setItem(r, 3, QTableWidgetItem(str(row.get("close", "-"))))
+            self.table.setItem(r, 4, QTableWidgetItem(f"{row.get('score', 0):.4f}"))
             prob = row.get('prob', 0)
             if isinstance(prob, (int, float)):
-                 self.table.setItem(r, 5, QTableWidgetItem(f"{float(prob) * 100:.1f}%"))
+                 self.table.setItem(r, 5, QTableWidgetItem(f"{prob * 100:.1f}%"))
             else:
                  self.table.setItem(r, 5, QTableWidgetItem("-"))
 
@@ -818,7 +677,7 @@ class PredictionPage(QWidget):
                     item.setTextAlignment(Qt.AlignCenter)
 
     def closeEvent(self, event):
-        if self.runner is not None and self.runner.isRunning():
-            self.runner.requestInterruption()
-            self.runner.wait()
+        if self.worker is not None and self.worker.isRunning():
+            self.worker.terminate()
+            self.worker.wait()
         super().closeEvent(event)
