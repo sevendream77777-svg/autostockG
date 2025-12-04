@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QStackedWidget, QLabel, QListWidget, QListWidgetItem,
     QSizePolicy, QFrame, QGridLayout
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, QTimer
 from PySide6.QtGui import QIcon, QGuiApplication
 
 # ----------------------------------------------------------
@@ -79,16 +79,21 @@ class NavCard(QWidget):
             border-radius: 10px;
         """)
 
-        self.icon.setStyleSheet("font-size: 18px; padding-left:4px;")
-        self.title.setStyleSheet("font-size: 15px; font-weight:700; padding-left:4px;")
-        self.subtitle.setStyleSheet("font-size: 11px; padding-left:4px; padding-bottom:4px;")
+        self.icon.setStyleSheet("font-size: 20px; padding-left:4px; color: #f5f5f5;")
+        self.title.setStyleSheet("font-size: 17px; font-weight:800; padding-left:4px; color: #f5f5f5;")
+        self.subtitle.setStyleSheet("font-size: 13px; font-weight:600; padding-left:4px; padding-bottom:4px; color: #e8e8e8;")
 
     def setSelected(self, selected: bool):
         if selected:
-            self.inner_card.setStyleSheet("""
-                background-color: rgba(0,0,0,35);
+            self.inner_card.setStyleSheet(f"""
+                background-color: {self.base_color};
                 border-radius: 10px;
+                border: none;
+                border-left: 5px solid #FFD166;
             """)
+            self.icon.setStyleSheet("font-size: 24px; padding-left:4px; color: #fff; font-weight:900;")
+            self.title.setStyleSheet("font-size: 21px; font-weight:900; padding-left:4px; color: #fff; letter-spacing: 0.3px;")
+            self.subtitle.setStyleSheet("font-size: 15px; font-weight:800; padding-left:4px; padding-bottom:4px; color: #f0f0f0;")
         else:
             self._apply_card_style(self.base_color)
 
@@ -107,6 +112,7 @@ class MainWindow(QMainWindow):
             screen.y() + (screen.height() - 800)//2,
             1280, 800
         )
+        self.setMinimumSize(1100, 650)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -190,26 +196,31 @@ class MainWindow(QMainWindow):
     # ----------------------------------------------------------
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        self._apply_nav_layout()
 
-        total_w = self.width()
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 최초 표시 시 레이아웃을 한 번 더 적용 (초기 높이 0 문제 방지)
+        QTimer.singleShot(0, self._apply_nav_layout)
+
+    def _apply_nav_layout(self):
+        total_w = max(1, self.width())
         nav_w = int(total_w * 0.18)  # 가로 자동 비율
         nav_w = max(150, min(nav_w, 300))
         self.nav_list.setFixedWidth(nav_w)
-
-        # 세로 자동 조절
-        vh = self.nav_list.viewport().height()
-        if vh <= 0:
-            vh = self.nav_list.height()
 
         count = len(self.nav_items)
         if count == 0:
             return
 
-        # C옵션: 70~150px 자동분배
+        # 세로 자동 조절: 렌더링 전 viewport 높이가 0이 되는 현상 대비
+        vh = max(self.nav_list.viewport().height(), self.nav_list.height(), self.height() - 40)
+        if vh <= 0:
+            vh = 1
+
         base_h = vh // count
         base_h = max(70, min(base_h, 150))
 
-        # 적용
         for item, card in zip(self.nav_items, self.cards):
             item.setSizeHint(QSize(nav_w, base_h))
 

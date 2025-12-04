@@ -45,6 +45,8 @@ def _form_controls_qss(p):
         border: 1px solid {p['border']};
         selection-background-color: {p['primary_alt']}; selection-color: #000000;
     }}
+    QTableWidget::item:selected {{ background-color: rgba(255,255,255,0.18); 
+    }}
     QTextEdit {{
         background-color: {p['surface']}; border: 1px solid {p['border']};
         padding: 8px; border-radius: 8px; color: {p['text']};

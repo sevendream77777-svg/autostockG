@@ -1,0 +1,35 @@
+
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,Helvetica,Arial,sans-serif;background:#1f2430;color:#EAEAEA}
+header{position:sticky;top:0;background:#262c3a;border-bottom:1px solid #374151;padding:14px;z-index:10}
+h1{margin:0;font-size:18px}
+.container{padding:12px 14px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+select,button{background:#1b2030;color:#EAEAEA;border:1px solid #384257;border-radius:10px;padding:10px 12px;font-size:14px}
+button.primary{background:#ff8a3d;border-color:#ff8a3d;color:#111}
+button:disabled{opacity:.6;cursor:not-allowed}
+.grid{display:grid;gap:12px}
+@media(min-width:980px){.grid{grid-template-columns:360px 1fr}}
+.card{background:#262c3a;border:1px solid #374151;border-radius:12px;padding:12px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1px solid #30384a;padding:10px 8px;white-space:nowrap}
+th{position:sticky;top:0;background:#2a3142;text-align:center}
+td.num{text-align:right}
+td.code,td.rank{text-align:center}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
+.badge.h5{background:#4c566a;color:#fff}
+.pos{color:#ff6b6b}.neg{color:#6cb8ff}
+.footer{padding:18px 14px;color:#8fa3c8;font-size:12px;text-align:center}
+small.mono{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;color:#9aa6c9}
+/* Calendar */
+.cal{user-select:none}
+.cal .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal .hdr button{padding:6px 10px;border-radius:8px}
+.cal .mon{font-weight:700}
+.cal table{width:100%;border-collapse:separate;border-spacing:6px 6px}
+.cal th{background:transparent;border:none;color:#aeb9d6;font-weight:600}
+.cal td{height:46px;border:1px solid #3b4459;border-radius:10px;text-align:center;vertical-align:middle;position:relative;background:#202636}
+.cal td.dim{opacity:.45}
+.cal td.sel{outline:2px solid #ff8a3d}
+.cal .cnt{position:absolute;left:0;right:0;bottom:2px;font-size:12px;color:#ffa54d}
+.cal .inwin{background:rgba(255,165,0,0.12)}

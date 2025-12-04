@@ -45,6 +45,29 @@ class KiwoomTokenManager:
         api_conf = parser["API"]
         app_key = api_conf.get("APP_KEY", "").strip()
         app_secret = api_conf.get("APP_SECRET", "").strip()
+        app_key_file = api_conf.get("APP_KEY_FILE", "").strip()
+        app_secret_file = api_conf.get("APP_SECRET_FILE", "").strip()
+
+        def _read_first_value(path: str) -> str:
+            if not path:
+                return ""
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"키 파일이 없습니다: {path}")
+            with open(path, "r", encoding="utf-8") as f:
+                for line in f:
+                    val = line.strip()
+                    if not val:
+                        continue
+                    if val.startswith(("#", ";", "//")):
+                        continue
+                    return val
+            raise ValueError(f"키 파일에 유효한 값이 없습니다: {path}")
+
+        # 파일 경로가 설정돼 있으면 우선 적용 (노출 방지)
+        if app_key_file:
+            app_key = _read_first_value(app_key_file)
+        if app_secret_file:
+            app_secret = _read_first_value(app_secret_file)
 
         if not app_key or not app_secret:
             raise ValueError("APP_KEY 또는 APP_SECRET가 비어있습니다.")
@@ -60,6 +83,7 @@ class KiwoomTokenManager:
             # 호환성 처리
             token = data.get("access_token") or data.get("token")
             exp_str = data.get("expires_at") or data.get("expires_dt")
+            base_url = data.get("base_url")
             
             expires_at = None
             if exp_str:
@@ -69,14 +93,18 @@ class KiwoomTokenManager:
                         break
                     except ValueError:
                         continue
-            return {"access_token": token, "expires_at": expires_at}
+            return {"access_token": token, "expires_at": expires_at, "base_url": base_url}
         except Exception:
             return None
 
     def _save_token(self, token: str, expires_at: datetime) -> None:
         with open(self.token_path, "w", encoding="utf-8") as f:
             json.dump(
-                {"access_token": token, "expires_at": expires_at.isoformat()},
+                {
+                    "access_token": token,
+                    "expires_at": expires_at.isoformat(),
+                    "base_url": self.config.get("base_url"),
+                },
                 f,
                 indent=4,
                 ensure_ascii=False
@@ -87,6 +115,11 @@ class KiwoomTokenManager:
             return False
         token = self.token_data.get("access_token")
         exp = self.token_data.get("expires_at")
+        token_host = (self.token_data or {}).get("base_url")
+        cfg_host = self.config.get("base_url")
+        # base_url이 바뀌었거나 기록이 없으면 새 토큰 발급
+        if not token_host or (cfg_host and token_host.rstrip("/") != cfg_host.rstrip("/")):
+            return False
         if not token or not exp:
             return False
         if isinstance(exp, str):
@@ -148,7 +181,11 @@ class KiwoomTokenManager:
             expires_at = datetime.now() + timedelta(hours=6)
 
         self._save_token(token, expires_at)
-        self.token_data = {"access_token": token, "expires_at": expires_at}
+        self.token_data = {
+            "access_token": token,
+            "expires_at": expires_at,
+            "base_url": self.config.get("base_url"),
+        }
         return token
 
     def get_token(self) -> str:

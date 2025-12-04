@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>모바일 Top10 (p6 규칙)</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>AI 추천 Top10 – p6 규칙</h1>
+    <div style="margin-top:6px;color:#9aa6c9;font-size:12px">날짜 클릭 → 파일 자동 필터 → Top10 표시 | 현재가: 무료(야후) 갱신</div>
+  </header>
+
+  <div class="container grid">
+    <div class="card cal">
+      <div class="hdr">
+        <button id="prevM">&lt;</button>
+        <div class="mon" id="calTitle"></div>
+        <button id="nextM">&gt;</button>
+      </div>
+      <table>
+        <thead><tr id="dow"></tr></thead>
+        <tbody id="calBody"></tbody>
+      </table>
+
+      <div class="controls" style="margin-top:8px">
+        <select id="fileSel" style="flex:1 1 auto"></select>
+        <button class="primary" id="btnLoad">불러오기</button>
+        <button id="btnRefresh">현재가 갱신</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="meta"></div>
+      <div class="table-wrap" style="margin-top:8px">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th>순위</th><th>종목명</th><th>코드</th><th>추천가</th><th>총등락률</th>
+              <th>현재가</th><th>금일등락률</th><th>거래량</th><th>점수</th><th>확률</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3 style="margin:0 0 8px 0;font-size:16px">상세</h3>
+        <div id="detail">종목을 선택하면 상세가 표시됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <small class="mono">/g2g/mobile/index.html — 파일목록: /g2g/data/files.json — 데이터: /g2g/data/*.json</small>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

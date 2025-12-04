@@ -1,0 +1,206 @@
+
+
+---
+
+# ✅ **HOJ_DB 최종 버전(완성판) 전체 컬럼 리스트**
+
+## **1. 기본 필수(이미 존재하는 원본 컬럼)**
+
+1. Date
+2. Code
+3. Name
+4. Market
+5. Open
+6. High
+7. Low
+8. Close
+9. Volume
+10. Change (전일 대비 등락%)
+
+---
+
+# ✅ **2. KOSPI/KOSDAQ 지수 관련 (이미 있는 항목 + 확장)**
+
+11. KOSPI_Close
+12. KOSPI_Return
+13. KOSDAQ_Close
+14. KOSDAQ_Return
+
+---
+
+# ✅ **3. 기술적 지표 (기존 + 반드시 추가해야 하는 전체)**
+
+### ■ 이동평균
+
+15. SMA_5
+16. SMA_20
+17. SMA_40
+18. SMA_60
+19. SMA_90
+20. SMA_120
+21. EMA_12
+22. EMA_26
+23. EMA_60
+24. EMA_120
+25. WMA_20
+26. TEMA_20
+
+### ■ 거래량 기반
+
+27. VOL_SMA_20
+28. VROC_10
+29. VROC_20
+
+### ■ 모멘텀
+
+30. MOM_10
+31. ROC_20
+
+### ■ MACD
+
+32. MACD_12_26
+33. MACD_SIGNAL_9
+34. MACD_HIST (필수)
+
+### ■ 밴드/변동성
+
+35. BBP_20
+36. ATR_14
+37. Keltner_Upper
+38. Keltner_Lower
+39. Keltner_Width
+
+### ■ 오실레이터
+
+40. RSI_14
+41. STOCH_K
+42. STOCH_D
+43. CCI_20
+
+### ■ 캔들 패턴(필수)
+
+44. Body_Ratio
+45. UpperShadow_Ratio
+46. LowerShadow_Ratio
+
+---
+
+# ✅ **4. 가치지표(Valuation, 완전판 핵심)**
+
+47. PER
+48. PBR
+49. EPS
+50. BPS
+51. ROE
+52. MarketCap (시가총액)
+53. SharesOut (상장주식수)
+54. PSR
+55. PCR
+56. DividendYield
+57. OperatingMargin
+58. NetMargin
+59. Revenue_YoY
+60. OperatingIncome_YoY
+61. NetIncome_YoY
+
+---
+
+# ✅ **5. 수급자료(기관/외국인/연기금) — 최종 엔진 핵심**
+
+### ■ 일자별
+
+62. Inst_Net_Qty
+63. Frgn_Net_Qty
+64. NPS_Net_Qty
+65. Inst_Net_Amt
+66. Frgn_Net_Amt
+67. NPS_Net_Amt
+
+### ■ 누적 수급
+
+68. Cum5_Net_Qty
+69. Cum20_Net_Qty
+70. Cum60_Net_Qty
+71. Cum120_Net_Qty
+
+### ■ 비율
+
+72. Inst_Net_Ratio
+73. Frgn_Net_Ratio
+74. NPS_Net_Ratio
+
+---
+
+# ✅ **6. 섹터 / 테마 관련 — 이번 버전업에서 반드시 넣어야 함**
+
+### ■ 섹터 메타
+
+75. SectorCode
+76. SectorName
+77. Sector_MarketCap
+78. Sector_Turnover
+
+### ■ 섹터 수익률
+
+79. SectorRet_1D
+80. SectorRet_5D
+81. SectorRet_20D
+
+### ■ 섹터 밸류
+
+82. Sector_PER_Avg
+83. Sector_PBR_Avg
+84. Sector_EPS_Avg
+85. Sector_BPS_Avg
+
+### ■ 섹터 강도(Relative Strength)
+
+86. Sector_RS
+
+---
+
+# ✅ **7. 거시지표(Macro) — 완성판 조건**
+
+87. USDKRW
+88. WTI
+89. Brent_Oil
+90. KR10Y (한국 10년 금리)
+91. US10Y (미국 10년 금리)
+92. VIX
+93. DXY (달러인덱스)
+94. S&P500_Return
+95. Nasdaq_Return
+
+---
+
+# ✅ **8. 파생 Feature(엔진 성능 극대화용)**
+
+96. Price_Change_1D
+
+97. Price_Change_5D
+
+98. Price_Change_20D
+
+99. Volatility_20D
+
+100. Volatility_60D
+
+101. Return_1D
+
+102. Return_5D
+
+103. Return_20D
+
+104. Volume_Surge_Factor (거래량 급등 지표)
+
+105. Price_Surge_Factor (가격 급등 지표)
+
+106. GapUp
+
+107. GapDown
+
+108. RelativeStrength_vs_Market
+
+109. RelativeStrength_vs_Sector
+
+110. TrendScore (장기/단기 기준 지표 조합)
