@@ -121,17 +121,34 @@ def select_feature_columns(df):
         'Return_1d','Return_5d','Label_1d','Label_5d',
         'KOSPI_Close','KOSPI_Change'
     ]
+    # 타겟/수익률 관련 컬럼 패턴 제외 (피처 누수 방지)
+    exclude_patterns = [
+        'Return_', 'Label_', 'Target', 'target', 'ret_', 'label_',
+        'future_', 'next_', 'forward_', 'ahead_'
+    ]
     feats = []
     for col in df.columns:
         if col in drop_cols:
+            continue
+        # 패턴 매칭으로 타겟 관련 컬럼 제외
+        if any(pattern in col for pattern in exclude_patterns):
             continue
         if str(df[col].dtype).startswith(("float","int")):
             feats.append(col)
     return feats
 
 def feature_period(col: str) -> int:
+    """피처 컬럼명에서 기간 추출 (연도/코드 숫자 제외)"""
     m = [int(x) for x in INT_PAT.findall(col)]
-    return max(m) if m else 0
+    if not m:
+        return 0
+    # 연도 패턴 제외 (2000~2099, 20XX 형태)
+    filtered = [x for x in m if not (2000 <= x <= 2099)]
+    if not filtered:
+        return 0
+    # 6자리 숫자(종목코드) 제외
+    filtered = [x for x in filtered if len(str(x)) != 6]
+    return max(filtered) if filtered else 0
 
 def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col: str, horizon: int):
     if input_window and input_window > 0:
@@ -149,13 +166,26 @@ def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col:
         g = g.sort_values("Date")
         if max_period > 0:
             g = g.iloc[max_period:].copy()
-        if horizon > 0:
-            g = g.iloc[:-horizon] if len(g) > horizon else g.iloc[0:0]
+        # [수정] 이중 트리밍 방지: shift(-horizon) 후 마지막 horizon만 제거
+        # 꼬리를 먼저 자르지 않고 shift만 적용
         parts.append(g)
 
     df_m = pd.concat(parts, ignore_index=True) if parts else df.iloc[0:0].copy()
+    
+    # 타겟 생성 (shift 적용)
     df_m["TargetRet"] = df_m.groupby("Code")[close_col].shift(-horizon) / df_m[close_col] - 1.0
     df_m["TargetUp"] = (df_m["TargetRet"] > 0).astype("int8")
+    
+    # [수정] shift 후 마지막 horizon 구간 제거 (미래 정보 누수 방지)
+    if horizon > 0:
+        # 각 종목별로 마지막 horizon 행 제거
+        idx_to_drop = []
+        for code, g in df_m.groupby("Code", sort=False):
+            g_idx = g.index
+            if len(g_idx) > horizon:
+                idx_to_drop.extend(g_idx[-horizon:].tolist())
+        if idx_to_drop:
+            df_m = df_m.drop(index=idx_to_drop)
 
     use_cols = ["Date","Code", close_col] + features + ["TargetRet","TargetUp"]
     df_m = df_m[use_cols].dropna(subset=features + ["TargetRet"])
@@ -165,14 +195,30 @@ def apply_A_mask(df: pd.DataFrame, features: list, input_window: int, close_col:
 # 3) 스플릿 & 학습
 # ------------------------------------------------------------
 def split_train_valid(df: pd.DataFrame, valid_days: int) -> tuple:
+    """검증 분할 (거래일 기준으로 개선)"""
     max_day = df["Date"].max().normalize()
     valid_start = max_day - timedelta(days=int(valid_days))
+    
+    # 거래일 기준으로 재계산 (더 정확한 샘플 수)
+    unique_dates = sorted(df["Date"].dt.normalize().unique())
+    if len(unique_dates) > 0:
+        # valid_days에 해당하는 거래일 수 계산
+        valid_date_count = min(valid_days, len(unique_dates))
+        if valid_date_count > 0:
+            valid_start_date = unique_dates[-valid_date_count]
+            valid_start = pd.Timestamp(valid_start_date)
+    
     is_valid = df["Date"] >= valid_start
     train = df.loc[~is_valid].copy()
     valid = df.loc[ is_valid].copy()
+    
+    # 경고: 검증 샘플이 너무 적으면 경고
+    if len(valid) < 100:
+        print(f"[경고] 검증 샘플이 매우 적습니다: {len(valid):,}개 (권장: 100개 이상)")
+    
     return train, valid, valid_start.date(), max_day.date()
 
-def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
+def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000, random_state: int = 42):
     X_tr = df_m.loc[df_m["is_train"], features]
     y_reg_tr = df_m.loc[df_m["is_train"], "TargetRet"]
     y_cls_tr = df_m.loc[df_m["is_train"], "TargetUp"]
@@ -181,10 +227,11 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
     y_reg_va = df_m.loc[~df_m["is_train"], "TargetRet"]
     y_cls_va = df_m.loc[~df_m["is_train"], "TargetUp"]
 
+    # [수정] 재현성을 위한 random_state 추가
     model_reg = lgb.LGBMRegressor(
         n_estimators=n_estimators, max_depth=-1, learning_rate=0.03,
         subsample=0.9, colsample_bytree=0.9, objective="regression",
-        n_jobs=-1
+        n_jobs=-1, random_state=random_state, verbose=-1
     )
     if len(X_va) > 0:
         model_reg.fit(X_tr, y_reg_tr,
@@ -197,7 +244,7 @@ def train_models(df_m: pd.DataFrame, features: list, n_estimators: int = 1000):
     model_cls = lgb.LGBMClassifier(
         n_estimators=n_estimators, max_depth=-1, learning_rate=0.03,
         subsample=0.9, colsample_bytree=0.9, objective="binary",
-        n_jobs=-1
+        n_jobs=-1, random_state=random_state, verbose=-1
     )
     if len(X_va) > 0:
         model_cls.fit(X_tr, y_cls_tr,
@@ -265,7 +312,7 @@ def run_unified_training(
     max_date = df["Date"].max().date()
     print(f"[DATA] DB max(Date) = {max_date} | rows={len(df):,}")
 
-    # SKIP 체크
+    # SKIP 체크 (개선: DB 해시도 확인)
     base = get_path("HOJ_ENGINE")
     if os.path.isfile(base):
         base = os.path.dirname(base)
@@ -284,8 +331,20 @@ def run_unified_training(
     path_chk = os.path.join(out_dir, fname_chk)
 
     if os.path.exists(path_chk):
-        print(f"\n[SKIP] 동일 설정/날짜 엔진 있음: {fname_chk}")
-        return
+        # [개선] DB 해시 확인 (데이터가 바뀌었는지 체크)
+        try:
+            with open(path_chk, "rb") as f:
+                existing_payload = pickle.load(f)
+                existing_hash = existing_payload.get("meta", {}).get("db_hash", None)
+            current_hash = df_hash(df)
+            if existing_hash == current_hash:
+                print(f"\n[SKIP] 동일 설정/날짜/데이터 엔진 있음: {fname_chk}")
+                return
+            else:
+                print(f"\n[재학습] DB 데이터 변경 감지 (기존 해시 != 현재 해시)")
+        except Exception:
+            # 기존 엔진 로드 실패 시 재학습
+            print(f"\n[재학습] 기존 엔진 메타 확인 실패, 재학습 진행")
 
     # 2) 피처 선택
     features = select_feature_columns(df)
@@ -299,9 +358,30 @@ def run_unified_training(
     mask_max = df_m["Date"].max().date() if len(df_m) else None
     print(f"[MASK] MaxPeriod={max_period}d | After rows={len(df_m):,} | Date: {mask_min}~{mask_max}")
 
+    # [추가] 데이터 검증
+    if len(df_m) == 0:
+        raise ValueError("마스킹 후 데이터가 없습니다. 설정을 확인하세요.")
+    
+    # 필수 컬럼 확인
+    required_cols = ["Date", "Code", close_col, "TargetRet", "TargetUp"] + features
+    missing_cols = [c for c in required_cols if c not in df_m.columns]
+    if missing_cols:
+        raise ValueError(f"필수 컬럼 누락: {missing_cols}")
+    
+    # NaN 비율 체크
+    nan_ratio = df_m[features + ["TargetRet"]].isnull().sum().sum() / (len(df_m) * len(features + ["TargetRet"]))
+    if nan_ratio > 0.5:
+        print(f"[경고] NaN 비율이 높습니다: {nan_ratio:.2%}")
+    
+    # 종목별 최소 샘플 수 체크
+    code_counts = df_m.groupby("Code").size()
+    min_samples = code_counts.min()
+    if min_samples < 10:
+        print(f"[경고] 일부 종목의 샘플 수가 매우 적습니다 (최소: {min_samples}개)")
+    
     df_m = df_m.sort_values(["Code", "Date"], kind="mergesort").reset_index(drop=True)
     
-    print(f"[HASH] df_m = {df_hash(df_m)}")   # ← 이 한 줄
+    print(f"[HASH] df_m = {df_hash(df_m)}")
     # 4) 분할
     if mode == "research":
         tr, va, valid_start, valid_end = split_train_valid(df_m, valid_days)
@@ -315,7 +395,7 @@ def run_unified_training(
         print(f"[SPLIT] REAL: 전체 {len(data):,} 학습")
 
     # 5) 학습
-    model_reg, model_cls = train_models(data, features, n_estimators=n_estimators)
+    model_reg, model_cls = train_models(data, features, n_estimators=n_estimators, random_state=42)
     print("[TRAIN] 모델 학습 완료")
 
     # ============================================================
@@ -387,6 +467,8 @@ def run_unified_training(
         "trained_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "close_col": close_col,
         "n_estimators": int(n_estimators),
+        "db_hash": df_hash(df),  # [추가] DB 해시 저장
+        "random_state": 42,  # [추가] 재현성
         # >>> ADD — base_summary 메타 저장
         "base_summary": base_summary,
     }

@@ -1,0 +1,43 @@
+{
+  "status": "000",
+  "message": "정상",
+  "page_no": 702,
+  "page_count": 100,
+  "total_count": 70103,
+  "total_page": 702,
+  "list": [
+    {
+      "corp_code": "01236815",
+      "corp_name": "선산",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "[기재정정]주요사항보고서(회사합병결정)",
+      "rcept_no": "20191231000541",
+      "flr_nm": "선산",
+      "rcept_dt": "20200102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00442233",
+      "corp_name": "한국산업양행",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "연결감사보고서 (2018.12)",
+      "rcept_no": "20191231000540",
+      "flr_nm": "회계법인세진",
+      "rcept_dt": "20200102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00160144",
+      "corp_name": "한국투자증권",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "증권발행실적보고서",
+      "rcept_no": "20191231000538",
+      "flr_nm": "한국투자증권",
+      "rcept_dt": "20200102",
+      "rm": ""
+    }
+  ]
+}

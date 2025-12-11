@@ -1,0 +1,185 @@
+[Raw rows] 223개
+자산총계 (ifrs-full_Assets) = 504875185000000.0
+유동자산 (ifrs-full_CurrentAssets) = 212160671000000.0
+미수금 (dart_ShortTermOtherReceivablesNet) = 6805736000000.0
+현금및현금성자산 (ifrs-full_CashAndCashEquivalents) = 47120025000000.0
+단기당기손익-공정가치금융자산 (ifrs-full_CurrentFinancialAssetsAtFairValueThroughProfitOrLoss) = 27575000000.0
+선급비용 (ifrs-full_CurrentPrepaidExpenses) = 3651493000000.0
+매출채권 (ifrs-full_CurrentTradeReceivables) = 43550509000000.0
+재고자산 (ifrs-full_Inventories) = 51037413000000.0
+기타유동자산 (ifrs-full_OtherCurrentAssets) = 6387366000000.0
+단기금융상품 (ifrs-full_ShorttermDepositsNotClassifiedAsCashEquivalents) = 53580554000000.0
+비유동자산 (ifrs-full_NoncurrentAssets) = 292714514000000.0
+이연법인세자산 (ifrs-full_DeferredTaxAssets) = 19448012000000.0
+무형자산 (ifrs-full_IntangibleAssetsAndGoodwill) = 25997746000000.0
+관계기업 및 공동기업 투자 (ifrs-full_InvestmentAccountedForUsingEquityMethod) = 12843894000000.0
+당기손익-공정가치금융자산 (ifrs-full_NoncurrentFinancialAssetsAtFairValueThroughProfitOrLoss) = 1233859000000.0
+기타포괄손익-공정가치금융자산 (ifrs-full_NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome) = 11030251000000.0
+순확정급여자산 (ifrs-full_NoncurrentRecognisedAssetsDefinedBenefitPlan) = 2398103000000.0
+기타비유동자산 (ifrs-full_OtherNoncurrentAssets) = 14737011000000.0
+유형자산 (ifrs-full_PropertyPlantAndEquipment) = 205025638000000.0
+자본총계 (ifrs-full_Equity) = 399561967000000.0
+지배기업의 소유주에게 귀속되는 자본 (ifrs-full_EquityAttributableToOwnersOfParent) = 388694117000000.0
+기타자본항목 (dart_ElementsOfOtherStockholdersEquity) = 7787466000000.0
+자본금 (ifrs-full_IssuedCapital) = 897514000000.0
+보통주자본금 (dart_IssuedCapitalOfCommonStock) = 778047000000.0
+우선주자본금 (dart_IssuedCapitalOfPreferredStock) = 119467000000.0
+이익잉여금 (ifrs-full_RetainedEarnings) = 375605244000000.0
+주식발행초과금 (ifrs-full_SharePremium) = 4403893000000.0
+비지배지분 (ifrs-full_NoncontrollingInterests) = 10867850000000.0
+부채와자본총계 (ifrs-full_EquityAndLiabilities) = 504875185000000.0
+유동부채 (ifrs-full_CurrentLiabilities) = 84402645000000.0
+예수금 (dart_ShortTermWithholdings) = 894050000000.0
+단기차입금 (-표준계정코드 미사용-) = 7190268000000.0
+미지급비용 (ifrs-full_AccrualsClassifiedAsCurrent) = 28113018000000.0
+선수금 (ifrs-full_CurrentAdvances) = 1726072000000.0
+유동성장기부채 (ifrs-full_CurrentPortionOfLongtermBorrowings) = 1203701000000.0
+유동충당부채 (ifrs-full_CurrentProvisions) = 7455925000000.0
+당기법인세부채 (ifrs-full_CurrentTaxLiabilities) = 7643128000000.0
+기타유동부채 (ifrs-full_OtherCurrentLiabilities) = 2691595000000.0
+미지급금 (ifrs-full_OtherCurrentPayables) = 14809044000000.0
+매입채무 (ifrs-full_TradeAndOtherCurrentPayablesToTradeSuppliers) = 12675844000000.0
+부채총계 (ifrs-full_Liabilities) = 105313218000000.0
+비유동부채 (ifrs-full_NoncurrentLiabilities) = 20910573000000.0
+이연법인세부채 (ifrs-full_DeferredTaxLiabilities) = 446536000000.0
+사채 (ifrs-full_NoncurrentPortionOfNoncurrentBondsIssued) = 13470000000.0
+장기차입금 (ifrs-full_NoncurrentPortionOfNoncurrentLoansReceived) = 5622234000000.0
+비유동충당부채 (ifrs-full_NoncurrentProvisions) = 2904014000000.0
+순확정급여부채 (ifrs-full_NoncurrentRecognisedLiabilitiesDefinedBenefitPlan) = 521564000000.0
+기타비유동부채 (ifrs-full_OtherNoncurrentLiabilities) = 6204679000000.0
+장기미지급금 (ifrs-full_OtherNoncurrentPayables) = 5198076000000.0
+영업이익 (dart_OperatingIncomeLoss) = 4676057000000.0
+기타수익 (dart_OtherGains) = 302750000000.0
+기타비용 (dart_OtherLosses) = 283194000000.0
+판매비와관리비 (dart_TotalSellingGeneralAdministrativeExpenses) = 20820694000000.0
+매출원가 (ifrs-full_CostOfSales) = 49069566000000.0
+기본주당이익(손실) (ifrs-full_BasicEarningsLossPerShare) = 737.0
+희석주당이익(손실) (ifrs-full_DilutedEarningsLossPerShare) = 737.0
+금융비용 (ifrs-full_FinanceCosts) = 3444354000000.0
+금융수익 (ifrs-full_FinanceIncome) = 4345852000000.0
+매출총이익 (ifrs-full_GrossProfit) = 25496751000000.0
+법인세비용 (ifrs-full_IncomeTaxExpenseContinuingOperations) = 639694000000.0
+반기순이익 (ifrs-full_ProfitLoss) = 5116435000000.0
+비지배지분 (ifrs-full_ProfitLossAttributableToNoncontrollingInterests) = 182401000000.0
+지배기업 소유지분 (ifrs-full_ProfitLossAttributableToOwnersOfParent) = 4934034000000.0
+법인세비용차감전순이익 (ifrs-full_ProfitLossBeforeTax) = 5756129000000.0
+매출액 (ifrs-full_Revenue) = 74566317000000.0
+지분법이익 (ifrs-full_ShareOfProfitLossOfAssociatesAndJointVenturesAccountedForUsingEquityMethod) = 159018000000.0
+반기총포괄손익 (ifrs-full_ComprehensiveIncome) = -3454670000000.0
+비지배지분 (ifrs-full_ComprehensiveIncomeAttributableToNoncontrollingInterests) = 117135000000.0
+지배기업 소유주지분 (ifrs-full_ComprehensiveIncomeAttributableToOwnersOfParent) = -3571805000000.0
+기타포괄손익 (ifrs-full_OtherComprehensiveIncome) = -8571105000000.0
+후속적으로 당기손익으로 재분류되는 포괄손익 (ifrs-full_OtherComprehensiveIncomeThatWillBeReclassifiedToProfitOrLossNetOfTax) = -9292392000000.0
+현금흐름위험회피파생상품평가손익 (ifrs-full_GainsLossesOnCashFlowHedgesNetOfTax) = -20716000000.0
+해외사업장환산외환차이 (ifrs-full_GainsLossesOnExchangeDifferencesOnTranslationNetOfTax) = -9038545000000.0
+관계기업 및 공동기업의 기타포괄손익에 대한 지분 (ifrs-full_ShareOfOtherComprehensiveIncomeOfAssociatesAndJointVenturesAccountedForUsingEquityMethodThatWillBeReclassifiedToProfitOrLossNetOfTax) = -233131000000.0
+후속적으로 당기손익으로 재분류되지 않는 포괄손익 (ifrs-full_OtherComprehensiveIncomeThatWillNotBeReclassifiedToProfitOrLossNetOfTax) = 721287000000.0
+기타포괄손익-공정가치금융자산평가손익 (ifrs-full_OtherComprehensiveIncomeNetOfTaxGainsLossesFromInvestmentsInEquityInstruments) = 738266000000.0
+순확정급여부채(자산) 재측정요소 (ifrs-full_OtherComprehensiveIncomeNetOfTaxGainsLossesOnRemeasurementsOfDefinedBenefitPlans) = -35870000000.0
+관계기업 및 공동기업의 기타포괄손익에 대한 지분 (ifrs-full_ShareOfOtherComprehensiveIncomeOfAssociatesAndJointVenturesAccountedForUsingEquityMethodThatWillNotBeReclassifiedToProfitOrLossNetOfTax) = 18891000000.0
+반기순이익 (ifrs-full_ProfitLoss) = 5116435000000.0
+기초현금및현금성자산 (dart_CashAndCashEquivalentsAtBeginningOfPeriodCf) = 53705579000000.0
+반기말의 현금및현금성자산 (dart_CashAndCashEquivalentsAtEndOfPeriodCf) = 47120025000000.0
+재무활동현금흐름 (ifrs-full_CashFlowsFromUsedInFinancingActivities) = -14748410000000.0
+자기주식의 취득 (dart_AcquisitionOfTreasuryShares) = 4276964000000.0
+장기차입금의 차입 (dart_ProceedsFromLongTermBorrowings) = 2003746000000.0
+비지배지분의 증감 (-표준계정코드 미사용-) = 1072000000.0
+단기차입금의 순증가(감소) (ifrs-full_CashFlowsFromUsedInIncreaseDecreaseInCurrentBorrowings) = -5936276000000.0
+배당금의 지급 (ifrs-full_DividendsPaidClassifiedAsFinancingActivities) = 4982218000000.0
+사채 및 장기차입금의 상환 (ifrs-full_RepaymentsOfNoncurrentBorrowings) = 1555626000000.0
+투자활동현금흐름 (ifrs-full_CashFlowsFromUsedInInvestingActivities) = -24173503000000.0
+당기손익-공정가치금융자산의 처분 (dart_ProceedsFromSalesOfFairValueFinancialAsset) = 56281000000.0
+기타포괄손익-공정가치금융자산의 처분 (dart_ProceedsFromSalesOfFinancialAssetsAtFairValueThroughOtherComprehensiveIncome) = 401353000000.0
+장기금융상품의 처분 (dart_ProceedsFromSalesOfLongTermFinancialInstruments) = 676413000000.0
+매각예정분류자산의 처분으로 인한 현금유입액 (dart_ProceedsFromSalesOfNonCurrentAssetsOrDisposalGroupsClassifiedAsHeldForSale) = 0.0
+당기손익-공정가치금융자산의 취득 (dart_PurchaseOfFairValueFinancialAsset) = 88579000000.0
+기타포괄손익-공정가치금융자산의 취득 (dart_PurchaseOfFinancialAssetsAtFairValueThroughOtherComprehensiveIncome) = 53796000000.0
+장기금융상품의 취득 (dart_PurchaseOfLongTermFinancialInstruments) = 601024000000.0
+단기상각후원가금융자산의 순감소(증가) (-표준계정코드 미사용-) = 0.0
+단기당기손익-공정가치금융자산의 순감소(증가) (-표준계정코드 미사용-) = 9302000000.0
+단기금융상품의 순감소(증가) (-표준계정코드 미사용-) = 3212673000000.0
+사업결합으로 인한 순현금유출액 (ifrs-full_CashFlowsUsedInObtainingControlOfSubsidiariesOrOtherBusinessesClassifiedAsInvestingActivities) = 214033000000.0
+기타투자활동으로 인한 현금유출입액 (ifrs-full_OtherInflowsOutflowsOfCashClassifiedAsInvestingActivities) = -163979000000.0
+무형자산의 처분 (ifrs-full_ProceedsFromSalesOfIntangibleAssetsClassifiedAsInvestingActivities) = 10954000000.0
+관계기업 및 공동기업 투자의 처분 (ifrs-full_ProceedsFromSalesOfInvestmentsAccountedForUsingEquityMethod) = 3143000000.0
+유형자산의 처분 (ifrs-full_ProceedsFromSalesOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities) = 102496000000.0
+무형자산의 취득 (ifrs-full_PurchaseOfIntangibleAssetsClassifiedAsInvestingActivities) = 2039179000000.0
+관계기업 및 공동기업 투자의 취득 (ifrs-full_PurchaseOfInterestsInInvestmentsAccountedForUsingEquityMethod) = 322146000000.0
+유형자산의 취득 (ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities) = 25163382000000.0
+영업활동현금흐름 (ifrs-full_CashFlowsFromUsedInOperatingActivities) = 33941002000000.0
+영업에서 창출된 현금흐름 (ifrs-full_CashFlowsFromUsedInOperations) = 35085845000000.0
+영업활동으로 인한 자산부채의 변동 (dart_AdjustmentsForAssetsLiabilitiesOfOperatingActivities) = -3282196000000.0
+조정 (ifrs-full_AdjustmentsForReconcileProfitLoss) = 25028728000000.0
+반기순이익 (ifrs-full_ProfitLoss) = 5116435000000.0
+배당금 수입 (ifrs-full_DividendsReceivedClassifiedAsOperatingActivities) = 194783000000.0
+법인세 납부액 (ifrs-full_IncomeTaxesPaidRefundClassifiedAsOperatingActivities) = 3643963000000.0
+이자의 지급 (ifrs-full_InterestPaidClassifiedAsOperatingActivities) = 273038000000.0
+이자의 수취 (ifrs-full_InterestReceivedClassifiedAsOperatingActivities) = 2577375000000.0
+외화환산으로 인한 현금의 변동 (ifrs-full_EffectOfExchangeRateChangesOnCashAndCashEquivalents) = -1604643000000.0
+현금및현금성자산의 증가(감소) (ifrs-full_IncreaseDecreaseInCashAndCashEquivalents) = -6585554000000.0
+연결실체의 변동 (dart_ChangesInConsolidatedCompanies) = 0.0
+연결실체의 변동 (dart_ChangesInConsolidatedCompanies) = 0.0
+... 103 more rows
+
+[Map logs] 61개
+[MAP*] assets <- 자산총계 (ifrs-full_Assets; sj=BS) = 504875185000000.0
+[ALIAS] assets <- 자산총계 (ifrs-full_Assets; sj=BS) = 504875185000000.0
+[HINT] assets <- 자산총계 (ifrs-full_Assets; sj=BS) = 504875185000000.0
+[HINT] assets <- 유동자산 (ifrs-full_CurrentAssets; sj=BS) = 212160671000000.0
+[HINT] assets <- 단기당기손익-공정가치금융자산 (ifrs-full_CurrentFinancialAssetsAtFairValueThroughProfitOrLoss; sj=BS) = 27575000000.0
+[HINT] assets <- 기타유동자산 (ifrs-full_OtherCurrentAssets; sj=BS) = 6387366000000.0
+[HINT] assets <- 비유동자산 (ifrs-full_NoncurrentAssets; sj=BS) = 292714514000000.0
+[HINT] assets <- 이연법인세자산 (ifrs-full_DeferredTaxAssets; sj=BS) = 19448012000000.0
+[HINT] assets <- 무형자산 (ifrs-full_IntangibleAssetsAndGoodwill; sj=BS) = 25997746000000.0
+[HINT] equity <- 관계기업 및 공동기업 투자 (ifrs-full_InvestmentAccountedForUsingEquityMethod; sj=BS) = 12843894000000.0
+[HINT] assets <- 당기손익-공정가치금융자산 (ifrs-full_NoncurrentFinancialAssetsAtFairValueThroughProfitOrLoss; sj=BS) = 1233859000000.0
+[HINT] assets <- 기타포괄손익-공정가치금융자산 (ifrs-full_NoncurrentFinancialAssetsMeasuredAtFairValueThroughOtherComprehensiveIncome; sj=BS) = 11030251000000.0
+[HINT] assets <- 순확정급여자산 (ifrs-full_NoncurrentRecognisedAssetsDefinedBenefitPlan; sj=BS) = 2398103000000.0
+[HINT] assets <- 기타비유동자산 (ifrs-full_OtherNoncurrentAssets; sj=BS) = 14737011000000.0
+[MAP*] equity <- 자본총계 (ifrs-full_Equity; sj=BS) = 399561967000000.0
+[ALIAS] equity <- 자본총계 (ifrs-full_Equity; sj=BS) = 399561967000000.0
+[HINT] equity <- 자본총계 (ifrs-full_Equity; sj=BS) = 399561967000000.0
+[MAP*] equity <- 지배기업의 소유주에게 귀속되는 자본 (ifrs-full_EquityAttributableToOwnersOfParent; sj=BS) = 388694117000000.0
+[HINT] equity <- 지배기업의 소유주에게 귀속되는 자본 (ifrs-full_EquityAttributableToOwnersOfParent; sj=BS) = 388694117000000.0
+[HINT] equity <- 기타자본항목 (dart_ElementsOfOtherStockholdersEquity; sj=BS) = 7787466000000.0
+[HINT] liabilities <- 부채와자본총계 (ifrs-full_EquityAndLiabilities; sj=BS) = 504875185000000.0
+[HINT] equity <- 부채와자본총계 (ifrs-full_EquityAndLiabilities; sj=BS) = 504875185000000.0
+[HINT] liabilities <- 유동부채 (ifrs-full_CurrentLiabilities; sj=BS) = 84402645000000.0
+[HINT] liabilities <- 당기법인세부채 (ifrs-full_CurrentTaxLiabilities; sj=BS) = 7643128000000.0
+[HINT] liabilities <- 기타유동부채 (ifrs-full_OtherCurrentLiabilities; sj=BS) = 2691595000000.0
+[MAP*] liabilities <- 부채총계 (ifrs-full_Liabilities; sj=BS) = 105313218000000.0
+[ALIAS] liabilities <- 부채총계 (ifrs-full_Liabilities; sj=BS) = 105313218000000.0
+[HINT] liabilities <- 부채총계 (ifrs-full_Liabilities; sj=BS) = 105313218000000.0
+[HINT] liabilities <- 비유동부채 (ifrs-full_NoncurrentLiabilities; sj=BS) = 20910573000000.0
+[HINT] liabilities <- 이연법인세부채 (ifrs-full_DeferredTaxLiabilities; sj=BS) = 446536000000.0
+[HINT] liabilities <- 순확정급여부채 (ifrs-full_NoncurrentRecognisedLiabilitiesDefinedBenefitPlan; sj=BS) = 521564000000.0
+[HINT] liabilities <- 기타비유동부채 (ifrs-full_OtherNoncurrentLiabilities; sj=BS) = 6204679000000.0
+[MAP*] op_income <- 영업이익 (dart_OperatingIncomeLoss; sj=IS) = 4676057000000.0
+[ALIAS] op_income <- 영업이익 (dart_OperatingIncomeLoss; sj=IS) = 4676057000000.0
+[HINT] op_income <- 영업이익 (dart_OperatingIncomeLoss; sj=IS) = 4676057000000.0
+[ALIAS] revenue <- 기타수익 (dart_OtherGains; sj=IS) = 302750000000.0
+[ALIAS] revenue <- 매출원가 (ifrs-full_CostOfSales; sj=IS) = 49069566000000.0
+[MAP*] eps <- 기본주당이익(손실) (ifrs-full_BasicEarningsLossPerShare; sj=IS) = 737.0
+[ALIAS] op_income <- 기본주당이익(손실) (ifrs-full_BasicEarningsLossPerShare; sj=IS) = 737.0
+[HINT] eps <- 기본주당이익(손실) (ifrs-full_BasicEarningsLossPerShare; sj=IS) = 737.0
+[MAP*] eps <- 희석주당이익(손실) (ifrs-full_DilutedEarningsLossPerShare; sj=IS) = 737.0
+[ALIAS] op_income <- 희석주당이익(손실) (ifrs-full_DilutedEarningsLossPerShare; sj=IS) = 737.0
+[ALIAS] revenue <- 금융수익 (ifrs-full_FinanceIncome; sj=IS) = 4345852000000.0
+[ALIAS] revenue <- 매출총이익 (ifrs-full_GrossProfit; sj=IS) = 25496751000000.0
+[MAP*] net_income <- 반기순이익 (ifrs-full_ProfitLoss; sj=IS) = 5116435000000.0
+[ALIAS] net_income <- 반기순이익 (ifrs-full_ProfitLoss; sj=IS) = 5116435000000.0
+[HINT] net_income <- 반기순이익 (ifrs-full_ProfitLoss; sj=IS) = 5116435000000.0
+[HINT] net_income <- 비지배지분 (ifrs-full_ProfitLossAttributableToNoncontrollingInterests; sj=IS) = 182401000000.0
+[HINT] net_income <- 지배기업 소유지분 (ifrs-full_ProfitLossAttributableToOwnersOfParent; sj=IS) = 4934034000000.0
+[ALIAS] net_income <- 법인세비용차감전순이익 (ifrs-full_ProfitLossBeforeTax; sj=IS) = 5756129000000.0
+[HINT] net_income <- 법인세비용차감전순이익 (ifrs-full_ProfitLossBeforeTax; sj=IS) = 5756129000000.0
+[MAP*] revenue <- 매출액 (ifrs-full_Revenue; sj=IS) = 74566317000000.0
+[ALIAS] revenue <- 매출액 (ifrs-full_Revenue; sj=IS) = 74566317000000.0
+[HINT] revenue <- 매출액 (ifrs-full_Revenue; sj=IS) = 74566317000000.0
+[HINT] net_income <- 지분법이익 (ifrs-full_ShareOfProfitLossOfAssociatesAndJointVenturesAccountedForUsingEquityMethod; sj=IS) = 159018000000.0
+[MAP*] cash_flow_fin <- 재무활동현금흐름 (ifrs-full_CashFlowsFromUsedInFinancingActivities; sj=CF) = -14748410000000.0
+[ALIAS] cash_flow_fin <- 재무활동현금흐름 (ifrs-full_CashFlowsFromUsedInFinancingActivities; sj=CF) = -14748410000000.0
+[MAP*] cash_flow_inv <- 투자활동현금흐름 (ifrs-full_CashFlowsFromUsedInInvestingActivities; sj=CF) = -24173503000000.0
+[ALIAS] cash_flow_inv <- 투자활동현금흐름 (ifrs-full_CashFlowsFromUsedInInvestingActivities; sj=CF) = -24173503000000.0
+[MAP*] cash_flow_op <- 영업활동현금흐름 (ifrs-full_CashFlowsFromUsedInOperatingActivities; sj=CF) = 33941002000000.0
+[ALIAS] cash_flow_op <- 영업활동현금흐름 (ifrs-full_CashFlowsFromUsedInOperatingActivities; sj=CF) = 33941002000000.0

@@ -1,0 +1,68 @@
+============================================================
+ [V52 컬럼 전수 검사] 타겟: 005930 / 날짜: 20251205
+============================================================
+
+>> [검사 시작] 종목: 005930 / 날짜: 20251205
+Basic Error: '거래대금'
+
+============================================================
+ Column                    | Value                | Status
+------------------------------------------------------------
+ date                      | 20251205             | ✅ OK
+ code                      | 005930               | ✅ OK
+ name                      | 삼성전자                 | ✅ OK
+ market                    | KOSPI                | ✅ OK
+ listing_status            | None                 | ❌ FAIL
+ sector_code               | 278                  | ✅ OK
+ sector_name               | ��ъ�����蹂� 留ㅻℓ������ | ✅ OK
+ open                      | 105300.0             | ✅ OK
+ high                      | 108400.0             | ✅ OK
+ low                       | 104600.0             | ✅ OK
+ close                     | 108400.0             | ✅ OK
+ volume                    | 19739076.0           | ✅ OK
+ amount                    | None                 | ❌ FAIL
+ adj_factor                | None                 | ❌ FAIL
+ vwap                      | None                 | ❌ FAIL
+ market_cap                | None                 | ❌ FAIL
+ shares_out                | None                 | ❌ FAIL
+ frgn_net_amt              | 0                    | ✅ OK
+ inst_net_amt              | 196150053800.0       | ✅ OK
+ nps_net_amt               | 0                    | ✅ OK
+ tust_net_amt              | 0                    | ✅ OK
+ dealer_net_amt            | 0                    | ✅ OK
+ frgn_net_qty              | None                 | ❌ FAIL
+ inst_net_qty              | None                 | ❌ FAIL
+ nps_net_qty               | None                 | ❌ FAIL
+ short_sell_amt            | None                 | ❌ FAIL
+ short_sell_qty            | None                 | ❌ FAIL
+ loan_balance_amt          | None                 | ❌ FAIL
+ loan_balance_qty          | None                 | ❌ FAIL
+ announce_date             | None                 | ❌ FAIL
+ revenue                   | None                 | ❌ FAIL
+ op_income                 | None                 | ❌ FAIL
+ net_income                | None                 | ❌ FAIL
+ total_equity              | None                 | ❌ FAIL
+ total_assets              | None                 | ❌ FAIL
+ cash_flow_op              | None                 | ❌ FAIL
+ cash_flow_inv             | None                 | ❌ FAIL
+ cash_flow_fin             | None                 | ❌ FAIL
+ div_amount                | 1446.0               | ✅ OK
+ eps                       | 4950.0               | ✅ OK
+ roe                       | None                 | ❌ FAIL
+ usdkrw                    | 1465.030029296875    | ✅ OK
+ us10y_yield               | 4.107999801635742    | ✅ OK
+ kr10y_yield               | None                 | ❌ FAIL
+ wti                       | None                 | ❌ FAIL
+ dxy                       | None                 | ❌ FAIL
+ cnykrw                    | None                 | ❌ FAIL
+ gold                      | None                 | ❌ FAIL
+ ex_div_date               | None                 | ❌ FAIL
+ earnings_date             | None                 | ❌ FAIL
+ bps                       | 57951.0              | ✅ OK
+ debt_ratio                | None                 | ❌ FAIL
+------------------------------------------------------------
+ >> 총 52개 중 21개 확보 성공, 31개 실패
+============================================================
+ ⚠️ 실패한 컬럼을 확인하고 로직을 보완하세요.
+
+ [로그 저장 완료] F:\autostockG\ui\pages\v52_data\check_log.txt

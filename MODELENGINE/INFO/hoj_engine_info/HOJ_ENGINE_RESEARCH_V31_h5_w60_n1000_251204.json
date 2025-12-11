@@ -1,0 +1,15 @@
+{
+  "engine_meta": {},
+  "top10": [],
+  "ai_report": "",
+  "engine_training_info": {
+    "auc": 0.5677451296868099,
+    "rmse": Infinity,
+    "train_samples": 5910027,
+    "train_date_range": "2015-04-01 ~ 2025-11-29",
+    "valid_start": "2024-05-29",
+    "valid_end": "2025-11-29",
+    "max_period": 60,
+    "feature_count": 19
+  }
+}

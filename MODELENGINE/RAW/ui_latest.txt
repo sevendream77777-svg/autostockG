@@ -1,0 +1,6 @@
+time=2025-12-10T22:43:58.685989
+cmd=C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+log=F:\autostockG\MODELENGINE\RAW\raw_sle\ui_run.log
+result=F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930.csv
+out_dir=F:\autostockG\MODELENGINE\RAW\raw_sle\out
+dart_mode=full

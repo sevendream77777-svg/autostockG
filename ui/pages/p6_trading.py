@@ -504,6 +504,7 @@ class TradingPage(QWidget):
 
     def _on_date_clicked(self, date: QDate):
         self.list_engines.clear()
+        self.selected_chart_date = date
         matched = [f for f in self.json_files_cache if date == f.get("win_start", f["date"])]
         for m in matched:
             item = QListWidgetItem(m["name"])
@@ -770,16 +771,36 @@ class TradingPage(QWidget):
         if not code: return self._log("종목코드를 입력하세요.")
         token = self._get_token()
         if not token: return
+        base_date = getattr(self, "selected_chart_date", QDate.currentDate())
+        base_dt = base_date.toString("yyyyMMdd")
         url = f"{self.api_host}/api/dostk/chart"
         headers = {"api-id": "ka10081", "authorization": f"Bearer {token}", "Content-Type": "application/json"}
-        body = {"stk_cd": code, "base_dt": QDate.currentDate().toString("yyyyMMdd"), "term_cnt": "60", "upd_stkpc_tp": "1"}
+        body = {"stk_cd": code, "base_dt": base_dt, "term_cnt": "60", "upd_stkpc_tp": "D"}
         res = debug_post(url, headers, body)
-        if res["status"] != 200 or not res["json"]: return self._log(f"[ka10081 오류] 응답 이상")
-        items = res["json"].get("output")
+        if res["status"] != 200 or not res["json"]:
+            return self._log(f"[ka10081 오류] HTTP {res['status']} | {res.get('json')}")
+        data = res["json"]
+        items = data.get("output")
         if not items:
-            if isinstance(res["json"], list): items = res["json"]
-            else: items = (res["json"].get("chart") or res["json"].get("data") or [])
-        if not items: return self._log(f"[ka10081 오류] 데이터 없음")
+            if isinstance(data, list):
+                items = data
+            else:
+                items = (
+                    data.get("chart")
+                    or data.get("data")
+                    or data.get("stk_dt_pole_chart_qry")
+                    or []
+                )
+        if not items:
+            # 한 번 더 시도: upd_stkpc_tp='1'로 재호출
+            body_fallback = {"stk_cd": code, "base_dt": base_dt, "term_cnt": "60", "upd_stkpc_tp": "1"}
+            res2 = debug_post(url, headers, body_fallback)
+            data2 = res2.get("json") or {}
+            items = data2.get("output") or data2.get("chart") or data2.get("data") or data2.get("stk_dt_pole_chart_qry") or (data2 if isinstance(data2, list) else [])
+            if not items:
+                rc = data.get("return_code") or data2.get("return_code")
+                rm = data.get("return_msg") or data2.get("return_msg")
+                return self._log(f"[ka10081 오류] 데이터 없음 (return_code={rc} msg={rm})")
         norm = normalize_ohlcv(items)[:10]
         self.tbl_chart.setRowCount(0)
         for r in norm:

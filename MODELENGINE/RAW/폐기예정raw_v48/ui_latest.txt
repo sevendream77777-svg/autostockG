@@ -1,0 +1,6 @@
+time=2025-12-10T13:09:53.872546
+cmd=C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20151231 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+log=F:\autostockG\MODELENGINE\RAW\raw_v48\ui_run.log
+result=F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+out_dir=F:\autostockG\MODELENGINE\RAW\raw_v48\out
+dart_mode=full

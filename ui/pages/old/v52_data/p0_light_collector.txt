@@ -1,0 +1,71 @@
+PS F:\autostockg\ui\pages> python p0_light_collector.py
+
+=== 데이터 수집 시작: 005930 (요청일: 20251205) ===
+[Log] 거래대금 0원 감지 -> 추정치(2,139,715,838,400)로 보정
+
+============================================================
+ [최종 수집 결과] (요청: 20251205 -> 확보: 20251205)
+ 확보율: 45/58
+============================================================
+Column                    | Value                | Status
+------------------------------------------------------------
+date                      | 20251205             | ✅ OK
+code                      | 005930               | ✅ OK
+name                      | 삼성전자                 | ✅ OK
+market                    | KOSPI                | ✅ OK
+open                      | 105,300.00           | ✅ OK
+high                      | 108,400.00           | ✅ OK
+low                       | 104,600.00           | ✅ OK
+close                     | 108,400.00           | ✅ OK
+volume                    | 19,739,076.00        | ✅ OK
+amount                    | 2,139,715,838,400.00 | ✅ OK
+adj_factor                | 1.00                 | ✅ OK
+vwap                      | 108,400.00           | ✅ OK
+inst_net_qty              | 1,838,285.00         | ✅ OK
+inst_net_amt              | 196,150,053,800.00   | ✅ OK
+frgn_net_qty              | 4,058,756.00         | ✅ OK
+frgn_net_amt              | 435,663,672,950.00   | ✅ OK
+nps_net_qty               | 0.00                 | ✅ OK
+nps_net_amt               | 0.00                 | ✅ OK
+dealer_net_qty            | 0.00                 | ✅ OK
+dealer_net_amt            | 0.00                 | ✅ OK
+short_sell_qty            | 0.00                 | ✅ OK
+short_sell_amt            | 0.00                 | ✅ OK
+loan_balance_qty          | 0.00                 | ✅ OK
+loan_balance_amt          | 0.00                 | ✅ OK
+revenue                   | 74,566,317,000,000.00 | ✅ OK
+op_income                 | 4,676,057,000,000.00 | ✅ OK
+net_income                | 4,934,034,000,000.00 | ✅ OK
+eps                       | 4,950.00             | ✅ OK
+bps                       | 57,951.00            | ✅ OK
+roe                       | 1.27                 | ✅ OK
+roa                       | 0.98                 | ✅ OK
+debt_ratio                | 27.09                | ✅ OK
+cash_flow_op              | 33,941,002,000,000.00 | ✅ OK
+cash_flow_inv             | -24,173,503,000,000.00 | ✅ OK
+cash_flow_fin             | -14,748,410,000,000.00 | ✅ OK
+sector_code               | -                    | ❌ MISSING
+sector_name               | 주소                   | ✅ OK
+theme_code                | -                    | ❌ MISSING
+theme_name                | -                    | ❌ MISSING
+sector_index_close        | -                    | ❌ MISSING
+usdkrw                    | 1,473.30             | ✅ OK
+cnykrw                    | 208.40               | ✅ OK
+dxy                       | 98.99                | ✅ OK
+us10y_yield               | -                    | ❌ MISSING
+kr10y_yield               | -                    | ❌ MISSING
+wti                       | 59.67                | ✅ OK
+gold                      | 4,243.00             | ✅ OK
+vix                       | -                    | ❌ MISSING
+earnings_announce_date    | -                    | ❌ MISSING
+earnings_surprise         | -                    | ❌ MISSING
+earnings_effective_date   | -                    | ❌ MISSING
+ex_div_date               | -                    | ❌ MISSING
+div_amount                | 1,446.00             | ✅ OK
+split_announce_date       | -                    | ❌ MISSING
+split_effective_date      | -                    | ❌ MISSING
+rights_issue_announce_date | -                    | ❌ MISSING
+rights_issue_effective_date | -                    | ❌ MISSING
+mna_announce_date         | -                    | ❌ MISSING
+------------------------------------------------------------
+ >> 총 42개 컬럼 확보.

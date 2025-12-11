@@ -1,0 +1,229 @@
+v62_db_컬럼정의 — 원천 62컬럼 및 600피처 자동생성 설계서 (Master Feature Lineage V1)
+작성일: 2025-12-04  (TZ=Asia/Seoul)
+용도: 데이터 수집·PIT 변환·피처엔진·학습·일일추천의 기준 문서(코드 독립).
+
+────────────────────────────────────────────────────────────────────────────
+0) 문서 개요
+- 본 문서는 ‘62개 원천 컬럼’을 기준으로 ‘Core120 / Wide300 / XL600’ 피처세트를 자동 생성하는 규칙을 정의한다.
+- 데이터 누수 방지(PIT), 레이턴시, 결측/이상치 처리, 증분 스냅샷 운영, 메타·라인리지까지 포함한다.
+- 모든 수식은 row.date 이전 정보만 사용한다.
+
+약어:
+- PIT: Point-in-time(미래정보 차단 규칙)
+- win[n]: 이동 윈도우 길이 n(영업일)
+- MA/EMA/WMA/TEMA: 단순/지수/가중/삼중 지수이평
+- z[n]: 윈도우 n의 z-score
+- Δx: 1일 변화량, pct_chg: 전일 대비 수익률
+- RS: 상대강도(Relative Strength)
+
+윈도우 표준 세트:
+- S = {5, 10, 20, 60, 120}
+- Volatility = {10, 20, 60}
+- Event lookback = {5, 10, 20}
+- RS 비교: {시장지수, 섹터지수}
+
+데이터 캘린더/타임존:
+- 거래일 캘린더 = KRX 영업일, TZ=Asia/Seoul.
+
+────────────────────────────────────────────────────────────────────────────
+1) 원천 62컬럼 정의 (분류/정의/PIT/소스/검증)
+
+■ 1. 가격(Price) — 15개
+P1  date                  | dtype=date    | key | PIT=N/A(캘린더) | src=system | chk:영업일
+P2  code                  | str           | key | PIT=N/A         | src=listing| chk:KRX코드
+P3  name                  | str           | meta| PIT=유효기간    | src=listing| chk:변경이력
+P4  market                | str(KOSPI/…) | meta| PIT=유효기간    | src=listing| chk:변경로그
+P5  open                  | float         | OHLC | PIT=D          | src=exch/rest | chk:>=0
+P6  high                  | float         | OHLC | PIT=D          | src=exch/rest | chk:high>=low
+P7  low                   | float         | OHLC | PIT=D          | src=exch/rest | chk:low<=close
+P8  close                 | float         | OHLC | PIT=D          | src=exch/rest | chk:>0
+P9  volume                | float         | 수량 | PIT=D          | src=exch/rest | chk:>=0
+P10 amount                | float(KRW)    | 대금 | PIT=D          | src=exch/rest | chk:>=0
+P11 adj_factor            | float         | 조정 | PIT=이벤트일    | src=CA-table | chk:정방향(과거×adj = post)
+P12 close_adj (=close×adj_factor)        | float | 파생저장 | PIT=D | src=calc | chk:불연속 제거
+P13 volume_adj (=volume/adj_factor)      | float | 파생저장 | PIT=D | src=calc | chk:일관성
+P14 vwap                  | float         | 체결가중 | PIT=D | src=exch/rest | chk:범위
+P15 turnover              | float         | 회전율(=amount/시총) | PIT=D | src=calc | chk:0~1 합리
+
+■ 2. 수급(Flow) — 12개 (단위: qty=주, amt=KRW, FFill 금지)
+F1  inst_net_qty          | float | D | src=broker/rest | chk:NaN허용
+F2  inst_net_amt          | float | D | src=broker/rest | chk:단위확인
+F3  frgn_net_qty          | float | D | src=broker/rest | -
+F4  frgn_net_amt          | float | D | src=broker/rest | -
+F5  nps_net_qty           | float | D | src=broker/rest | -
+F6  nps_net_amt           | float | D | src=broker/rest | -
+F7  dealer_net_qty        | float | D | src=broker/rest | -
+F8  dealer_net_amt        | float | D | src=broker/rest | -
+F9  short_sell_qty        | float | D | src=short/rest  | -
+F10 short_sell_amt        | float | D | src=short/rest  | -
+F11 loan_balance_qty      | float | D | src=margin/rest | -
+F12 loan_balance_amt      | float | D | src=margin/rest | -
+
+■ 3. 재무(PIT Quarterly) — 12개 (발표일 기준)
+R1  revenue               | float | PIT=[from,to] | src=DART/벤더 | chk:>=0
+R2  op_income             | float | ""            | ""            | ""
+R3  net_income            | float | ""            | ""            | ""
+R4  eps                   | float | ""            | ""            | ""
+R5  bps                   | float | ""            | ""            | ""
+R6  roe                   | float | ""            | ""            | 범위
+R7  roa                   | float | ""            | ""            | 범위
+R8  debt_ratio            | float | ""            | ""            | 범위
+R9  cash_flow_op          | float | ""            | ""            | 부호
+R10 cash_flow_inv         | float | ""            | ""            | 부호
+R11 cash_flow_fin         | float | ""            | ""            | 부호
+R12 pit_effective_[from,to]| date | 유효기간       | src=calc      | 무누수검증
+
+■ 4. 섹터/테마(PIT) — 5개
+S1  sector_code           | str   | PIT=유효기간 | src=vendor | 유효성
+S2  sector_name           | str   | ""          | ""        | ""
+S3  theme_code            | str   | PIT=유효기간 | src=vendor | 다중행
+S4  theme_name            | str   | ""          | ""        | ""
+S5  sector_index_close    | float | D          | src=vendor | >=0
+
+■ 5. 거시/지수(Macro/Index) — 8개 (항목별 레이턴시 관리)
+M1  usdkrw                | float | T+0         | src=fdr/fx | -
+M2  dxy                   | float | T+0~1       | src=fdr    | -
+M3  us10y_yield           | float | T+0         | src=fred   | -
+M4  kr10y_yield           | float | T+0         | src=boK    | -
+M5  wti                   | float | T+0~1       | src=fdr    | -
+M6  gold                  | float | T+0~1       | src=fdr    | -
+M7  vix                   | float | T+0         | src=yf     | -
+M8  kospi_index_close     | float | T+0         | src=exch   | -
+
+■ 6. 이벤트/CA(Event) — 10개 (선언일 조인, 발생일은 후행지표로)
+E1  earnings_announce_date| date  | PIT=join key | src=vendor | -
+E2  earnings_surprise     | float | 발표일 기준  | src=vendor | -
+E3  earnings_effective_date|date  | 후행지표용   | src=vendor | -
+E4  ex_div_date           | date  | ""           | ""        | -
+E5  div_amount            | float | ""           | ""        | -
+E6  split_announce_date   | date  | ""           | ""        | -
+E7  split_effective_date  | date  | ""           | ""        | -
+E8  rights_issue_announce_date | date | ""      | ""        | -
+E9  rights_issue_effective_date | date | ""     | ""        | -
+E10 mna_announce_date     | date  | ""           | ""        | flag 별도
+
+────────────────────────────────────────────────────────────────────────────
+2) 전처리/품질 규칙
+- 결측: 원천 레벨 NaN 보존(특히 수급). 피처 단계에서 정책 적용.
+- 이상치: winsorize(1~99%) 또는 robust scaler(피처세트별 고정).
+- 타임존: Asia/Seoul, 거래정지/휴장 마스크.
+- shares_outstanding_pit 별도 테이블 유지, market_cap = close_adj×shares_pit 검증(이탈≥1% 경보).
+
+────────────────────────────────────────────────────────────────────────────
+3) 피처 원리(원천→1차 파생→확장 규칙)
+
+3.1 가격 기반(예시)
+- pct_ret_n = close_adj / close_adj.shift(n) - 1  (n∈S)
+- log_ret_n = ln(close_adj) - ln(close_adj.shift(n))
+- MA_n, EMA_n, WMA_n, TEMA_n (n∈S)
+- vol_n = std(log_ret_1, win=n) (n∈{10,20,60})
+- ATR_14, true_range = max(high-low, abs(high-close_prev), abs(low-close_prev))
+- band: Bollinger (mid=MA_20, up=mid+2σ, dn=mid-2σ), Keltner(EMA_20±k·ATR)
+- ratio: close_adj/MA_n, MA_5/MA_20, EMA_12/EMA_26
+- z[n]: (x - MA_n)/std_n
+- candle: body=(close-open), shadow_upper=(high-max(open,close)), shadow_lower=(min(open,close)-low), 각 비율
+
+3.2 수급 기반
+- flow_norm = net_amt / amount
+- cum_flow_n = rolling_sum(net_qty, n∈{5,20,60,120})
+- flow_z_n = z-score(net_qty, win=n)
+- flow_shift_k = net_qty.shift(k)
+- short_pressure = short_sell_qty / volume
+- loan_ratio = loan_balance_qty / shares_outstanding_pit
+
+3.3 재무 기반(발표일 이후 구간만 FFill 허용)
+- growth_yoy = (metric - metric.shift(4))/abs(metric.shift(4))
+- quality_z = z(metric, by=industry, rolling=8Q)
+- value_factor = z(-PER) + z(BPS) + z(ROE) (표준화 가중 조합 예시)
+- cash_flow_quality = (cash_flow_op - capex) / revenue (capex≈-cash_flow_inv 가정 가능)
+
+3.4 섹터/거시/지수
+- sector_ret_n, sector_MA_n, sector_RS = (stock_ret_n - sector_ret_n)
+- market_RS = (stock_ret_n - kospi_ret_n)
+- macro_z = z(macro_series, n∈{20,60})
+- carry_spread = us10y_yield - kr10y_yield
+
+3.5 이벤트 기반(선언일 기준, row.date로 계산)
+- days_to_earnings = (earnings_announce_date - row.date)
+- days_to_exdiv = (ex_div_date - row.date)
+- surprise_scaled = winsorize(earnings_surprise)
+- event_past_flag_k = (row.date - earnings_announce_date ≤ k) for k∈{5,10,20}
+
+────────────────────────────────────────────────────────────────────────────
+4) 확장 규칙 → Core120 / Wide300 / XL600 산출
+
+윈도우 집합과 조합 정책으로 피처 수를 통제한다.
+
+4.1 공통 파라미터
+- MA_family = {MA, EMA, WMA, TEMA}
+- S = {5,10,20,60,120}
+- VOLW = {10,20,60}
+- RS_cmp = {시장지수(kospi), 섹터지수}
+
+4.2 Core120 (안정형)
+- 가격 60: pct_ret_{5,20,60}, log_ret_{5,20,60}, MA/EMA {5,20,60}, ATR_14, Bollinger pos, Keltner pos, ratio( close/MA_20, MA_5/MA_20 ), z_20 등
+- 수급 20: flow_norm, cum_flow_{5,20}, flow_z_{20}, short_pressure, loan_ratio
+- 재무 10: growth_yoy(Revenue/OP/NI), value_factor, ROE_z, EPS/BPS_z
+- 섹터/거시 10: sector_RS_{20,60}, market_RS_{20}, macro_z(usdkrw,dxy,vix){20}
+- 이벤트 20: days_to_earnings, days_to_exdiv, surprise_scaled, event_past_flag_{5,10,20}
+
+4.3 Wide300 (확장형)
+- Core120 + 윈도우 확대(S, VOLW 전체) + MA_family 일부 확장 + RS 대비항목 확대 + 수급 누적/변화량 확대
+- 가격 ≈ 140, 수급 ≈ 60, 재무 ≈ 30, 섹터/거시 ≈ 40, 이벤트 ≈ 30
+
+4.4 XL600 (대규모)
+- Wide300에 교차항 추가(예: price_z20 × flow_norm, sector_RS × macro_z), 파생 윈도우 세분화, 이벤트 윈도우 교차
+- 가격 ≈ 260, 수급 ≈ 120, 재무 ≈ 70, 섹터/거시 ≈ 90, 이벤트 ≈ 60  → 총합 ≈ 600
+- 상관상한 |ρ|≤0.95, 분산 유지 규칙 적용으로 중복 제거 후 600±5 내외로 고정
+
+주의: XL600의 교차항은 정규화된 변수끼리만 허용(z-score, ratio).
+
+────────────────────────────────────────────────────────────────────────────
+5) 누수 방지(PIT)/레이턴시/결측 정책
+
+- 모든 조인은 row.date 기준 과거 정보만 허용.
+- 재무/섹터/테마/이벤트: 발표일/유효기간 기반 PIT.
+- 매크로·지수: 항목별 레이턴시 테이블을 운영(source_sla.yaml).
+- 결측: 원천 NaN 보존, 피처 단계에서 정책(a: NaN 유지, b: 과거 중앙값 대체, c: 0 대체-승인항목 한정).
+- 이상치: winsorize 또는 robust scaler(세트별 고정).
+- 거래정지/휴장: 마스크 처리 후 학습 입력 제외.
+
+────────────────────────────────────────────────────────────────────────────
+6) Feature Store/스냅샷/H5 운영
+
+- Parquet: RAW/PIT/Master 저장, 파티션=date, row-group=code 정렬.
+- H5 스냅샷(증분): [date, code, feature] float32, 신규 날짜 append, 주/월 단위 무결성 점검 후 재압축.
+- 무결성 체크: 행·열·피처 수, 해시, null율, 범위(min/max).
+- 재빌드 트리거: 무결성 실패/스키마 변경/엔진 버전업.
+- 메타: feature_set_version(Core120/Wide300/XL600) + feature_hash, calendar_version, source_sla_version.
+
+────────────────────────────────────────────────────────────────────────────
+7) 학습/검증 및 JSON 메타
+
+- 시계열 분리(Train<Valid<Test), Rolling-Validation/Last-year-out 병행.
+- 리포트: AUC/PR-AUC/IC/RankIC/Hit@K/Turnover/기간별 드리프트.
+- JSON(metadata 필수): engine_version, feature_set_version, train_range, last_train_date, n_features, n_samples_*, validation_protocol, data_hashes, calendar/source_sla_version.
+
+────────────────────────────────────────────────────────────────────────────
+8) 체크리스트
+
+- adj_factor 정방향(과거×adj=post-adjusted) 선언, close/open/high/low/volume 모두 일관 적용.
+- 이벤트 조인=선언일, 발생일은 후행 피처로.
+- 수급 FFill 금지, 피처 단계 정책 분리.
+- shares_outstanding_pit 유지 및 시총 검증.
+- 섹터/테마 모두 PIT 유효기간 관리(문자열 리스트 금지, 행 단위).
+- 매크로/지수 레이턴시 표 운영.
+- H5 증분 + 무결성/재빌드 SOP 가동.
+- 상관상한·분산유지로 600개 최종 고정.
+
+────────────────────────────────────────────────────────────────────────────
+부록 A) 62→피처 수 개략 매핑(예시 비중)
+- 가격(15)    → Core≈60 / Wide≈140 / XL≈260
+- 수급(12)    → Core≈20 / Wide≈60  / XL≈120
+- 재무(12)    → Core≈10 / Wide≈30  / XL≈70
+- 섹터/테마(5)→ Core≈10 / Wide≈20  / XL≈40
+- 거시/지수(8)→ Core≈10 / Wide≈20  / XL≈50
+- 이벤트(10)  → Core≈20 / Wide≈30  / XL≈60
+총합: Core≈120 / Wide≈300 / XL≈600
+
+끝.

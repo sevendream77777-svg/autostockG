@@ -1,2 +1,0 @@
-# Compatibility shim for legacy imports.
-from api.kiwoom_rest.kiwoom_api import KiwoomRestApi  # noqa: F401

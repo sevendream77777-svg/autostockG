@@ -1,0 +1,111 @@
+PS F:\autostockg\api\kiwoom_rest> python kiwoom_58_scannergem.py
+
+🔥 [문서화 모드] 005930 / 20150102 데이터 수집 및 정의서 생성 시작
+
+   ✅ 일봉차트 데이터 확보
+   ✅ 투자자상세 데이터 확보
+   ✅ 공매도추이 데이터 확보
+   ✅ 신용매매 데이터 확보
+   ✅ 프로그램 데이터 확보
+   ✅ 대차거래 데이터 확보
+   ⚠️ 기본정보 데이터 확보 (MASTER_ 접두어)
+
+============================================================
+🎉 작업 완료
+   1. 데이터 파일: max_data_005930_20150102.csv (총 91개 컬럼)
+   2. 컬럼 설명서: max_data_columns_info.csv
+============================================================
+
+[수집된 컬럼 정보 미리보기]
+ No                Column(변수명)         Name(한글명) Sample(샘플값)
+  1                       date                일자    20150102
+  2                     stk_cd              종목코드      005930
+  3                  open_pric                시가     1340000
+  4                  high_pric                고가     1340000
+  5                   low_pric                저가     1327000
+  6                 close_pric                종가    +1330000
+  7                   trde_qty               거래량      175499
+  8                    cur_prc       미정의(직접확인필요)     1330000
+  9                 trde_prica              거래대금      230643
+ 10                         dt                일자    20150102
+ 11                   pred_pre              전일대비       +3000
+ 12               pred_pre_sig 전일대비부호(2:상승,5:하락)           2
+ 13               trde_tern_rt             거래회전율       +0.12
+ 14                    pre_sig       미정의(직접확인필요)           2
+ 15                     flu_rt               등락률         +23
+ 16               acc_trde_qty         누적거래량(수급)      175499
+ 17             acc_trde_prica        누적거래대금(수급)      230643
+ 18                  ind_invsr             개인순매수       -5925
+ 19                frgnr_invsr            외국인순매수       21328
+ 20                       orgn            기관계순매수      -20583
+ 21                  fnnc_invt              금융투자      -32934
+ 22                     insrnc                보험        2755
+ 23                     invtrt                투신         421
+ 24                   etc_fnnc              기타금융         612
+ 25                       bank                은행         131
+ 26                 penfnd_etc              연기금등        7828
+ 27                  samo_fund              사모펀드        1526
+ 28                       natn                국가        -922
+ 29                   etc_corp              기타법인        5042
+ 30                     natfor              내외국인         138
+ 31                  shrts_qty             공매도수량        5486
+ 32              ovr_shrts_qty           공매도누적수량      125249
+ 33                  trde_wght             공매도비중       +3.13
+ 34           shrts_trde_prica           공매도거래대금     7309504
+ 35             shrts_avg_pric            공매도평균가     1332392
+ 36                        new              신용신규        1042
+ 37                       rpya              신용상환        2930
+ 38                       remn              신용잔고       16911
+ 39                        amt              신용금액       17034
+ 40                        pre       미정의(직접확인필요)       -1888
+ 41                     shr_rt               공여율        0.53
+ 42                    remn_rt             신용잔고율        0.00
+ 43               prm_sell_amt          프로그램매도금액       84735
+ 44                prm_buy_amt          프로그램매수금액       91659
+ 45            prm_netprps_amt         프로그램순매수금액       +6924
+ 46       prm_netprps_amt_irds       미정의(직접확인필요)      +61943
+ 47               prm_sell_qty          프로그램매도수량       63561
+ 48                prm_buy_qty          프로그램매수수량       68777
+ 49            prm_netprps_qty         프로그램순매수수량       +5216
+ 50       prm_netprps_qty_irds       미정의(직접확인필요)      +46655
+ 51                    stex_tp             거래소구분         KRX
+ 52          dbrt_trde_cntrcnt            대차체결주수           0
+ 53              dbrt_trde_rpy            대차상환주수           0
+ 54             dbrt_trde_irds              대차증감           0
+ 55                       rmnd            대차잔고주수           0
+ 56                   remn_amt            대차잔고금액           0
+ 57              MASTER_stk_nm       종목명(Master)        삼성전자
+ 58             MASTER_setl_mm       미정의(직접확인필요)          12
+ 59                 MASTER_fav       미정의(직접확인필요)         100
+ 60                 MASTER_cap       미정의(직접확인필요)        7780
+ 61             MASTER_flo_stk       미정의(직접확인필요)     5919638
+ 62              MASTER_crd_rt       미정의(직접확인필요)       +0.29
+ 63            MASTER_oyr_hgst       미정의(직접확인필요)     +112400
+ 64            MASTER_oyr_lwst       미정의(직접확인필요)      -50800
+ 65                 MASTER_mac       미정의(직접확인필요)     6221539
+ 66          MASTER_for_exh_rt       미정의(직접확인필요)      +52.24
+ 67           MASTER_repl_pric       미정의(직접확인필요)       79420
+ 68                 MASTER_per           PER(현재)       21.23
+ 69                 MASTER_eps           EPS(현재)        4950
+ 70                 MASTER_roe           ROE(현재)         9.0
+ 71                 MASTER_pbr           PBR(현재)        1.81
+ 72                  MASTER_ev       미정의(직접확인필요)        7.02
+ 73                 MASTER_bps       미정의(직접확인필요)       57930
+ 74            MASTER_sale_amt       미정의(직접확인필요)     3008709
+ 75             MASTER_bus_pro       미정의(직접확인필요)      327260
+ 76             MASTER_cup_nga       미정의(직접확인필요)      344514
+ 77             MASTER_250hgst       미정의(직접확인필요)     +112400
+ 78             MASTER_250lwst       미정의(직접확인필요)      -50800
+ 79            MASTER_upl_pric               상한가     +135800
+ 80            MASTER_lst_pric               하한가      -73200
+ 81           MASTER_base_pric       미정의(직접확인필요)      104500
+ 82       MASTER_exp_cntr_pric       미정의(직접확인필요)          -0
+ 83        MASTER_exp_cntr_qty       미정의(직접확인필요)           0
+ 84     MASTER_250hgst_pric_dt       미정의(직접확인필요)    20251104
+ 85 MASTER_250hgst_pric_pre_rt       미정의(직접확인필요)       -6.49
+ 86     MASTER_250lwst_pric_dt       미정의(직접확인필요)    20250203
+ 87 MASTER_250lwst_pric_pre_rt       미정의(직접확인필요)     +106.89
+ 88            MASTER_trde_pre       미정의(직접확인필요)      -81.18
+ 89            MASTER_fav_unit       미정의(직접확인필요)           원
+ 90            MASTER_dstr_stk       미정의(직접확인필요)     4473470
+ 91             MASTER_dstr_rt       미정의(직접확인필요)        75.6

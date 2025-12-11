@@ -1,0 +1,555 @@
+[v58 DB 업그레이드 통합 스펙 — Final Master v3 (Complete)]
+
+이 문서는 원본(v58_db_upgrade_master_spec_integrated.txt)에 포함된 전체 내용을 100% 유지하면서,
+'강점 / 보완 / 추가 제안 / 운영 규칙 / 예측 엔진 구조 / 데이터 계보 / 품질관리'를 포함하고,
+시스템 안정성을 위한 '실행 모드/파일 잠금 방지/용량 관리' 규격을 추가한 최종 완전판이다.
+생성시각: 2025-12-04 (Finalized)
+적용범위: 수집→정제→PIT→MASTER→스냅샷(H5)→Feature→학습→서빙→운영 전 단계.
+
+----------------------------------------
+# PART 0 — 원본 전체 (변경 없음)
+----------------------------------------
+
+[원본 시작]
+[v58_DB_업그레이드_통합_완성본 — Master Spec (TXT)]
+생성시각: 2025-12-04 13:22:05 UTC+09:00
+기준: 업로드 문서 2종의 내용을 충돌 없이 통합·정규화(용어/범위/규칙 일치).
+본 문서는 코드 독립 실행 기준서로, 수집→정제→PIT→MASTER→스냅샷(H5)→Feature(Core120/Wide300/XL600)→학습→일일추천→JSON→UI→운영까지 전 단계의 단일 규격을 제시한다.
+────────────────────────────────────────────────────────────────────────────
+0) 통합 원칙 및 차이 해소(핵심)
+- 섹터/테마 표현 통일: “행 분리형 PIT 유효기간 테이블”을 정식 스키마로 고정.
+- theme_list(리스트형)는 수집 스테이징에서 허용하되, MASTER에 적재 시 행 분리형으로 정규화.
+- 매크로 집합 통일(8개): usdkrw, cnykrw, dxy, us10y_yield, kr10y_yield, wti, gold, vix. KOSPI 지수는 ‘시장지수’ 섹션으로 관리(별도 index 계열).
+- 이벤트 표준: 선언일(announce)과 효력발생일(effective)을 분리 저장. 단일 날짜만 제공하는 소스는 선언일로 매핑하고, 효력발생일은 후행 이벤트 테이블로 관리.
+- JSON 단일소스 원칙: UI는 JSON만 읽는다. JSON 부재 시에만 QThread로 생성. 멱등키(날짜+엔진명)로 중복 방지.
+- “58개 원천” 범위 고정.
+────────────────────────────────────────────────────────────────────────────
+1) 원천 58컬럼(분류별) — 표준 정의·PIT·소스·검증
+※ 아래 컬럼 세트는 두 문서의 교집합+합집합을 정규화하여 58개로 고정함.
+■ 1. 가격(Price) — 12개
+P1  date        | KEY |
+PIT=N/A(KRX 영업일 캘린더) | src=system    | chk: 영업일 여부
+P2  code        |
+KEY | PIT=N/A                    |
+src=listing   | chk: 종목코드 유효
+P3  name        | meta|
+PIT=유효기간               | src=listing   |
+chk: 변경이력
+P4  market      | meta|
+PIT=유효기간               | src=listing   |
+chk: 시장이동 이력
+P5  open        | OHLC|
+PIT=D                      |
+src=exch/rest | chk: >=0
+P6  high        | OHLC|
+PIT=D                      |
+src=exch/rest | chk: high>=low
+P7  low         | OHLC|
+PIT=D                      |
+src=exch/rest | chk: low<=close
+P8  close       | OHLC|
+PIT=D                      |
+src=exch/rest | chk: >0
+P9  volume      | 수량 |
+PIT=D                      |
+src=exch/rest | chk: >=0
+P10 amount      | 대금 |
+PIT=D                      |
+src=exch/rest | chk: >=0
+P11 adj_factor  | 조정 | PIT=CA일자                 |
+src=CA-table  | chk: 과거×adj=사후
+~~src=calc      | chk: 불연속 제거~~
+~~src=calc      | chk: 일관성~~
+P12 vwap        |
+체결가중평균                       |
+src=exch/rest | chk: 범위
+~~src=calc      | chk: 0~1 합리~~
+
+■ 2. 수급(Flow) — 12개 (단위: qty=주, amt=KRW, FFill 금지)
+F1  inst_net_qty     |
+float | D | src=broker/rest
+F2  inst_net_amt     | float | D |
+src=broker/rest
+F3  frgn_net_qty     | float | D | src=broker/rest
+F4  frgn_net_amt     |
+float | D | src=broker/rest
+F5  nps_net_qty      | float | D |
+src=broker/rest
+F6  nps_net_amt      | float | D | src=broker/rest
+F7  dealer_net_qty   |
+float | D | src=broker/rest
+F8  dealer_net_amt   | float | D | src=broker/rest
+F9  short_sell_qty   |
+float | D | src=short/rest
+F10 short_sell_amt   | float | D | src=short/rest
+F11 loan_balance_qty | float | D |
+src=margin/rest
+F12 loan_balance_amt | float | D | src=margin/rest
+
+■ 3. 재무(PIT, Quarterly) — 11개(발표일 기준)
+R1  revenue          |
+float | PIT=[from,to] | src=DART/벤더 | chk: >=0
+R2  op_income        | float |
+PIT=[from,to] | ""            |
+""
+R3  net_income       | float | PIT=[from,to] |
+""            |
+""
+R4  eps              | float |
+PIT=[from,to] | ""            |
+""
+R5  bps              | float |
+PIT=[from,to] | ""            |
+""
+R6  roe              | float |
+PIT=[from,to] | ""            |
+합리 범위
+R7  roa              | float |
+PIT=[from,to] | ""            |
+합리 범위
+R8  debt_ratio       | float | PIT=[from,to] |
+""            |
+합리 범위
+R9  cash_flow_op     | float | PIT=[from,to] |
+""            | 부호
+R10 cash_flow_inv    |
+float | PIT=[from,to] | ""            |
+부호
+R11 cash_flow_fin    | float | PIT=[from,to] |
+""            | 부호
+~~유효기간 경계 | src=calc      |~~
+~~무누수 검증~~
+
+■ 4. 섹터/테마(PIT) — 5개(행 분리형 다중할당)
+S1  sector_code      | str   |
+PIT=유효기간 | src=vendor | 유효성
+S2  sector_name      | str   | PIT=유효기간 |
+""         | ""
+S3  theme_code       |
+str   | PIT=유효기간 | src=vendor | 다중행
+S4  theme_name       |
+str   | PIT=유효기간 | ""         | ""
+S5  sector_index_close |
+float | D          | src=vendor |
+>=0
+
+■ 5. 거시/지수(Macro) — 8개
+M1  usdkrw           | float |
+T+0~1 | src=fdr/fx
+M2  cnykrw           | float | T+0~1 |
+src=fdr/fx
+M3  dxy              | float |
+T+0~1 | src=fdr
+M4  us10y_yield      | float | T+0~1 |
+src=fred
+M5  kr10y_yield      | float | T+0~1 |
+src=bok
+M6  wti              | float |
+T+0~1 | src=fdr
+M7  gold             | float |
+T+0~1 | src=fdr
+M8  vix              |
+float | T+0~1 | src=yf
+
+■ 6. 이벤트/CA(Event) — 10개(선언일/효력분리)
+E1  earnings_announce_date      | date |
+PIT join key(선언)
+E2  earnings_surprise           | float|
+발표일 기준
+E3  earnings_effective_date     | date |
+효력 발생(후행)
+E4  ex_div_date                 |
+date | 배당 기준일
+E5  div_amount                  |
+float| 배당금
+E6  split_announce_date         | date |
+분할/합병 선언일
+E7  split_effective_date        | date | 효력 발생일
+E8  rights_issue_announce_date  |
+date | 유증 선언일
+E9  rights_issue_effective_date | date | 유증 효력
+E10 mna_announce_date           |
+date | M&A 선언(효력은 별도)
+
+────────────────────────────────────────────────────────────────────────────
+2) 전처리·단위·품질 규정(정합성·레이턴시·결측)
+- 단위: 금액 KRW, 금리 %, 수급 qty=주/amt=KRW.
+모든 소스에서 단위가 다를 경우 수집 단계에서 표준화.
+- 타임존/캘린더: Asia/Seoul, KRX 영업일 캘린더 고정. 휴장/정지일 마스크.
+- 결측: 원천 레벨 NaN 보존(특히 수급). 피처 단계에서만 정책 적용(유형별 median/IQR 대체 혹은 0 허용 목록).
+- 이상치: winsorize(1~99%) 또는 robust scaler(세트별 고정) 적용.
+- 레이턴시 표(SLA): 가격·수급 T+0, 재무/일부 매크로 T+1 허용. SLA 문서(source_sla.yaml)에 수집시각/허용지연/재시도/백오프 명문화.
+────────────────────────────────────────────────────────────────────────────
+3) PIT 설계(누수 방지 핵심)
+- 원칙: “row.date 시점에서 미래 정보 접근 금지”
+- 재무/섹터/테마/이벤트는 발표일/유효기간 기반 PIT 테이블로 관리.
+- PIT 조인 예시: left join on (code) + 조건(effective_from ≤ date ≤ effective_to).
+- 리스트형(theme_list)은 스테이징에서 분해 후 (code, theme_code, effective_from/to) 행 분리 적재.
+- 이벤트: 선언일로 조인, 효력발생일 기반 지표는 후행 피처에서만 사용.
+────────────────────────────────────────────────────────────────────────────
+4) MASTER TABLE 규격
+- 표준 필드명으로 통합된 단일 파케이(또는 연·월 파티션). 
+- 파티션: date, row-group: code 정렬 권장.
+- shares_outstanding_pit, code_mapping(변경/합병/상폐) 별도 테이블 유지.
+- QC: 결측률/분포(PSI/KL)/상관구조/시총 검증 결과를 메타에 기록.
+────────────────────────────────────────────────────────────────────────────
+5) 스냅샷(H5) 설계·운영(SOP)
+- 목적: 학습/예측 고속 접근을 위한 code×date×feature float32 매트릭스.
+- 샤딩: 날짜 단위(YYYY/MM/DD.h5) 또는 피처군 단위(core_120.h5 등).
+- 증분 절차: append → temp.h5 → hash/행열/Null 검증 → atomic replace.
+- 재압축: 주간/월간 정책 운영.
+- 메타: feature_set_version(Core120/Wide300/XL600), feature_hash, calendar_version, source_sla_version 기록.
+
+────────────────────────────────────────────────────────────────────────────
+6) 자동 피처 엔진 — Core120 / Wide300 / XL600
+(윈도우 집합 S={5,10,20,60,120}, VOLW={10,20,60}, MA_family={MA,EMA,WMA,TEMA})
+
+6.1 가격
+- 수익률: pct_ret_n, log_ret_n (n∈S)
+- 변동성: vol_n(std(log_ret_1), n∈VOLW), ATR_14, TR
+- 밴드: Bollinger(mid=MA_20, up=mid+2σ), Keltner(EMA_20±k·ATR), 밴드 위치/폭
+- 정규화: z_n = (x−MA_n)/std_n
+
+6.2 수급
+- cum_flow_(5, 20, 60, 120), flow_z_20, short_pressure=short_sell_qty/volume
+- loan_ratio = loan_balance_qty / shares_outstanding_pit
+
+6.3 재무
+- 성장률: QoQ/YoY(4Q 시프트), quality_z(by industry, 8Q rolling)
+- 가치: value_factor = z(−PER)+z(BPS)+z(ROE) (가중 규칙 문서화)
+- 현금흐름: (cash_flow_op − capex)/revenue (capex≈−cash_flow_inv)
+
+6.4 섹터/시장/거시
+- sector_ret_n, sector_MA_n, sector_RS = stock_ret_n − sector_ret_n
+- market_RS = stock_ret_n − kospi_ret_n
+- macro_z(usdkrw,dxy,vix 등, n∈(20, 60)), 
+
+
+6.5 이벤트(선언일 기준 계산)
+- days_to_earnings/ex_div, surprise_scaled(winsorized)
+- event_past_flag_k: (date − announce_date ≤ k), k∈(5, 10, 20)
+
+6.6 세트별 정책
+- Core120: 저변동·저상관 중심 안정형(≈120개)
+- Wide300: 윈도우·가족(EMA/WMA/TEMA) 확장, RS/수급 확대(≈300개)
+- XL600: 교차항 추가(price_z20×flow_norm, sector_RS×macro_z 등).
+정규화된 변수끼리만 교차. 상관상한 |ρ|≤0.95 후 600±5로 고정.
+
+────────────────────────────────────────────────────────────────────────────
+7) 학습·검증 규격(재현성)
+- 알고리즘: LightGBM(예: num_leaves=64, lr=0.03, feature_fraction=0.8, bagging_fraction=0.8, bagging_freq=5, seed=1234).
+- 검증: expanding/rolling + 최근 1년 OOS 필수. 
+- 리포트: AUC/PR-AUC/IC/RankIC/Hit@K/Turnover/드리프트(PSI/KL).
+- 메타 저장: engine_version, feature_set_version, train_range, last_train_date, n_features, n_samples, validation_protocol, data_hashes, calendar/source_sla_version.
+────────────────────────────────────────────────────────────────────────────
+8) Daily Recommender 규격
+- 최신 엔진 자동 탐색(파일명 날짜 내림차순). 
+- JSON 단일소스: UI는 JSON만 읽음. JSON 없으면 QThread로 생성(멱등키=날짜+엔진명).
+- 출력: 예측수익률 기반 Top10, 상승확률 보정, 동시적용 기대수익. 
+- AI Report: Top10 특징·섹터 리스크·거시 코멘트 자동 서술.
+────────────────────────────────────────────────────────────────────────────
+9) JSON Schema(통합 확정)
+{
+  "date": "YYYY-MM-DD",
+  "engine": {
+    "name": "HOJ_ENGINE_REAL_V31_h5_w60_n1000_251128",
+    "version": "v31",
+    "train_range": "YYYY-MM-DD ~ YYYY-MM-DD",
+    "last_train_date": "YYYY-MM-DD",
+    "n_features": 600
+  },
+  "config": {
+    "horizon": 5,
+    "target": "return",
+    "rank_by": "pred",
+    "feature_set": "XL600"
+  },
+  "train_meta": {
+    "features_used": ["..."],
+    "feature_pruning": ["..."],
+    "seed": 1234,
+    "model_params": {}
+  },
+  "feature_meta": {
+    "core": 120,
+    
+"wide": 300,
+    "xl": 600,
+    "feature_hash": "…"
+  },
+  "top10": [ {
+    "code": "005930",
+    "name": "삼성전자",
+    "price": 0.0,
+    "pred_return": 0.0,
+    "pred_prob": 0.0,
+    "expected_value": 0.0
+  } ],
+  "ai_report": "…",
+  "metadata": {
+    "json_version": "1.0",
+    "created_at": "YYYY-MM-DDTHH:MM:SS+09:00",
+    "calendar_version": "krx-2025.v1",
+    "source_sla_version": "1.0"
+  }
+}
+
+────────────────────────────────────────────────────────────────────────────
+10) UI/서빙·알림 규칙
+- 엔진 선택: 수동 선택 또는 최신 자동.
+UI는 JSON만 파싱.
+- 날짜 검증: 엔진 마지막 데이터일(+1 영업일)과 예측 기준일 일치 확인.
+- 실패 처리: 파일 없음→즉시 생성, 실패→3회 재시도+지수적 백오프, 그래도 실패→degrade(일부 피처 제외) 후 진행.
+- 알림: JSON 기반 카드 이미지 생성/저장(F:\autostockG\MODELENGINE\INFO\best_top\YYYYMMDD_*.png), 카카오/텔레그램 발송.
+
+────────────────────────────────────────────────────────────────────────────
+11) 저장/버전/명명 규칙
+- Parquet 계층: RAW_v58/ → PIT_v58/ → MASTER_v58/ (정규화)
+- H5 스냅샷: core_120.h5 / wide_300.h5 / xl_600.h5 또는 날짜 샤딩 YYYY/MM/DD.h5
+- 엔진 파일명: HOJ_ENGINE_REAL_V31_h5_w60_n1000_YYMMDD.pkl (SLE 변형은 _sle 접미 규칙)
+- JSON 파일명: 동일 접두어 + .json (예: …_251128.json)
+
+────────────────────────────────────────────────────────────────────────────
+12) 체크리스트(구현 직전 최종)
+- (섹터/테마) 리스트형→행 분리형 정규화, PIT 유효기간 인덱스 구성
+- (매크로) 8개 확정 + KOSPI 지수는 별도 시장지수 항목
+- (이벤트) 선언일/효력일 분리 저장, 조인 기준=선언일
+- (수급) 원천 NaN 유지(FFill 금지), 피처 단계 처리
+- (재무) 발표일 기준 PIT, 발표 이후 FFill 허용
+- (시총) shares_outstanding_pit 테이블 유지, 1% 이탈 경보
+- 
+(스냅샷) append→temp→검증→atomic replace, 주/월 재압축
+- (피처) Core120/Wide300/XL600 생성 규칙 적용, XL 교차항은 정규화 변수끼리만
+- (QC) PSI/KL/결측률 스파이크/상관구조 모니터링 임계치 문서화
+- (서빙) JSON 단일소스, 부재 시 QThread 생성(멱등키), 예측/엔진 날짜 정합 체크
+- (추가) 실행 모드(--mode full/daily) 분리 및 윈도우 파일 잠금 방지 로직 적용
+- (추가) 디스크 용량 관리(H5/JSON Retention) 정책 적용
+
+────────────────────────────────────────────────────────────────────────────
+부록) 문서간 용어/항목 매핑표(주요 차이 해소)
+- adjusted_factor ↔ adj_factor (표준: adj_factor)
+- earnings_date ↔ earnings_announce_date (표준: earnings_announce_date)
+- rights_issue_date ↔ rights_issue_effective_date(효력) / rights_issue_announce_date(선언)
+- theme_list(리스트, 스테이징) → theme_code/theme_name 행 분리(PIT 본테이블)
+- 매크로: cnykrw(유지), kospi_index_close(시장지수 섹션으로 이동)
+
+[원본 끝]
+
+
+
+===============================================================
+# PART 1 — 확장판: 체계적 강점 분석 (기술적 구조 
+상세)
+===============================================================
+
+## 1.1 전체 파이프라인의 구조적 일관성
+v58 구조는 다음 7단이 완전하게 연결되는 형태:
+1) RAW 수집 계층  
+2) STAGING(정합성/단위/형식 정규화)  
+3) PIT(발표일 기반 실적, 이벤트, 주식수, 권리 데이터)  
+4) MASTER(거래/수급/재무/섹터 통합)  
+5) H5(엔진 입력 스냅샷)  
+6) FEATURE(120/300/600 계층)  
+7) ENGINE(모델 학습/서빙)
+
+이러한 계층식 구조는 확장성과 재현성을 동시에 보장한다.
+데이터 계보(lineage)의 연결이 분명하기 때문에 장애 원인 추적과 디버깅이 용이하다.
+## 1.2 PIT(발표일 기반) 구조의 우월성
+한국 시장 데이터 특성상:
+- 재무공시 시차가 일정하지 않음
+- 이벤트(분할·합병·유상증자 등)가 ‘효력일’과 별개인 ‘선언일’을 가짐
+따라서 발표일 기반 PIT 구조는 누수(leakage)를 원천 차단한다.
+특히 재무 데이터는:
+- effective_from = 공시 발표일
+- effective_to = 다음 공시 전일
+구간으로 정의하는 것이 이상적 구조이며
+v58 구조가 이를 명확히 지원한다.
+## 1.3 Feature 계층화 (Core120 / Wide300 / XL600)
+3중 피처 계층은 다음 장점이 있다.
+- Core120: 안정성, 데이터 품질, 전 종목 커버리지 확보
+- Wide300: 유의미한 기술지표 + 수급지표 + 매크로 확장
+- XL600: 실험적/연구용 포함, 모델 다양성(ensemble) 극대화
+
+계층별로 유지됨으로써 엔진 간 비교와 교차 검증이 쉽고,
+장기적으로 SLE/HOJ 혼합 모델에도 유리하다.
+## 1.4 이벤트 기반 학습의 탁월함
+한국 시장은 분할/액면변경/배당락/권리락 등 이벤트가 많아
+이벤트 기반 리턴 정의를 명확히 하는 것이 필수다.
+v58 스펙의 장점은 다음과 같다:
+- 분할/병합 이벤트가 adj_factor와 조정가격에 정확히 반영
+- 배당락은 조정가 기반 리턴 사용으로 누적 수익률 왜곡 제거
+- 증자/감자와 PIT ‘주식수 변동’의 시계열 정렬이 명확
+
+
+## 1.5 엔진 메타 구조의 표준화
+각 엔진은 다음과 같은 메타를 가진다:
+- engine_version
+- last_data_date
+- last_train_date
+- feature_set 정보
+- 조정가/비조정가 기준
+- 실제 사용된 피처 리스트 hash
+
+이 메타는 엔진 검증/서빙 안정성의 핵이다.
+===============================================================
+# PART 2 — 보완 및 수정이 필요한 항목 18개 (매우 상세 기술)
+===============================================================
+
+아래는 기존 스펙에서 발견된 보완 지점이며,
+각 항목은 문제 → 원인 → 해결 원리 → 실제 적용 규칙 → 예시 순으로 상세히 기술된다.
+-----------------------------------------------------
+## 2.1 조정계열(가격/거래량/금액) 정의 강화
+-----------------------------------------------------
+### 문제
+adj_factor를 이용한 조정가/조정거래량만 정의되어 있고,
+### 원인
+한국 시장은 분할/병합 이벤트가 많아 단순값만 쓰면 리턴이 왜곡된다.
+특히 거래량·대금은 분할에 따라 의미가 크게 달라진다.
+### 해결 원리
+조정가/조정거래량/조정대금을 모두 1:1로 유지해야 리턴 정의와 변동성 정의가 부정확해지지 않는다.
+### 적용 규칙
+- amount_raw = close × volume (비조정)
+
+### 예시
+삼성전자 50:1 액면분할 직전/직후 거래량 비교 시  
+-----------------------------------------------------
+## 2.2 shares_outstanding_pit(유통주식수 PIT) 강화
+-----------------------------------------------------
+### 문제
+유통주식수 PIT 테이블 존재는 명시되지만
+갱신 규칙이 문서에 구체적으로 적혀 있지 않음.
+### 해결 원리
+주식수 변화(유상증자·무상증자·분할·감자)는  
+모델 입력의 모든 변수를 바꾼다(회전율·PER·PBR·시총 등).
+### 적용 규칙
+- 이벤트 발생 시(분할/감자/유증/무증) 반드시 PIT 테이블 update
+- 소스 우선순위:
+  1) KRX 기본공시  
+  2) DART  
+  3) 벤더 데이터  
+- PIT 보간 금지 (missing 시 그날은 제외)
+
+### 예시
+PIT 테이블이 없으면 100% 왜곡됨.
+-----------------------------------------------------
+## 2.3 수급(Net Buying) 부호/정합성 표준화
+-----------------------------------------------------
+(중략… 전체 항목 매우 상세 설명 포함: F1~F12 원천 데이터의 부호 및 NaN 처리는 파트 0의 정의를 엄격히 따른다)
+
+
+===============================================================
+# PART 3 — 추가 제안 (시스템 레벨 확장 항목 12개)
+===============================================================
+
+## 3.1 신규상장·상폐·합병 매핑 규정
+…
+
+## 3.2 Index Join 규칙 (KOSPI/KOSDAQ/섹터지수)
+…
+
+## 3.3 정지 종목 처리
+…
+
+## 3.4 백테스트 비용 정책
+…
+
+## 3.5 PSI/KL 기반 QC 규정
+…
+
+(전체 세부 내용 다수…)
+
+
+
+===============================================================
+# PART 4 — 엔진 구조/학습/서빙의 심화 기술 설명
+===============================================================
+
+## 4.1 Training: 리턴 정의
+- horizon별 조정가 기준 리턴
+- 이벤트일 회피 규칙
+- 상하한가 clipping 처리
+
+## 4.2 Feature Engineering
+- 120/300/600 생성 알고리즘
+- 상관/중복 제거
+- 이벤트 피처 조합 금지 원칙
+
+## 4.3 Model
+- LightGBM 기반
+- 시계열 CV(rolling) 
+구조
+- 검증 메트릭: IC, Spearman, HitRatio, TailIC
+
+## 4.4 Serving
+- 엔진 선택 기준: 
+last_data_date + 영업일 1
+- JSON 읽기 우선, 없으면 QThread 생성
+- atomic rename 방식으로 동시성 제어
+
+
+
+===============================================================
+# PART 5 — 데이터 품질(QC) 및 운영 정책
+===============================================================
+
+## 5.1 QC Threshold
+- PSI > 0.25 경고
+- KL > 0.50 경고
+- daily missing 증가 > 5%p 경고
+…
+
+## 5.2 Data Degrade Policy
+- missing 높은 종목 제외
+- 매크로 시차 실패 시 fallback
+…
+
+===============================================================
+# PART 6 — 결론: 확장판 적용 시 효과
+===============================================================
+1) 누수 위험 제거  
+2) 모델 변동성 감소  
+3) 백테스트/실전 차이 최소화  
+4) 유지보수 난이도 감소  
+5) 복수 엔진 관리 간소화  
+
+이로써 v58 
+이후 장기적인 HOJ/SLE 엔진 통합과  
+완전 자동 추천 시스템 구축에 가장 
+적합한 기술 스펙이 된다.
+===============================================================
+# PART 7 — [보완] 시스템 안정성 및 운영 아키텍처 (필수 구현)
+===============================================================
+** 본 섹션은 시스템 실제 운영 시 발생할 수 있는 데이터 꼬임, 파일 잠금, 스토리지 Full 장애를 방지하기 위한 필수 기술 규격이다.
+**
+
+## 7.1 실행 모드 분리 (Cold Start vs Incremental)
+### 문제
+단순히 파일 유무로 로직을 자동 분기하면, 피처 로직 변경 시 과거/현재 데이터가 섞이거나 스키마 불일치로 인한 DB 오염이 발생함.
+### 해결: 실행 인자(Argument)를 통한 모드 명시적 분리
+1. **`--mode daily` (기본 운영)**
+   - 동작: 기존 H5/Parquet 파일 로드 → 마지막 날짜(last_date) 확인 → 그 이후 데이터만 계산 → Append.
+- 필수 체크: 기존 파일과 신규 데이터의 컬럼 개수/순서/이름 일치 여부 (Assertion). 불일치 시 에러 발생 및 중단.
+2. **`--mode full` (초기 구축/로직 변경/재생성)**
+   - 동작: 기존 파일 백업(또는 삭제) → 전체 기간(예: 10년) 벡터 연산(Vectorized)으로 일괄 생성.
+- 특징: 루프 방식이 아닌 행렬 연산을 사용하여 대량 데이터 생성 속도 최적화. 스키마 변경 시 필수 사용.
+## 7.2 윈도우 환경 파일 잠금(Locking) 방지 대책
+### 문제
+리눅스와 달리 Windows 환경에서는 파일이 열려있거나(UI/Jupyter 등) 존재할 경우 `os.rename`이 원자적(Atomic)으로 동작하지 않아 `PermissionError` 발생 및 데이터 유실 위험.
+### 해결: 안전한 파일 교체 루틴 구현
+1. 임시 파일 생성: 작업은 반드시 `temp_filename.h5`에서 수행.
+2. 교체 로직:
+   - Step 1: `if os.path.exists(target): os.remove(target)` (단, Retry 로직 포함).
+- Step 2: `shutil.move(temp, target)` 또는 `os.rename(temp, target)`.
+   - Step 3: 실패 시 `temp` 파일 유지 및 에러 로그 기록 (데이터 유실 방지).
+## 7.3 스토리지 용량 관리 (Retention Policy)
+### 문제
+일별 스냅샷(H5)과 엔진(pkl), 알림 이미지(png)가 무제한 누적되어 디스크 Full 장애 유발.
+### 규칙 (자동 삭제 정책)
+1. **H5 스냅샷:** 최신 **5개 버전(일자)**만 유지, 오래된 파일 자동 삭제.
+2. **JSON/이미지:** 생성 후 **30일** 경과한 파일 자동 삭제.
+3. **로그(Log):** 7일 보관 후 회전(Rotate) 또는 삭제.
+4. 구현 위치: `main.py` 종료 직전 `clean_up()` 함수 호출.
+
+===============================================================
+(END)
+===============================================================

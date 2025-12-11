@@ -1,0 +1,125 @@
+[v47_데이터_수집_및_운영_명세서 — 상세 보완판 25-12-10]
+일반데이터 36개
+재무데이터 11개
+전체 47개의 컬럼 목록
+
+====================================================================
+[HOJ_DATA] 일반 데이터 (General Data) — 36개
+* 수집 주기: 매일 (Daily)
+* 모든 종목에서 반드시 존재해야 하는 시계열 기본 데이터
+====================================================================
+
+■ 1. 기본 정보 (Meta)
+1.  date                  : 기준 일자 (YYYY-MM-DD, Primary Key)
+2.  code                  : 종목 코드(6자리, PK)
+3.  name                  : 종목명
+4.  market                : 시장 구분 (KOSPI/KOSDAQ/KONEX)
+5.  listing_status        : 상장 상태 (정상, 관리, 거래정지 등)
+6.  sector_code           : 업종 코드
+7.  sector_name           : 업종명 (섹터 로테이션 분석용)
+
+■ 2. 가격 및 상태 (Price & Status)
+8.  open                  : 시가
+9.  high                  : 고가
+10. low                   : 저가
+11. close                 : 종가(비보정가)
+12. adjust_close          : 수정종가 (백테스트·팩터 분석 기준값)
+13. volume                : 거래량
+14. amount                : 거래대금 (유동성 판단 최우선 지표)
+15. adj_factor            : 수정계수 (adjust_close 계산 및 검증용)
+16. shares_out            : 상장주식수 (turnover·시총 계산 필수 원천)
+17. is_trading_suspended  : 거래정지 여부 (True/False — 데이터 오염 방지)
+18. is_limit_reached      : 상·하한가 여부 (1=상한, -1=하한, 0=없음)
+
+■ 3. 수급 및 주체 (Flow & Sentiment)
+19. frgn_net_amt          : 외국인 순매수 금액
+20. inst_net_amt          : 기관 전체 순매수 금액 (하위 항목보다 우선 사용)
+21. nps_net_amt           : 연기금 순매수 금액 (장기 자금 성격)
+22. tust_net_amt          : 투신 순매수 금액 (단기 자금 성격)
+23. dealer_net_amt        : 금융투자 순매수 금액 (차익거래·헤지비중)
+24. frgn_net_qty          : 외국인 순매수 수량
+25. inst_net_qty          : 기관 전체 순매수 수량
+26. nps_net_qty           : 연기금 순매수 수량
+27. frgn_hold_ratio       : 외국인 지분율 (%) — 장기 수급 강도 핵심 팩터
+
+■ 4. 거시경제 및 이벤트 (Macro & Event)
+28. usdkrw                : 원/달러 환율
+29. us10y_yield           : 미국 10년물 국채 금리
+30. kr10y_yield           : 한국 10년물 국채 금리
+31. wti                   : 국제 유가(WTI)
+32. dxy                   : 달러 인덱스
+33. cnykrw                : 원/위안 환율
+34. gold                  : 국제 금 가격
+35. vix                   : 변동성 지수 (Risk On/Off 지표)
+36. earnings_date         : 실적 발표 예정일 (이벤트 리스크 관리용)
+
+====================================================================
+[SLE_DATA] 재무 데이터 (Financial Data) — 11개
+* 수집 주기: 분기(Quarterly)
+* 2016년 1Q 이후 권장
+====================================================================
+
+■ 5. 재무제표 펀더멘털 (Fundamental)
+1. revenue               : 매출액
+2. op_income             : 영업이익
+3. net_income            : 당기순이익
+4. eps                   : 주당순이익 (공식 발표치, 회계적 조정 반영)
+5. total_assets          : 자산총계
+6. total_equity          : 자본총계
+7. cash_flow_op          : 영업활동현금흐름
+8. cash_flow_inv         : 투자활동현금흐름
+9. cash_flow_fin         : 재무활동현금흐름
+10. announce_date         : 재무 공시 실제 발표일 (주가 매핑 기준일)
+11. div_amount            : 주당 배당금(DPS)
+
+====================================================================
+[PART 0] 운영 규칙 (Operational Rules & ETL)
+* 이 규칙들은 DB 스키마에는 저장하지 않으며,
+  데이터 로딩/전처리/모델링 과정에서 반드시 적용해야 하는 필수 절차임.
+====================================================================
+
+1. Feature Layer 자동 생성 (Daily ETL 단계)
+   * 아래 파생 변수들은 DB에 저장하지 않고, 매일 로드 시 자동 생성하여 모델에 주입한다.
+   * 목적: 성능 향상, 시계열 구조 안정화, 데이터 노이즈 감소.
+     - change_rate (등락률)
+       = close / prev_close - 1
+     - vol_change_rate (거래량 변화율)
+       = volume / prev_volume - 1
+     - high_low_spread (고저폭 비율)
+       = (high - low) / close
+     - close_loc (캔들 위치: 종가의 상대적 위치)
+       = (close - low) / (high - low)
+
+2. 기관 수급 데이터 해석 규칙
+   * inst_net_amt 는 nps/tust/dealer 의 단순 합이 절대 아님.
+   * 정의:
+       inst_net_amt =
+           기관 전체(투신, 연기금, 금융투자, 보험, 은행, 기타법인, 사모펀드 등)
+           순매수 금액을 모두 포함한 값.
+   * 모델 적용 시:
+       → inst_net_amt = “기관 전체 흐름”
+       → nps/tust/dealer = “기관 세부 성격” 분석용
+
+3. earnings_date 사용 규칙 (미래정보 누수 방지)
+   * earnings_date 는 “예정일”이며 실제 공시일과 다를 수 있음.
+   * 정확한 재무제표 반영 및 주가 매핑 기준은 announce_date.
+   * ML 모델에서 미래 데이터 누수를 방지하려면:
+       → earnings_date는 이벤트 리스크 필터용
+       → 재무 반영일은 announce_date 로 통일
+
+4. adj_factor 사용 규칙
+   * 목적: 분할/병합/배당락 등 가격 보정 발생 시 검증 및 adjust_close 생성용.
+   * adj_factor 자체를 모델에 넣으면 위험:
+       - 가격 이벤트 누수
+       - 분기별 점프로 인해 모델 왜곡
+   * 결론: ML Feature로 절대 사용 금지.
+====================================================================
+[Appendix] 런타임 계산 공식 (Do Not Store — 계산만)
+====================================================================
+turnover_ratio  = volume / shares_out
+market_cap      = close * shares_out
+debt_ratio      = (total_assets - total_equity) / total_equity
+bps             = total_equity / shares_out
+roe             = net_income(TTM) / total_equity(Avg)
+
+====================================================================

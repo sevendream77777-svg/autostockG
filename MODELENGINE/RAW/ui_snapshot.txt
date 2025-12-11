@@ -1,0 +1,415 @@
+time=2025-12-10T22:44:42.761113
+ret_code=None
+log=F:\autostockG\MODELENGINE\RAW\raw_sle\ui_run.log
+log_exists=True size=22051
+[log_head] (full)
+
+[2025-12-10T16:41:47.974222] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930,000660 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 1 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930.csv
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2016년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T18:39:01.766311] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930,000660 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2016년
+    [보고서] 11013 …
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11013_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11013_OFS_All_raw.json
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11012_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11012_OFS_All_raw.json
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11014_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11014_OFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11011_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11011_OFS_All_raw.json
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\000660_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\000660.csv
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[Singl] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=OFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T20:16:07.784252] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T20:50:51.384536] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930_25121020.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T21:05:20.399472] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930_25121021.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T21:14:28.199927] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930_25121021_1.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T21:57:59.765014] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930_25121021_3.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T22:43:58.681707] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_sle\run_raw_sle.py --codes 005930 --start 20160101 --end 20161231 --out F:\autostockG\MODELENGINE\RAW\raw_sle\out --workers 5 --mode full
+
+============================================
+   SLE Financial Collector (11 cols, 2016+)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2016년
+    [보고서] 11013 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11013 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11013_OFS_Singl_raw.json
+    [보고서] 11012 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11012 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11012_OFS_Singl_raw.json
+    [보고서] 11014 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11014 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11014_OFS_Singl_raw.json
+    [보고서] 11011 …
+[All] status=000 msg=정상 key=2fe78cb9 rc=11011 year=2016 fs=CFS
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_CFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_All_raw.json
+[DEBUG] raw dump: F:\autostockG\MODELENGINE\RAW\raw_sle\out\debug_accounts\005930_2016_11011_OFS_Singl_raw.json
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930_25121022_1.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+result=F:\autostockG\MODELENGINE\RAW\raw_sle\out\csv\005930.csv
+result_exists=True size=948
+[result_head] (full)
+﻿date,code,corp_code,bsns_year,reprt_code,announce_date,revenue,op_income,net_income,eps,total_assets,total_equity,cash_flow_op,cash_flow_inv,cash_flow_fin,div_amount
+20160331,005930,00126380,2016,11013,,49782252000000.0,6675812000000.0,5252803000000.0,36356.0,241239789000000.0,178326186000000.0,8718290000000.0,-2390665000000.0,-4261569000000.0,3921000000.0
+20160630,005930,00126380,2016,11012_Q,,50937120000000.0,8143950000000.0,5847393000000.0,,243960673000000.0,181842516000000.0,13344845000000.0,-7786329000000.0,-4506919000000.0,2920603000000.0
+20160930,005930,00126380,2016,11014_Q,,47815633000000.0,5200089000000.0,4537855000000.0,,244471456000000.0,179536379000000.0,14336597000000.0,-12180872000000.0,-1491940000000.0,149658000000.0
+20161231,005930,00126380,2016,11011_Q,20170331,53331740000000.0,9220821000000.0,7088041000000.0,,262174324000000.0,192963033000000.0,10985912000000.0,-7300809000000.0,1590914000000.0,40560000000.0

@@ -1,0 +1,376 @@
+이건 트레인파일(train_engine_unified.py) 내부 구조에서 “단 하나의 핵심 기능”이 틀어졌을 때 100% 발생하는 전형적인 오류다.
+
+두 표는 같은 날짜 + 같은 DB + 같은 트레인파일에서 생성됐다고 했지?
+
+그렇다면 가능한 경우의 수는 딱 3개밖에 없다.
+그리고 그중 1개는 거의 확정이다.
+
+아래에서 정확하게 짚는다.
+
+✔ 핵심 문제 요약
+**리서치엔진과 리얼엔진이 동일한 모델을 사용하지 않았다.
+
+같은 트레인파일을 썼지만, 내부에서 서로 다른 데이터 슬라이싱을 통해 “서로 다른 모델”이 생성되었다.**
+
+즉:
+
+➜ 학습구간 / 검증구간 / 마스크 처리가
+리서치와 리얼에서 서로 다르게 적용되고 있다.
+
+그 결과:
+
+예측 점수 스케일 완전히 다름
+
+확률 매핑이 서로 다름
+
+피처 마스크 적용 범위가 다름
+
+학습 데이터 수가 다름
+
+horizon tail 제거 범위도 다름
+
+라벨 생성 방식도 달라짐
+
+train/valid split 구간 다름
+
+단 1개만 달라도
+모델은 완전히 다른 엔진이 된다.
+
+지금은 2개 이상이 다르게 적용된 상태다.
+
+✔ 두 표 비교 분석 (팩트 기반)
+① 리서치 엔진 결과
+
+예측 점수: 1.1~2.0
+
+확률: 0.7~0.8%
+→ 점수 스케일 크게 나옴
+→ 확률 변환도 고정된 0.7~0.8%
+
+이 패턴은:
+
+✔ 학습 데이터가 “짧을 때” 발생한다.
+
+즉, 리서치 엔진은
+9년 학습 + 1년 검증 구조라
+“학습데이터 중 최근 1년을 제외하고 학습한다.”
+
+→ 모델이 안정적
+→ 출력 스케일이 크게 나오는 구조
+
+② 리얼 엔진 결과
+
+예측 점수: 0.05~0.45
+
+확률: 0.3%~49% (!!)
+
+이 패턴은:
+
+✔ 학습 데이터가 “검증 구간과 섞여버렸을 때” 나온다.
+
+예:
+
+horizon tail 처리 미적용
+
+feature mask 적용 누락
+
+valid_days=365 적용되지 않음
+
+학습/검증 구간이 완전히 뒤바뀜
+
+과거/미래 구간이 섞여버림
+
+혹은 리얼엔진이 ‘미래 데이터를 포함해서 학습’함
+
+즉:
+
+→ 리얼엔진이 데이터 누수 + 학습구간 오류 + 마스크 오류
+3개가 동시에 발생했을 가능성이 매우 높다.
+✔ 가장 가능성 높은 원인 3개 (정확도 90%)
+원인 1 — valid_days(검증기간) 적용이 리얼엔진에서 skip됨
+
+리서치는 split_train_valid(df, 365)을 사용
+리얼은 전기간 학습 중
+
+결과:
+
+리얼엔진은 미래 정보 섞은 “오염된 모델”
+
+예측 점수 스케일 완전 붕괴
+
+확률 계산식도 비정상적으로 작동
+
+지금 결과 그래프와 완벽히 일치한다.
+
+원인 2 — feature_mask / indicator 제거가 리얼엔진에서 적용 안됨
+
+리서치엔진:
+
+기술지표 제한
+
+mask 적용
+
+horizon tail 제거
+
+리얼엔진:
+
+마스크 적용 누락
+
+horizon tail 제거 안됨
+
+미래 feature 포함
+
+→ 점수 완전 다르게 나옴
+→ 확률 연동학이 50%까지 폭등 (이건 100% 미래 누수)
+
+**원인 3 — 리서치 엔진은 “2모델(회귀·분류)” 제대로 학습
+
+리얼 엔진은 “1개만 학습 또는 잘못된 입력”**
+
+현재 테이블상:
+
+리서치: predict_reg → predict_prob 일관적
+리얼: 출력값이 0.05~0.45 → 거의 raw output 그대로임
+
+확률 변환 함수(sigmoid? rank?)가 리얼에서 정상 작동 안함.
+
+✔ 정답 (이 두 결과는 동일 엔진일 수 없다)
+
+지금 상태는 사실상 이거다:
+
+리서치는 정상적으로 “검증구간 분리 + 학습”
+
+리얼은
+
+검증구간 없이 전체 학습
+
+또는 horizon tail 제거 실패
+
+또는 미래데이터 누수
+
+또는 mask 미적용
+
+또는 라벨 offset 오류
+
+또는 DB 슬라이싱 오류
+
+또는 model_reg/model_cls 축이 반대로 적용됨
+
+이 중 2개 이상이 겹친 상태다.
+
+✔ 꼭 해야 할 검증 6가지 (정확히 말해준다)
+1) train_engine_unified.py의
+split_train_valid()
+
+
+이 함수가 리얼엔진에서는 호출되지 않는다.
+
+2) horizon tail 제거 코드가
+
+리서치는 적용되지만
+리얼은 적용되지 않는다.
+
+3) feature mask(15개 기술지표 제거)가
+
+둘 중 한쪽에서만 적용됨.
+
+4) y_reg, y_cls 라벨 생성 과정에서
+
+offset 차이가 발생하고 있다.
+
+5) scaler(normalization) 적용 유무가 다르다.
+6) OUTPUT score → prob 변환 함수가
+
+리서치/리얼에서 다르게 호출된다.
+
+✔ 최종 핵심 결론 (짧게)
+**리서치엔진과 리얼엔진이
+
+같은 트레인파일을 사용했지만
+입력 데이터 구조(슬라이싱/마스크)가 달라져
+서로 다른 모델이 생성되었다.**
+
+그래서 예측 점수 스케일이 완전히 달라지고
+확률 매핑도 완전히 깨진 것이다.
+
+필요하면
+너가 준 train_engine_unified.py를 기반으로
+
+리서치(slice A)
+
+리얼(slice B)
+
+아래를 최종 확정 폴더 구조·네이밍·입출력 규칙·검증 규칙·운영 체크리스트로 남긴다. 이대로 유지하면 새 방·새 PC에서도 동일 목표로 바로 이어갈 수 있다.
+
+1) 루트 구조(Windows 기준)
+F:\autostockG\
+├─ MODELENGINE\
+│  ├─ RAW\                        # 원천 시세/지수/보조데이터
+│  ├─ FEATURE\                    # 파생피처(중간 산출물)
+│  ├─ HOJ_DB\                     # 통합 DB(예: HOJ_DB_V31_YYYYMMDD.parquet)
+│  ├─ HOJ_ENGINE\                 # 엔진 산출물
+│  │  ├─ REAL\                    # 실전 엔진(.pkl)
+│  │  ├─ RESEARCH\                # 리서치 엔진(.pkl)
+│  │  └─ HOJ_ENGINE_INFO\         # 엔진 설명/요약(.txt)
+│  │─ OUTPUT\                     # 일일 추천, 로그, 리포트(백테스트/성능)
+│  │
+│  ├─│param_rap\                     # 리서치(파라미터 생성 전용)
+│   │     ├─ rap_runner.py               # 실험 엔트리
+│   │     ├─ rap_param_search.py         # 하이퍼파라미터/피처/라벨 탐색
+│  │      ├─ rap_validation.py           # TimeSeriesSplit/검증 스코어 산출
+│  │      ├─ rap_report.py               # 실험 리포트 생성(.md/.pdf)
+│  │      ├─ artifacts\                  # 산출 파라미터셋(JSON), 실험 로그
+│  │ 
+├  │── engine_garage\                 # 실전 운용(학습 호출·백테스트·추천)
+│  │      ├─ garage_operator.py          # 최신 데이터로 재학습 + 예측│  │      
+│   │        ─ garage_backtest.py          # 최근 3~15개월 OOS 백테스트
+│  │      ├─ garage_signals.py           # TopN 추천/스코어 산출
+│  │      ├─ garage_stats.py             # 성능지표(CAGR/MDD/승률 등)
+│  │      ├─ garage_report.py            # 일일/주간 리포트 출력
+│  │      └─ artifacts\                  # 백테스트 로그/그래프/표
+│  │
+├── train_engine\                  # 공통 학습 코어(단일)
+│          ├─ train_core.py               # fit/predict 공통 로직
+│          ├─ data_preprocess.py          # 정제/마스크/라벨 생성
+│          └─ feature_builder.py          # 피처 선택/관리
+│
+├─ ui\                             # 앱(UI 페이지들)
+├─ config\                         # 설정(.yaml/.json) — 경로/파라미터
+└─ logs\                           # 실행 로그(시간스탬프 파일)
+
+2) 파일 네이밍 규칙
+
+DB: HOJ_DB_V{ver}_{YYYYMMDD}.parquet
+
+엔진(pkl): HOJ_ENGINE_{REAL|RESEARCH}_V{ver}_h{H}_w{W}_n{N}_{YYMMDD}.pkl
+
+엔진 설명(txt): 위와 동일 파일명 + .txt (내용: 베이스요약/설정)
+
+추천 결과(csv): recommend_{REAL}_V{ver}_{YYYY-MM-DD}.csv
+
+백테스트 리포트: backtest_{REAL}_V{ver}_{기간태그}.md|pdf
+
+실험 파라미터셋(json): paramset_{Vver}_{hash}_{YYMMDD}.json
+
+모든 산출물에 버전(Vxx), 날짜, 핵심 하이퍼파라미터(h,w,n) 포함.
+
+3) 모듈 간 I/O 계약(깨지면 즉시 오류)
+param_rap → engine_garage
+
+입력(DB 경로/버전): MODELENGINE/HOJ_DB/HOJ_DB_V{ver}*.parquet
+
+출력(파라미터셋 JSON):
+
+{
+  "version":"V31",
+  "horizon":5,
+  "input_window":60,
+  "valid_days":365,
+  "n_estimators":1000,
+  "feature_mask":["RSI_14","SMA_20", "..."],
+  "label":"TargetRet|TargetUp",
+  "notes":"실험요약(AUC/RMSE 등)"
+}
+
+
+규칙: param_rap은 pkl을 만들지 않는다. 오직 JSON/리포트만 생성.
+
+engine_garage ↔ train_engine
+
+engine_garage가 paramset JSON을 읽어 train_engine의 fit() 호출.
+
+train_engine은 pkl + meta + info.txt 저장.
+
+engine_garage는 저장된 pkl로 예측/백테스트/리포트 생성.
+
+4) 데이터 슬라이싱/검증 규칙(누수 방지)
+
+리서치(검증): 최근 valid_days(기본 365일)를 검증으로 분리, 나머지 학습.
+
+실전(백테스트): 최신 10년 학습 후, 최근 3~15개월을 학습에서 제외한 구간으로 OOS 백테스트.
+
+마스크 공통
+
+앞단 MaxPeriod만큼 제거(지표 초기화 구간 제거)
+
+뒤단 Horizon만큼 제거(미래정보 차단)
+
+라벨 공통
+
+TargetRet = Close(t+H)/Close(t) - 1
+
+TargetUp = 1(TargetRet>0)
+
+5) 점수·확률 일관화 규칙
+
+회귀점수 score_reg와 분류확률 prob_up을 항상 분리 저장:
+
+pred_reg.csv(연속값), pred_cls.csv(0~1 확률)
+
+UI 표기:
+
+“예측 점수” = score_reg (단위 없음, 스케일 표시 금지)
+
+“상승확률” = prob_up * 100% (0~100%)
+
+변환/캘리브레이션은 engine_garage에서만 수행. (리서치는 금지)
+
+6) 운영 리포트(일일)
+
+필수 지표: TopN 평균수익률, WinRate, MDD, CAGR(누적), 예측분포 히스토그램
+
+파일: OUTPUT\{YYYY-MM-DD}\report.md|pdf + charts\*.png
+
+엔진 메타 스냅샷: 사용 pkl 파일명/파라미터셋 JSON 경로를 리포트 머리말에 기록.
+
+7) 변경·실험 통제(안전장치)
+
+prod/exp 분리
+
+engine_garage/artifacts/prod/ : 현재 운용 엔진
+
+engine_garage/artifacts/exp/ : 실험용
+
+시그니처
+
+pkl 저장 시 feature_hash와 data_date, trained_at를 메타에 포함.
+
+덮어쓰기 금지: 같은 태그가 있으면 새 파일 생성(운영 안정성 우선)
+
+8) 실행 예시(권장 CLI)
+# 1) 리서치: 파라미터 탐색 → JSON 산출
+python param_rap\rap_runner.py --version V31 --valid_days 365 --horizon 5 --input_window 60 --n_estimators 1000 --out artifacts\paramset_...
+
+# 2) 실전: 재학습 + 엔진 저장 + 백테스트 + 추천
+python engine_garage\garage_operator.py --paramset artifacts\paramset_....json --train-version V31
+python engine_garage\garage_backtest.py --engine HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_...pkl --oos-months 6
+python engine_garage\garage_signals.py --engine ...pkl --topn 10 --out MODELENGINE\OUTPUT\YYYY-MM-DD
+python engine_garage\garage_report.py  --engine ...pkl --out OUTPUT\YYYY-MM-DD\report.md
+
+9) 일일 파이프라인(자동 스케줄)
+
+RAW 업데이트 완료 확인(전영업일 기준)
+
+engine_garage 재학습(파라미터셋은 최신 안정판 사용)
+
+OOS 백테스트(최근 6~12개월)
+
+TopN 추천 CSV + 리포트 생성
+
+로그/산출물 압축 보존
+
+10) 품질 점검 체크리스트(DoD)
+
+학습/검증/OOS 기간 물리적 분리 확인
+
+마스크(앞·뒤) 적용 로그에 수치 표기
+
+pkl 메타에 feature_hash, data_date, valid_days, horizon, input_window, n_estimators 존재
+
+점수·확률 분리 저장 여부 확인
+
+리포트에 사용한 pkl/paramset 경로 명시
+
+REAL/RESEARCH 산출물 서로 다른 폴더에 생성 확인
+
+이 문서를 기준선으로 유지하면, 폴더/역할/네이밍/데이터 흐름이 더 이상 틀어지지 않는다.

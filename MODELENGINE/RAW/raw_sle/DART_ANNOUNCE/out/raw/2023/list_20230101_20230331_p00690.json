@@ -1,0 +1,109 @@
+{
+  "status": "000",
+  "message": "정상",
+  "page_no": 690,
+  "page_count": 100,
+  "total_count": 68909,
+  "total_page": 690,
+  "list": [
+    {
+      "corp_code": "00241388",
+      "corp_name": "디비자산운용",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "효력발생안내( 2022.12.28. 제출 증권신고서(집합투자증권-신탁형) )",
+      "rcept_no": "20221230100002",
+      "flr_nm": "금융감독원",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00243553",
+      "corp_name": "신한자산운용",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "효력발생안내( 2022.12.28. 제출 증권신고서(집합투자증권-신탁형) )",
+      "rcept_no": "20221230100008",
+      "flr_nm": "금융감독원",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00243553",
+      "corp_name": "신한자산운용",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "효력발생안내( 2022.12.28. 제출 증권신고서(집합투자증권-신탁형) )",
+      "rcept_no": "20221230100007",
+      "flr_nm": "금융감독원",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00243553",
+      "corp_name": "신한자산운용",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "효력발생안내( 2022.12.27. 제출 증권신고서(집합투자증권-신탁형) )",
+      "rcept_no": "20221230100006",
+      "flr_nm": "금융감독원",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00331478",
+      "corp_name": "우리자산운용",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "효력발생안내( 2022.12.28. 제출 증권신고서(집합투자증권-신탁형) )",
+      "rcept_no": "20230102100004",
+      "flr_nm": "금융감독원",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "00120182",
+      "corp_name": "NH투자증권",
+      "stock_code": "005940",
+      "corp_cls": "Y",
+      "report_nm": "증권발행실적보고서",
+      "rcept_no": "20221230000606",
+      "flr_nm": "NH투자증권",
+      "rcept_dt": "20230102",
+      "rm": ""
+    },
+    {
+      "corp_code": "01605848",
+      "corp_name": "나눔축산운동본부",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "공시대상기업집단의특수관계인과의내부거래",
+      "rcept_no": "20221230000607",
+      "flr_nm": "나눔축산운동본부",
+      "rcept_dt": "20230102",
+      "rm": "공"
+    },
+    {
+      "corp_code": "01605848",
+      "corp_name": "나눔축산운동본부",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "약관에의한금융거래시계열금융회사의거래상대방의공시",
+      "rcept_no": "20221230000604",
+      "flr_nm": "나눔축산운동본부",
+      "rcept_dt": "20230102",
+      "rm": "공"
+    },
+    {
+      "corp_code": "00877059",
+      "corp_name": "삼성바이오로직스",
+      "stock_code": "207940",
+      "corp_cls": "Y",
+      "report_nm": "임원ㆍ주요주주특정증권등소유상황보고서",
+      "rcept_no": "20221230000602",
+      "flr_nm": "김태한",
+      "rcept_dt": "20230102",
+      "rm": ""
+    }
+  ]
+}

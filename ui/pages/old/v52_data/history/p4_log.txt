@@ -1,0 +1,14 @@
+
+>> [P4 Master] 005930 (20251205) 수집 시작
+P4 Result: 41/52
+
+[2025-12-06 09:05:52.349338] 수집 시작: 005930 (Target: 20251205)
+  [Warn] 수급(금액) 데이터 없음
+  [Warn] 수급(수량) 데이터 없음
+  [Err] Macro: 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/KR10YT=RR?period1=1763996400&period2=1764860400&interval=1d&includeAdjustedClose=true
+
+============================================================
+ Column                    | Value                | Status
+------------------------------------------------------------
+ date                      | 20251205             | ✅
+ code                      | 005930               | ✅

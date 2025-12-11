@@ -1,0 +1,934 @@
+📌 주식추천프로그램 데이터 설계 최종 결론 (62개 원천 컬럼 모델)
+
+───────────────────────────────
+
+1) 왜 62개 원천 방식이 정답인가 (판단 기준 확정)
+✔ 1) PER/PBR/EPS/BPS/MCAP 등은 “계산값”이 아니라 “필드 데이터”
+
+회계기준 변경
+
+지배/비지배주주 구분
+
+연결/개별 실적
+
+분기 실적 정정 공시
+
+증권사마다 다른 PER 계산
+
+공시 시점에 따라 PER 값이 장중에도 변경됨
+
+➡ 계산으로 재현 불가능 → 반드시 그때의 원천값 저장이 정답.
+
+✔ 2) 수급 Qty/Amount는 모두 필요 (소형주·공매도·수급 강도 핵심)
+
+수량 기반 패턴은 금액 패턴과 전혀 다름
+
+공매도는 ‘수량’ 신호가 핵심
+
+소형주의 단타 신호는 ‘수량 폭발’에서 발생
+
+기관/연기금 조용한 매집은 수량 기준 확인됨
+
+➡ qty·amt 둘 다 저장해야 실전 알고리즘이 살 수 있음.
+
+✔ 3) 이벤트/재무/거시/지수는 계산이 불가능 → 원천 수집 필요
+
+배당락일
+
+배당지급일
+
+실적 발표일
+
+권리락
+
+유·무상증자
+
+M&A 이벤트
+
+금리/환율/VIX/WTI
+
+분기 매출·영업이익·순이익
+
+➡ 계산 불가 → 원천 확보 필수
+➡ 그래서 62개 원천이 반드시 필요.
+
+✔ 4) 30개 최소원자 방식은 실전에선 100% 실패
+
+Corporate Action 전체(액면분할·증자·감자·합병) 직접 반영해야 함
+
+재무 정정 때 10년 전체 PER 재계산해야 함
+
+회계 변경 시 모든 데이터 다시 계산
+
+유지보수 난이도 폭발
+
+➡ 이론적으로 깔끔하지만 실전에서는 절대 운영 불가
+➡ 데이터팀 5명 이상 필요
+
+✔ 5) 전 세계 퀀트 시스템 표준
+
+원천(Raw) 50~80개
+
+파생 Feature 200~500개
+
+최종 엔진 입력 500~800개
+
+➡ “62개 원천”은 정확히 업계 표준 범위.
+
+───────────────────────────────
+
+2) 최종 확정: 원천 62개 컬럼 (정식 목록)
+
+───────────────────────────────
+
+아래 62개는
+1) 계산 불가능 or 계산 리스크 심각
+2) 실전 엔진에서 반드시 필요한 필드 데이터
+3) 시장/회계/수급/이벤트/거시의 최소 원천
+으로 구성됨.
+
+A. 정적 메타 (13개)
+
+code
+
+name
+
+market
+
+sector_code
+
+sector_name
+
+theme
+
+ipo_date
+
+listed_shares
+
+outstanding_shares
+
+free_float_ratio
+
+par_value
+
+is_preferred
+
+is_spac
+
+B. 일별 시세 (10개)
+
+date
+
+open
+
+high
+
+low
+
+close
+
+prev_close
+
+volume
+
+amount
+
+vwap
+
+spread
+
+C. 일별 밸류에이션 (8개)
+
+market_cap
+
+per
+
+pbr
+
+eps
+
+bps
+
+div_yield
+
+foreign_hold_ratio
+
+free_float_mcap
+
+D. 수급 (10개)
+
+inst_qty
+
+inst_amt
+
+frgn_qty
+
+frgn_amt
+
+nps_qty
+
+nps_amt
+
+program_net
+
+short_sell_volume
+
+short_sell_balance
+
+stock_loan_balance
+
+E. 지수/거시 (10개)
+
+kospi
+
+kosdaq
+
+spx
+
+ndx
+
+vix
+
+dxy
+
+wti
+
+us10y
+
+kr10y
+
+usdk_rw
+
+F. 분기 재무 (6개)
+
+revenue
+
+op_income
+
+net_income
+
+revenue_yoy
+
+op_income_yoy
+
+net_income_yoy
+
+G. 이벤트 (5개)
+
+ex_div_date
+
+pay_date
+
+earnings_date
+
+rights_issue_event
+
+mna_event
+
+───────────────────────────────
+
+3) 62개 중 ‘보조 소스 필요 항목 15개’ 표시
+
+───────────────────────────────
+
+아래 항목은 pykrx 단독 불가,
+추가 API/크롤러가 반드시 필요함.
+
+✔ 보조 소스 필요(총 15개)
+● 밸류
+
+foreign_hold_ratio (과거 데이터 불완전)
+
+free_float_mcap (유통주식 변동 이력 필요)
+
+● 수급
+
+short_sell_volume (2015 일부 구멍)
+
+short_sell_balance (거래소 페이지 크롤링 필요)
+
+stock_loan_balance (대차잔고, 증권사/거래소 크롤러)
+
+● 지수/거시
+
+kr10y (한국은행 API)
+
+● 재무 (전부 보조 소스 필요)
+
+revenue
+
+op_income
+
+net_income
+
+revenue_yoy
+
+op_income_yoy
+
+net_income_yoy
+➡ FnGuide/Naver Financials 크롤러 필요
+
+● 이벤트
+
+pay_date (배당 지급일: 네이버/공시 크롤러)
+
+earnings_date (실적발표일: FnGuide 필요)
+
+rights_issue_event (DART 공시)
+
+mna_event (DART 공시)
+
+4) 수집 파이프라인 구조 (다음 방에서 바로 작업 가능)
+1단계: pykrx/증권사
+
+→ 47개 원천 자동 수집 (완벽히 가능)
+
+2단계: 거시/지수 API
+
+→ index/macro collector (WTI·VIX·DXY·SPX·US10Y·KR10Y 등)
+
+3단계: 재무재표(FnGuide)
+
+→ revenue/op income/net income / YoY
+(분기 기준, 2015~전부 가능)
+
+4단계: 이벤트 데이터(네이버+DART)
+
+→ 배당·실적·권리락·M&A 이벤트 수집
+
+5단계: 수급 보조(공매도/대차)
+
+→ 거래소 웹 크롤러
+(2015~현재까지 모두 확보 가능)
+
+5) DB 스키마 구조 (다음 방에서 바로 구현 가능)
+table: stock_meta
+
+(정적 13개)
+
+table: price_daily
+
+(시세 10개)
+
+table: value_daily
+
+(밸류 8개)
+
+table: flow_daily
+
+(수급 10개)
+
+table: index_macro_daily
+
+(거시·지수 10개)
+
+table: finance_quarterly
+
+(재무 6개)
+
+table: corporate_event
+
+(이벤트 5개)
+
+6) 최종 목표 데이터 구조
+
+원천 62개
+
+파생 feature 200~500개 자동생성
+
+엔진 입력용 final_feature_set 500~800개
+
+이 구조는
+딥러닝·트리·혼합엔진·강화학습까지 모두 호환되는 표준 구조.
+
+📌 이 문서의 목적
+
+다음 방에서 바로 코드 제작을 시작할 수 있게
+전체 개념·설계·판단 기준을 “최종합본”으로 만든 것.
+
+다음 방에서 저는 이 순서대로 바로 작업 가능합니다:
+
+62개 원천 기반 DB 구조 생성
+
+collector_full_final.py 제작 (pykrx + 보조 collector 포함)
+
+macro collector 제작
+
+financial collector 제작
+
+event collector 제작
+
+전체 파생 feature 파이프라인 제작
+
+parquet/h5 구조 설계
+
+엔진 입력 구조 통합
+
+✔ macro collector 구조 설계 = 부분적으로 포함 (필요 항목만 명시됨), 구체 로직·파일 구조는 아직 미포함
+✔ sector collector 구조 설계 = 이번 정리본에는 미포함
+✔ revenue/재무 collector 구조 설계 = 보조 소스 필요 표시만 했고, 구현 설명은 미포함
+✔ event collector 구조 설계 = 필요 항목만 표시, 크롤링 구조 설명은 미포함
+✔ parquet/h5 저장구조 = 테이블 설계까지만 포함, 파티션·경로·버전 구조는 미포함
+✔ feature_set 300~600 자동 생성 엔진 = 언급만 되었지 구조 설계는 미포함
+
+📌 준비해야 할 ‘추가 완성 설계 집합’은 아래 5가지
+
+1) Macro Collector 구조 설계 (WTI / VIX / DXY / SPX / US10Y / KR10Y / USDKRW / KOSPI / KOSDAQ)
+
+포함 내용
+
+사용 API
+
+빈 데이터 처리 방법
+
+다운로드 주기
+
+결측치 forward fill 기준
+
+parquet 파티션 구조
+
+테이블 스키마
+
+최종 merge 방식
+
+───────────────────────
+
+2) Sector Collector 구조 (섹터 수익률/섹터 평균 PER/PBR)
+
+포함 내용
+
+섹터 코드 매핑 방식
+
+업종별 가중치 계산 방식
+
+pykrx/네이버 조합
+
+섹터 트렌드 5일/20일 알고리즘
+
+저장 테이블 구조
+
+───────────────────────
+
+3) Revenue(재무) Collector 구조 (FnGuide / Naver Financials)
+
+포함 내용
+
+분기 데이터 크롤링 구조
+
+회계정정 처리 플로우
+
+연결/개별 선택 기준
+
+TTM 생성 방식
+
+parquet 버전 관리
+
+통합 finance_quarterly 스키마 완성
+
+───────────────────────
+
+4) Event Collector 구조 (실적 발표일/배당/권리락/M&A)
+
+포함 내용
+
+DART vs 네이버 사용 구간
+
+이벤트 날짜의 Point-in-Time 처리
+
+동일 이벤트의 중복 제거 로직
+
+corporate_event 테이블 최종 스키마
+
+───────────────────────
+
+5) parquet/h5 저장 구조 설계
+
+포함 내용
+
+/RAW /EXTERNAL /MACRO /EVENT /FINANCE 디렉토리 구조
+
+연도별 파티션
+
+종목별 파티션
+
+row-group 크기
+
+10년치 3,000종목 저장 시 예상 용량
+
+h5 구조(엔진 학습용) 파이프라인
+
+───────────────────────
+
+6) feature_set 300~600 자동 생성 코드 설계
+
+포함 내용
+
+① 시세 기반 파생: 이평, 변동성, 밴드, 모멘텀
+
+② 수급 기반 파생: 강도, 연속성, 비율, 기관턴
+
+③ 밸류 기반 파생: 저평가 스코어, 회귀 기반 밸류
+
+④ 재무 기반 파생: 성장성, 안정성, YOY 대비
+
+⑤ 섹터 기반 파생: 섹터 트렌드/섹터 프리미엄
+
+⑥ macro 기반 파생: 환율 민감도, 금리 민감도
+
+⑦ multi-period multi-window 자동 생성기 구조
+
+⑧ 엔진 입력용 final_feature_set.h5 생성기
+
+───────────────────────
+
+총정리
+
+주식추천프로그램 데이터 설계 완성본 (6개 전체 설계본)
+
+본 문서는 다음 방에서 곧바로 구현에 착수할 수 있도록, 개념·스키마·폴더·운영 규칙까지 모두 포함한 최종 설계안입니다. 코드 작성은 이 문서를 그대로 기준으로 합니다.
+
+0. 전역 규칙(모든 수집기/저장공통)
+
+타임존: Asia/Seoul, 기준 시각 = 거래일 종가(EOD) 기준.
+
+키:
+
+종목 일별 테이블: (date, code) 복합 PK
+
+분기 재무: (report_date, code) 복합 PK
+
+이벤트: (event_date, code, event_type) 복합 PK
+
+Point-in-Time(PIT): 해당 날짜에 시장/사용자가 볼 수 있었던 값으로 고정. 재수집 시에는 asof_ts 칼럼으로 “그때의 스냅샷”을 보존(히스토리컬 스냅샷 방식).
+
+다중 소스: source_primary, source_fallback_used (bool), source_detail 저장.
+
+검증(QC) 공통: 결측률, 범위 체크, 급변(5σ) 알림, 시총≈종가×주식수 일관성, 거래정지/상하한가 마스크.
+
+저장 포맷: Parquet(원천/중간/집계), HDF5(엔진 입력 Feature Set).
+
+디렉터리 루트(윈도우→Git 경로 매핑):
+
+실제: F:\autostockG\
+
+문서 내 표기: /autostockG/
+
+파티션 전략: date=YYYY-MM-DD(일별) + year=YYYY(상위) 혼용. 종목 단위 대량 I/O 최적화 위해 row-group: 50k~100k rows 권장.
+
+1) Macro/Index Collector 설계
+1.1 대상 시리즈(필수)
+
+국내지수: KOSPI, KOSDAQ
+
+해외/거시: SPX, NDX, VIX, DXY, US10Y, KR10Y, USDKRW, WTI, Brent
+-衍生(수익률/변환): 각 시리즈 ret_1d/5d/20d, 로그수익률, level_z_252.
+
+1.2 스키마
+
+table: macro_daily
+
+date (date)
+
+kospi_close, kosdaq_close (float)
+
+spx_close, ndx_close, vix_close, dxy_close (float)
+
+us10y_yield, kr10y_yield (float)
+
+usdk_rw (float) // 환율
+
+wti_close, brent_close (float)
+-衍生: *_ret_1d, *_ret_5d, *_ret_20d, *_z_252 (float, 계산 필드 → materialized view)
+
+메타: asof_ts (ts), source_primary (str), source_fallback_used (bool), source_detail (str)
+
+1.3 소스·페일오버
+
+1차: 공식/권위 API(국/해외), 거래소/중앙은행 등
+
+2차: 보조 데이터벤더
+
+3차: 합법 공개 웹 페이지 크롤러
+
+KR10Y는 한국은행 API 사용(일 단위), 환율은 공개 API/보조 소스 병행.
+
+1.4 수집·정합
+
+스케줄: 거래일 18:30 KST 이후 EOD 수집(지수/환율/금리의 종가 데이터).
+
+결측 처리: 당일 결측은 미기록, 다음 배치에서 보강. 과거 결측 발생 시 백필 배치 별도 운영.
+
+거래일 캘린더: 한국 거래일 기준. 해외 자산은 한국 기준 날짜로 스냅(UTC→KST 변환, 날짜 충돌 시 최근 영업일로 스냅).
+
+1.5 저장
+
+Parquet 경로: /autostockG/MODELENGINE/RAW/EXTERNAL/MACRO/year=YYYY/part-*.parquet
+
+뷰: macro_daily_mv (수익률·표준화衍生 컬럼 포함, 머티리얼라이즈드)
+
+2) Sector(업종) Collector 설계
+2.1 목적
+
+섹터 메타(티커→섹터 매핑) 관리
+
+섹터 일별 집계: 시총가중 평균/수익률/회전율/섹터 RS 등
+
+2.2 스키마
+
+table: sector_meta
+
+code (str), sector_code (str), sector_name (str), theme_tags (str[])
+
+effective_from, effective_to (date, 히스토리컬 매핑 지원)
+
+table: sector_daily
+
+date (date), sector_code (str)
+
+mcap_sum (float), turn_over (float) // 섹터 총시총, 회전율
+
+ret_1d, ret_5d, ret_20d (float) // 시총가중 섹터 수익률
+
+per_avg, pbr_avg, eps_avg, bps_avg (float) // 시총가중 평균
+
+rs_vs_kospi_20d, rs_vs_kospi_60d (float)
+
+메타: asof_ts, source_primary, source_fallback_used, source_detail
+
+2.3 집계 규칙
+
+가중치: 시총가중(기본), 필요 시 자유유통시총가중 옵션 추가.
+
+섹터 수익률: 섹터 구성종목 close 기반 시총가중 평균 후 수익률 계산.
+
+RS(Relative Strength): 섹터 20/60일 수익률을 KOSPI 동기간과 비교.
+
+변동 구성(편입/편출): sector_meta의 히스토리로 재현.
+
+2.4 소스·페일오버
+
+1차: 거래소/브로커 메타
+
+2차: 보조 웹(업종코드 표/섹터 분류 표준)
+
+섹터명/코드 표준화 테이블 유지(사전에 수동 검수 1회).
+
+2.5 저장
+
+Parquet:
+
+메타 /.../META/sector_meta.parquet (스냅샷 전체교체)
+
+일별 /.../DERIVED/SECTOR/year=YYYY/part-*.parquet
+
+3) Revenue(분기 재무) Collector 설계
+3.1 대상
+
+원천(필수 6): revenue, op_income, net_income, revenue_yoy, op_income_yoy, net_income_yoy
+-衍生(엔진 내부용): op_margin = op_income/revenue, net_margin = net_income/revenue, TTM 변환 등
+
+3.2 스키마
+
+table: finance_quarterly
+
+report_date (date, 분기말 기준 YYYY-Q)
+
+code (str)
+
+revenue, op_income, net_income (float)
+
+revenue_yoy, op_income_yoy, net_income_yoy (float) // 소스 제공 시 저장, 미제공 시 계산
+
+basis (str: 연결/개별), currency (str)
+
+revision_flag (bool), rev_version(int) // 정정공시 반영 버전
+
+메타: asof_ts, source_primary, source_fallback_used, source_detail
+
+3.3 정정공시/버저닝
+
+동일 (report_date, code) 다중 버전 허용 → rev_version 증가.
+
+엔진 기본은 최신 버전 사용하되, 백테스트용 PIT 스냅샷 선택 기능 제공.
+
+연결/개별 기준은 연결 우선, 미존재 시 개별.
+
+3.4 소스·페일오버
+
+1차: 전문 재무 데이터(분기)
+
+2차: 공시/요약(법적 데이터)
+
+3차: 보조 포털(표준화 필요)
+
+3.5 저장
+
+Parquet: /.../EXTERNAL/FINANCE/year=YYYY/part-*.parquet
+
+조회 뷰: finance_quarterly_latest (각 (report_date, code)의 최신 rev_version)
+
+4) Event Collector 설계
+4.1 대상 이벤트
+
+ex_div_date(배당락), pay_date(배당지급), earnings_date(실적발표), rights_issue_event(권리/증자/감자/분할), mna_event(M&A/합병/분할)
+
+4.2 스키마
+
+table: corporate_event
+
+event_date (date), code (str), event_type (enum: EXDIV, PAYDIV, EARNINGS, RIGHTS, MNA, HALT, RESUME …)
+
+value_1 (str/float, 예: 배당금/비율), value_2 (str/float), note (str)
+
+pit_effective_from (date) // 시장이 인지한 시점
+
+메타: asof_ts, source_primary, source_fallback_used, source_detail
+
+PK: (event_date, code, event_type)
+
+4.3 중복/상충 제거
+
+우선순위 규칙: 공시 > 전문 데이터 > 포털
+
+동일 (date, code, type) 중복은 value 우선순위 규칙으로 병합.
+
+상충 시 conflict_flag = true, note에 출처 및 차이 기록.
+
+4.4 PIT 처리
+
+pit_effective_from 사용: 시장 인지 시점 기록(뉴스/공시 시차 반영).
+
+백테스트 시 “발표 이전에는 모름” 제약을 보장.
+
+4.5 저장
+
+Parquet: /.../EXTERNAL/EVENTS/year=YYYY/type=EVENTTYPE/part-*.parquet
+
+5) Parquet/H5 저장 구조 설계
+5.1 디렉터리 트리(예시)
+/autostockG/
+  MODELENGINE/
+    RAW/
+      INSTRUMENT/          # 종목 일별 원천(OHLCV/밸류/수급) 통합
+        year=2015/part-*.parquet
+        ...
+      EXTERNAL/
+        MACRO/
+          year=2015/part-*.parquet
+        FINANCE/
+          year=2015/part-*.parquet
+        EVENTS/
+          year=2015/type=EXDIV/part-*.parquet
+          ...
+      META/
+        sector_meta.parquet
+    DERIVED/
+      SECTOR/
+        year=2015/part-*.parquet
+      FEATURE_MV/          # 머티 뷰 캐시(선택)
+        date=YYYY-MM-DD/*.parquet
+    FEATURESET/
+      SNAPSHOT=V1/
+        final_feature_set_YYYYMMDD.h5
+
+5.2 파일 단위/파티션
+
+일별 병합 스냅샷: INSTRUMENT는 날짜 파티션보다 연도 파티션이 I/O 효율적.
+
+이벤트/매크로/재무: 연도 파티션 + 타입 보조 파티션.
+
+Row Group: 50k~100k. 압축 snappy.
+
+5.3 스키마 고정/버전
+
+schema_version: 문자열(예: v1.0.0)을 모든 Parquet 메타에 주입.
+
+열 추가 시 Minor, 타입 변경 시 Major 올림. 다운스트림에서 스키마 핸드셰이크.
+
+5.4 H5(엔진 입력)
+
+파일명: final_feature_set_YYYYMMDD.h5
+
+구조:
+
+meta/date_index → 날짜 배열
+
+meta/code_index → 종목코드 배열
+
+data/features → float32 [N_date, N_code, N_feat] 3D 블록(결측은 NaN)
+
+data/mask → uint8 동일 shape(1=유효), 거래정지/데이터부족 마스크
+
+Chunking: (1, 256, all_feat) 또는 (date, code) 축 기준 실험 후 고정.
+
+무결성: sha256 체크섬 파일 동반 저장.
+
+6) Feature Set 300~600 자동 생성 엔진 설계
+6.1 입력 소스
+
+price_daily(OHLCV/밸류), flow_daily(수급), sector_daily(섹터 집계), macro_daily(거시), finance_quarterly_latest(재무), corporate_event(이벤트)
+
+필수 선행 조인 키: (date, code) 맞춤, 분기 재무는 직전 공시 기준으로 forward-fill(PIT 준수).
+
+6.2 공통 규칙
+
+윈도우: 5/10/20/60/120/240(핵심), 선택: 3/252
+
+NaN 규칙: 윈도우 미충족은 NaN, 모델 투입 전 마스크.
+
+표준화: z-score(252일 롤링), min-max는 비권장.
+
+리스크가중: 필요 시 변동성/유동성 가중 스케일러 별도 제공.
+
+누적/연속성: 연속 상승/하락 일수, 연속 순매수 일수 등 Boolean/카운트형.
+
+6.3 피처 패밀리(예시)
+
+A. 가격·수익률
+
+ret_1d/5d/20d/60d/120d/240d, logret_*
+
+drawdown_20/60, max_dd_252, recovery_days_since_last_peak
+
+B. 이동평균·추세
+
+sma_{5,20,60,120,240}, ema_{12,26}
+
+price_above_sma_{20,60,120}(0/1), ma_slope_{20,60}
+
+golden_cross_20_60, death_cross_20_60(0/1)
+
+C. 변동성/리스크
+
+atr_14, hv_{20,60,120}, down_vol_20, vol_of_vol_20
+
+beta_vs_kospi_120(회귀 베타)
+
+D. 오실레이터/밴드
+
+rsi_14, stoch_k/d, willr_14, cci_20
+
+bb_mid/upper/lower_20, keltner_mid/upper/lower_20
+
+bandwidth_20, percent_b_20
+
+E. 갭/이격/급등
+
+gap_open_pct, price_ma_gap_{20,60,120}
+
+surge_flag_15p, limit_up_dn_flag
+
+F. 유동성/체결강도
+
+turn_over = amount/mcap
+
+amount_ma_ratio_{5,20,60}, volume_ma_ratio_{5,20,60}
+
+liquidity_score = z(log(amount)) + z(volume) - z(spread_bp)
+
+G. 수급(주체별)
+
+inst_amt_{1,5,20,60}_cum, frgn_amt_{1,5,20,60}_cum, nps_amt_{1,5,20}_cum
+
+inst_share = inst_qty/volume, frgn_share = frgn_qty/volume
+
+frgn_hold_ratio(원천) 및 변화율
+
+연속성: inst_buy_streak_days, frgn_buy_streak_days
+
+H. 밸류·재무
+
+원천: per, pbr, eps, bps, div_yield
+-衍生: value_score(분위수 스코어 합), earnings_momentum(연속 QoQ/YoY)
+
+분기→일별 맵핑: PIT FFill
+
+I. 섹터·상대강도
+
+sector_ret_{5,20}, sector_per_avg, sector_pbr_avg
+
+rs_vs_sector_{20,60}, rs_vs_kospi_{20,60,120}
+
+섹터 프리미엄: ret_nd - sector_ret_nd
+
+J. 거시 민감도
+
+corr_60(close_ret, usdk_rw_ret), corr_60(close_ret, us10y_ret)
+
+macro_beta_{usd,rate,oil}: 60/120 회귀계수
+
+K. 이벤트 윈도우
+
+days_to_earnings(음수=지남), days_from_earnings
+
+exdiv_dminus_{1,3,5}, post_earnings_d{1,5,20} 수익률 플래그
+
+L. 품질/마스크
+
+halt_mask, limit_mask, missing_ratio_row
+
+anomaly_sigma_score
+
+6.4 산출물
+
+머티리얼라이즈드 Feature View: Parquet(선택 캐시)
+
+최종 엔진 입력: FEATURESET/final_feature_set_YYYYMMDD.h5
+
+N_feat 300~600 범위(설정파일로 윈도우/패밀리 on/off)
+
+6.5 실행 순서
+
+캘린더·매크로 갱신 → 2) 종목 원천(시세/밸류/수급) → 3) 섹터 집계 → 4) 재무 FFill → 5) 이벤트 맵핑 → 6) 피처 엔진 → 7) H5 생성
+
+7) 원천 62개 & 보조 소스 15개(확정 재명시)
+
+원천 62개: 정적 13, 시세 10, 밸류 8, 수급 10, 지수/거시 10, 재무 6, 이벤트 5
+
+보조 소스 필요 15개(pykrx 단독 불가):
+
+밸류: foreign_hold_ratio, free_float_mcap
+
+수급: short_sell_volume, short_sell_balance, stock_loan_balance
+
+지수/거시: kr10y
+
+재무(6개 전부): revenue, op_income, net_income, revenue_yoy, op_income_yoy, net_income_yoy
+
+이벤트(4): pay_date, earnings_date, rights_issue_event, mna_event
+
+8) 운영·배포·장애 처리
+
+스케줄: 평일 18:30~19:30 KST 배치(해외는 23:00 보강 배치 옵션)
+
+리트라이: 소스별 3회(지수 15분 간격), 실패 시 source_fallback_used=true
+
+로그: /LOGS/collector_YYYYMMDD.log + 요약 리포트(JSON)
+
+알림: QC 실패/결측 급증/값 폭주 시 alert_notify.py 통해 푸시
+
+버전: schema_version, collector_version 메타 기록
+
+9) 최종 산출물(다음 방 첫 작업 대상)
+
+DB 테이블 생성 스크립트(Parquet 스키마 포함)
+
+collector_full_final.py
+
+instrument(OHLCV/밸류/수급) 47개
+
+macro/index collector
+
+sector collector
+
+finance collector
+
+event collector
+
+feature_engine.py(300~600 피처 자동 생성)
+
+build_final_featureset.py(H5 스냅샷 생성)
+
+QC 리포트 생성기(결측/급변/마스크/소스플래그)
+
+CONFIG 템플릿(윈도우/피처 패밀리 on/off, 소스 키)

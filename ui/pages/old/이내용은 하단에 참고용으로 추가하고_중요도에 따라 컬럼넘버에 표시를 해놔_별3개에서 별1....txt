@@ -1,0 +1,563 @@
+﻿V58 데이터베이스 구축 기술 사양서 (Final Version)
+문서 버전: 1.1
+생성 일자: 2025-12-05
+목적: 퀀트 분석 및 알고리즘 트레이딩을 위한 고품질 주식 데이터베이스(V58) 구축 기준 정의
+1. 개요 (Overview)
+본 문서는 한국 주식시장(KOSPI/KOSDAQ) 전 종목을 대상으로 하는 일별 데이터셋 **'V58'**의 구성 요소를 정의합니다.
+데이터는 순수 원천(Raw), 필수 파생(Derived), **이벤트/참조(Reference)**의 3가지 계층으로 관리되며, 데이터의 무결성과 분석 활용성을 최우선으로 합니다.
+2. 컬럼 구성 (Total 58 Columns)
+A. 기본 정보 (Meta) - 4개
+종목 식별 및 시계열 기준이 되는 핵심 메타 데이터
+No
+	중요도
+	컬럼명 (Key)
+	타입
+	출처 (Source)
+	설명
+	비고
+	1
+	★★★
+	date
+	Date
+	System / PyKRX
+	기준 일자 (YYYYMMDD)
+	Primary Key
+	2
+	★★★
+	code
+	String
+	PyKRX
+	종목 코드 (6자리)
+	Primary Key
+	3
+	★★★
+	name
+	String
+	PyKRX
+	종목명
+	
+
+	4
+	★★☆
+	market
+	String
+	PyKRX
+	시장 구분 (KOSPI/KOSDAQ)
+	
+
+	B. 가격 데이터 (Price) - 8개
+시세 및 거래 관련 원천 데이터 (수정주가 제외)
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	데이터 검증 기준
+	5
+	★★★
+	open
+	Float
+	PyKRX
+	시가
+	> 0
+	6
+	★★★
+	high
+	Float
+	PyKRX
+	고가
+	>= open, close, low
+	7
+	★★★
+	low
+	Float
+	PyKRX
+	저가
+	<= open, close, high
+	8
+	★★★
+	close
+	Float
+	PyKRX
+	종가
+	> 0
+	9
+	★★★
+	volume
+	Float
+	PyKRX
+	거래량
+	>= 0
+	10
+	★★★
+	amount
+	Float
+	PyKRX
+	거래대금
+	0일 경우 보정 금지 (Raw 유지)
+	11
+	★★☆
+	adj_factor
+	Float
+	계산 (별도)
+	수정주가 계수
+	기본값 1.0 (이벤트 발생시 변경)
+	12
+	★☆☆
+	vwap
+	Float
+	계산 (파생)
+	amount / volume
+	거래대금 0이면 0.0 처리
+	C. 수급 데이터 (Flow) - 12개
+투자자별 순매수 및 대차/공매도 현황 (단위: 주/원)
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	비고
+	13
+	★☆☆
+	inst_net_qty
+	Float
+	PyKRX
+	기관 순매수 수량
+	금액 위주 분석 권장
+	14
+	★★★
+	inst_net_amt
+	Float
+	PyKRX
+	기관 순매수 금액
+	
+
+	15
+	★☆☆
+	frgn_net_qty
+	Float
+	PyKRX
+	외국인 순매수 수량
+	금액 위주 분석 권장
+	16
+	★★★
+	frgn_net_amt
+	Float
+	PyKRX
+	외국인 순매수 금액
+	
+
+	17
+	★☆☆
+	nps_net_qty
+	Float
+	PyKRX
+	연기금 순매수 수량
+	금액 위주 분석 권장
+	18
+	★★★
+	nps_net_amt
+	Float
+	PyKRX
+	연기금 순매수 금액
+	
+
+	19
+	★☆☆
+	dealer_net_qty
+	Float
+	PyKRX
+	금융투자 순매수 수량
+	금액 위주 분석 권장
+	20
+	★★☆
+	dealer_net_amt
+	Float
+	PyKRX
+	금융투자 순매수 금액
+	
+
+	21
+	★☆☆
+	short_sell_qty
+	Float
+	PyKRX
+	공매도 거래량
+	공매도 금지 기간엔 0
+	22
+	★★☆
+	short_sell_amt
+	Float
+	PyKRX
+	공매도 거래대금
+	
+
+	23
+	★☆☆
+	loan_balance_qty
+	Float
+	PyKRX
+	대차잔고 수량
+	
+
+	24
+	★★☆
+	loan_balance_amt
+	Float
+	PyKRX
+	대차잔고 금액
+	
+
+	D. 재무 데이터 (Finance) - 11개
+DART 공시 기반 펀더멘털 데이터 (지배주주지분 우선)
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	비고
+	25
+	★★★
+	revenue
+	Float
+	DART
+	매출액
+	
+
+	26
+	★★★
+	op_income
+	Float
+	DART
+	영업이익
+	
+
+	27
+	★★★
+	net_income
+	Float
+	DART
+	당기순이익
+	지배주주지분 우선 매핑
+	28
+	★★☆
+	eps
+	Float
+	DART
+	주당순이익
+	
+
+	29
+	★★☆
+	bps
+	Float
+	DART
+	주당순자산
+	
+
+	30
+	★☆☆
+	roe
+	Float
+	계산 (파생)
+	(순이익 / 자본) * 100
+	원천 데이터 부재 시 계산
+	31
+	★☆☆
+	roa
+	Float
+	계산 (파생)
+	(순이익 / 자산) * 100
+	
+
+	32
+	★☆☆
+	debt_ratio
+	Float
+	계산 (파생)
+	(부채 / 자본) * 100
+	
+
+	33
+	★★★
+	cash_flow_op
+	Float
+	DART
+	영업활동현금흐름
+	
+
+	34
+	★★☆
+	cash_flow_inv
+	Float
+	DART
+	투자활동현금흐름
+	
+
+	35
+	★★☆
+	cash_flow_fin
+	Float
+	DART
+	재무활동현금흐름
+	
+
+	E. 섹터 및 테마 (Sector/Theme) - 5개
+종목 분류 정보 (WICS 기준)
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	수집 전략
+	36
+	★☆☆
+	sector_code
+	String
+	FnGuide
+	섹터 코드
+	크롤링 (심화)
+	37
+	★★★
+	sector_name
+	String
+	FnGuide/Naver
+	섹터명
+	'주소' 등 오수집 필터링 필수
+	38
+	★☆☆
+	theme_code
+	String
+	FnGuide
+	테마 코드
+	크롤링 (심화)
+	39
+	★★☆
+	theme_name
+	String
+	FnGuide
+	테마명
+	
+
+	40
+	★☆☆
+	sector_index_close
+	Float
+	Naver
+	섹터 지수 종가
+	
+
+	F. 거시경제 지표 (Macro) - 8개
+시장 전체에 영향을 주는 매크로 변수
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	비고
+	41
+	★★★
+	usdkrw
+	Float
+	Naver
+	원/달러 환율
+	
+
+	42
+	★★☆
+	cnykrw
+	Float
+	Naver/FDR
+	원/위안 환율
+	
+
+	43
+	★★☆
+	dxy
+	Float
+	FDR
+	달러 인덱스
+	
+
+	44
+	★★★
+	us10y_yield
+	Float
+	Naver/FDR
+	미국채 10년물 금리
+	
+
+	45
+	★★★
+	kr10y_yield
+	Float
+	Naver
+	국고채 10년물 금리
+	
+
+	46
+	★★☆
+	wti
+	Float
+	Naver
+	WTI 원유 선물
+	
+
+	47
+	★★☆
+	gold
+	Float
+	Naver
+	국제 금 선물
+	
+
+	48
+	★☆☆
+	vix
+	Float
+	FDR
+	변동성 지수
+	
+
+	G. 이벤트 (Event) - 10개
+권리락, 실적발표 등 주요 이벤트 (심화 수집 영역)
+No
+	중요도
+	컬럼명
+	타입
+	출처
+	설명
+	비고
+	49
+	★★☆
+	earnings_announce_date
+	Date
+	DART
+	잠정실적 공시일
+	공시검색 API 필요
+	50
+	★☆☆
+	earnings_surprise
+	Float
+	계산
+	(실적-컨센)/컨센
+	컨센서스 데이터 필요
+	51
+	★☆☆
+	earnings_effective_date
+	Date
+	Rule
+	재무데이터 효력발생일
+	
+
+	52
+	★★☆
+	ex_div_date
+	Date
+	KRX/Yahoo
+	배당락일
+	
+
+	53
+	★★★
+	div_amount
+	Float
+	PyKRX
+	주당 배당금 (DPS)
+	
+
+	54
+	★☆☆
+	split_announce_date
+	Date
+	DART
+	액면분할 공시일
+	
+
+	55
+	★☆☆
+	split_effective_date
+	Date
+	DART
+	액면분할 효력일
+	
+
+	56
+	★☆☆
+	rights_issue_announce_date
+	Date
+	DART
+	유상증자 공시일
+	
+
+	57
+	★☆☆
+	rights_issue_effective_date
+	Date
+	DART
+	유상증자 효력일
+	
+
+	58
+	★☆☆
+	mna_announce_date
+	Date
+	DART
+	합병 공시일
+	
+
+	3. 데이터 수집 및 검증 원칙
+1. 원천 데이터 우선 (Raw First):
+   * 모든 데이터는 가능한 한 가공되지 않은 Raw Data를 수집하여 저장한다.
+   * amount(거래대금)가 0인 경우, 임의로 추정(close * volume)하지 않고 0.0으로 유지하여 데이터의 정합성을 지킨다.
+2. 교차 검증 (Cross Validation):
+   * 섹터명: FnGuide 크롤링 결과가 '주소', '전화번호' 등 비정상 텍스트일 경우, 즉시 폐기하고 Naver 금융에서 재수집한다.
+   * 매크로: FDR 라이브러리 실패 시, Naver 금융 페이지 파싱으로 자동 전환(Fail-over)한다.
+3. 지배주주지분 원칙 (Equity Principle):
+   * 재무 데이터(순이익, 자본) 수집 시, 연결 재무제표의 전체 값이 아닌 **'지배기업 소유주 지분'**을 최우선으로 매핑하여 밸류에이션(PER, ROE) 왜곡을 방지한다.
+4. 결측치 처리 (Missing Value Handling):
+   * 수집 실패 시 None 또는 NaN으로 표기하는 것을 원칙으로 하되, 수치 연산이 필요한 경우 0.0으로 초기화한다. (로그에 MISSING 상태 명시)
+4. 추가 제안 (Recommended Add-ons)
+분석의 깊이를 더하기 위해 다음 3가지 컬럼의 추가를 권장합니다.
+1. adj_close (수정종가): 백테스트 수익률 계산의 필수 요소.
+2. market_cap (시가총액): 기업 규모 분류 및 밸류에이션의 기준.
+3. tr_val (회전율): 거래량의 질적 분석(매집/허수 판별)을 위한 핵심 지표.
+[참고] 중요도 표시 기준 (Legend)
+표시
+	의미
+	상세 설명
+	★★★
+	필수 (Critical)
+	- 분석 및 트레이딩에 절대적으로 필요한 핵심 데이터.
+
+
+- 누락 시 모델링 및 전략 구현 자체가 불가능하거나 치명적인 오류 발생.
+
+
+- 예: OHLCV, 거래대금, 핵심 재무(매출/이익), 주요 수급(금액), 금리/환율
+	★★☆
+	보통 (Standard)
+	- 분석의 정확도와 깊이를 더해주는 중요 데이터.
+
+
+- 누락되더라도 기본 분석은 가능하나, 정교함이 떨어질 수 있음.
+
+
+- 예: 보조 지표, 배당락일, 시장 구분, 세부 현금흐름
+	★☆☆
+	제외 가능 (Optional)
+	- 있으면 좋지만 없어도 큰 지장이 없는 부가 데이터.
+
+
+- 중복 정보(수량 vs 금액)이거나 발생 빈도가 매우 낮은 희소 이벤트.
+
+
+- 데이터 다이어트 시 1순위 제거 대상.
+
+
+- 예: 수량 데이터(Qty), 파생 지표(계산 가능), 희귀 공시일

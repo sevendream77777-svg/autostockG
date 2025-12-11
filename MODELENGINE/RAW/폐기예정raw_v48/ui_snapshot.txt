@@ -1,0 +1,1282 @@
+time=2025-12-10T13:11:57.988065
+ret_code=None
+log=F:\autostockG\MODELENGINE\RAW\raw_v48\ui_run.log
+log_exists=True size=57843
+[log_head] (full)
+
+[2025-12-10T00:17:26.086178] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150103 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (005930, 2015, rc=11012)
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2015, rc=11014)
+      재무 없음 (005930, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (000660, 2015, rc=11013)
+      재무 없음 (000660, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (000660, 2015, rc=11012)
+      재무 없음 (000660, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (000660, 2015, rc=11014)
+      재무 없음 (000660, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (000660, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T00:36:46.322288] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (005930, 2015, rc=11012)
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2015, rc=11014)
+      재무 없음 (005930, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (000660, 2015, rc=11013)
+      재무 없음 (000660, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (000660, 2015, rc=11012)
+      재무 없음 (000660, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (000660, 2015, rc=11014)
+      재무 없음 (000660, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (000660, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T00:47:43.853153] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150105 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (005930, 2015, rc=11012)
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2015, rc=11014)
+      재무 없음 (005930, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (000660, 2015, rc=11013)
+      재무 없음 (000660, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (000660, 2015, rc=11012)
+      재무 없음 (000660, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (000660, 2015, rc=11014)
+      재무 없음 (000660, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (000660, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T00:53:42.926767] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150105 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1 --mode annual
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11011 …
+      announce_date 없음 (000660, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T01:34:42.758061] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150106 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 2 --mode annual
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11011 …
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11011 …
+      announce_date 없음 (000660, 2015, rc=11011)
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T02:05:06.505488] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150103 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      announce_date 없음 (000660, 2015, rc=11013)
+      재무 없음 (000660, 2015, rc=11013)
+    [보고서] 11012 …
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (000660, 2015, rc=11012)
+      announce_date 없음 (005930, 2015, rc=11012)
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      재무 없음 (000660, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (000660, 2015, rc=11014)
+      announce_date 없음 (005930, 2015, rc=11014)
+
+[END] return_code=3221225786
+
+[2025-12-10T02:15:02.189125] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150103 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+[Task 시작] 000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (000660, 2015, rc=11013)
+      announce_date 없음 (005930, 2015, rc=11013)
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      재무 없음 (000660, 2015, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (005930, 2015, rc=11012)
+      announce_date 없음 (000660, 2015, rc=11012)
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      재무 없음 (000660, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2015, rc=11014)
+      announce_date 없음 (000660, 2015, rc=11014)
+      재무 없음 (005930, 2015, rc=11014)
+    [보고서] 11011 …
+      재무 없음 (000660, 2015, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+      announce_date 없음 (000660, 2015, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T02:27:27.167543] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20180312 --end 20180312 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2018년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2018, rc=11013)
+    [보고서] 11012 …
+      announce_date 없음 (005930, 2018, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2018, rc=11014)
+    [보고서] 11011 …
+      announce_date 없음 (005930, 2018, rc=11011)
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T03:28:55.480127] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+
+[END] return_code=3221225786
+
+[2025-12-10T03:38:43.398308] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:39:15.892364] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:40:48.971241] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:44:06.086584] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:48:10.408215] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 415
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:50:30.145656] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:52:58.752943] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150108 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:53:34.476440] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T03:57:24.438017] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 419
+    from __future__ import annotations
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: from __future__ imports must occur at the beginning of the file
+
+[END] return_code=1
+
+[2025-12-10T04:14:07.402925] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+  [연도] 2015년
+    [보고서] 11013 …
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (005930, 2015, rc=11013) st=None msg=None
+    [보고서] 11012 …
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (000660, 2015, rc=11013) st=None msg=None
+    [보고서] 11012 …
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+
+[END] return_code=3221225786
+
+[2025-12-10T04:15:58.063707] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20151102 --end 20151102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+
+[END] return_code=3221225786
+
+[2025-12-10T04:17:09.318481] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20181102 --end 20181102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2018년
+    [보고서] 11013 …
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2018년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:29:09.072559] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:32:50.109944] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:34:38.083574] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20181103 --end 20181103 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2018년
+    [보고서] 11013 …
+  [연도] 2018년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:37:20.542247] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[WARN] --codes 비어 있음 → 실행 없이 종료
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:39:23.887722] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:39:40.041261] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:41:03.329236] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T04:47:51.626060] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[WARN] --codes 비어 있어서 기본값 사용: 005930,000660
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2018년
+    [보고서] 11013 …
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 657, in <module>
+    main()
+    ~~~~^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 587, in main
+    _, ok, _ = run_single_task(t)
+               ~~~~~~~~~~~~~~~^^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 623, in run_single_task
+    (code6, ok, info) = collect_one_code((code, start_date, end_date,
+                        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                          dart_mode, out_dir,
+                                          ^^^^^^^^^^^^^^^^^^^
+                                          sample_csv_limit, ordered_keys))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 388, in collect_one_code
+    announce_dt = fetch_announce_date(corp_code, year, rc, key)
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 322, in fetch_announce_date
+    label = ANN_REPORT_CODES.get(reprt_code, "")
+            ^^^^^^^^^^^^^^^^
+NameError: name 'ANN_REPORT_CODES' is not defined
+
+[END] return_code=1
+
+[2025-12-10T04:49:04.380080] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1 --mode annual
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11011 …
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 657, in <module>
+    main()
+    ~~~~^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 587, in main
+    _, ok, _ = run_single_task(t)
+               ~~~~~~~~~~~~~~~^^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 623, in run_single_task
+    (code6, ok, info) = collect_one_code((code, start_date, end_date,
+                        ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                          dart_mode, out_dir,
+                                          ^^^^^^^^^^^^^^^^^^^
+                                          sample_csv_limit, ordered_keys))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 388, in collect_one_code
+    announce_dt = fetch_announce_date(corp_code, year, rc, key)
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49.py", line 322, in fetch_announce_date
+    label = ANN_REPORT_CODES.get(reprt_code, "")
+            ^^^^^^^^^^^^^^^^
+NameError: name 'ANN_REPORT_CODES' is not defined
+
+[END] return_code=1
+
+[2025-12-10T04:49:19.049072] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 1 --mode annual
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\000660.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T12:36:02.044543] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930,000660 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 4 --mode full
+
+============================================
+   DART Standalone Collector v48 (전환기 강화)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/2 code=005930
+
+[수집 시작] 종목 005930
+[진행] 2/2 code=000660
+
+[수집 시작] 종목 000660
+  [연도] 2015년
+    [보고서] 11013 …
+  [연도] 2015년
+    [보고서] 11013 …
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (005930, 2015, rc=11013) st=None msg=None
+    [보고서] 11012 …
+      [rc=11013 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (000660, 2015, rc=11013) st=None msg=None
+    [보고서] 11012 …
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (005930, 2015, rc=11012) st=None msg=None
+    [보고서] 11014 …
+      [rc=11012 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      재무 없음 (000660, 2015, rc=11012) st=None msg=None
+    [보고서] 11014 …
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=OFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=None] status=100 msg=필수값(fs_div)이 누락되었습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11014 fs=CFS] status=013 msg=조회된 데이타가 없습니다.
+
+[END] return_code=3221225786
+
+[2025-12-10T12:39:42.299176] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart_v49_fixed2.py
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[ERROR] --codes 종목코드 필요
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T12:44:19.249863] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      announce_date 없음 (005930, 2015, rc=11013)
+      [rc=11013 fs=CFS api=All] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS api=All] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=CFS api=Singl] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11013 fs=OFS api=Singl] status=013 msg=조회된 데이타가 없습니다.
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      [rc=11012 fs=CFS api=All] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS api=All] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=CFS api=Singl] status=013 msg=조회된 데이타가 없습니다.
+      [rc=11012 fs=OFS api=Singl] status=013 msg=조회된 데이타가 없습니다.
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      announce_date 없음 (005930, 2015, rc=11014)
+
+[END] return_code=3221225786
+
+[2025-12-10T12:50:52.937152] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20150102 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+      재무 없음 (005930, 2015, rc=11013)
+    [보고서] 11012 …
+      재무 없음 (005930, 2015, rc=11012)
+    [보고서] 11014 …
+      재무 없음 (005930, 2015, rc=11014)
+    [보고서] 11011 …
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+
+[2025-12-10T12:53:02.861010] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20180602 --end 20180602 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2018년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\multiprocessing\pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\multiprocessing\pool.py", line 48, in mapstar
+    return list(map(*args))
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 624, in run_single_task
+    finalize_one_code(code, info.get("rows", []), out_dir, sample_csv_limit)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 523, in finalize_one_code
+    df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\util\_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\generic.py", line 3989, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        path_or_buf,
+        ^^^^^^^^^^^^
+    ...<14 lines>...
+        storage_options=storage_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\io\formats\format.py", line 1014, in to_csv
+    csv_formatter.save()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\io\formats\csvs.py", line 251, in save
+    with get_handle(
+         ~~~~~~~~~~^
+        self.filepath_or_buffer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        storage_options=self.storage_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as handles:
+    ^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+        handle,
+    ...<3 lines>...
+        newline="",
+    )
+PermissionError: [Errno 13] Permission denied: 'F:\\autostockG\\MODELENGINE\\RAW\\raw_v48\\out\\csv\\005930.csv'
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 652, in <module>
+    main()
+    ~~~~^^
+  File "F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py", line 587, in main
+    pool.map(run_single_task, tasks)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\multiprocessing\pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\slk\AppData\Local\Programs\Python\Python313\Lib\multiprocessing\pool.py", line 774, in get
+    raise self._value
+PermissionError: [Errno 13] Permission denied: 'F:\\autostockG\\MODELENGINE\\RAW\\raw_v48\\out\\csv\\005930.csv'
+
+[END] return_code=1
+
+[2025-12-10T13:09:53.869103] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only\dart.py --codes 005930 --start 20150102 --end 20151231 --out F:\autostockG\MODELENGINE\RAW\raw_v48\out --workers 5 --mode full
+
+============================================
+   DART Standalone Collector v48  (독립버전)
+============================================
+
+[키 로드됨] 총 8개
+  1. 2fe78cb907...
+  2. 3063a82f95...
+  3. d2bd3fe95c...
+  4. 06957560db...
+  5. d1c780f274...
+  6. 138873b699...
+  7. 51207c2138...
+  8. e62b9224a9...
+[진행] 1/1 code=005930
+[Task 시작] 005930
+
+[수집 시작] 종목 005930
+  [연도] 2015년
+    [보고서] 11013 …
+    [보고서] 11012 …
+    [보고서] 11014 …
+    [보고서] 11011 …
+[백업] 005930.csv -> 005930_20251210131157.csv
+[CSV 저장 완료] F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+
+[완료] 모든 작업 종료
+
+
+[END] return_code=0
+result=F:\autostockG\MODELENGINE\RAW\raw_v48\out\csv\005930.csv
+result_exists=True size=1001
+[result_head] (full)
+﻿date,code,corp_code,bsns_year,reprt_code,announce_date,revenue,op_income,net_income,total_equity,total_assets,cash_flow_op,cash_flow_inv,cash_flow_fin,div_amount,eps,roe,bps,debt_ratio
+20150331,005930,00126380,2015,11015,,10514879000000.0,19060144000000.0,19060144000000.0,4403893000000.0,242179521000000.0,40061761000000.0,-27167787000000.0,-6573509000000.0,3073481000000.0,126303.0,,,
+20150331,005930,00126380,2015,11015,,10514879000000.0,19060144000000.0,19060144000000.0,4403893000000.0,242179521000000.0,40061761000000.0,-27167787000000.0,-6573509000000.0,3073481000000.0,126303.0,,,
+20150331,005930,00126380,2015,11015,,10514879000000.0,19060144000000.0,19060144000000.0,4403893000000.0,242179521000000.0,40061761000000.0,-27167787000000.0,-6573509000000.0,3073481000000.0,126303.0,,,
+20151231,005930,00126380,2015,11011,,10514879000000.0,19060144000000.0,19060144000000.0,4403893000000.0,242179521000000.0,40061761000000.0,-27167787000000.0,-6573509000000.0,3073481000000.0,126303.0,,,

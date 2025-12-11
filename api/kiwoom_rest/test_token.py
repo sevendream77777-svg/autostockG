@@ -1,18 +1,16 @@
 import os
 import sys
 
-# F:\autostockG 를 패키지 루트로 인식시키기
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(CUR_DIR, os.pardir, os.pardir))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
-from kiwoom_rest.token_manager import KiwoomTokenManager
+from api.kiwoom_rest.token_manager import KiwoomTokenManager
 
 if __name__ == "__main__":
-    mgr = KiwoomTokenManager(
-        config_file=r"F:\autostockG\kiwoom_rest\config.ini",
-        token_file=r"F:\autostockG\kiwoom_rest\token.json",
-    )
+    config_path = os.path.join(PROJECT_ROOT, "api", "config.ini")
+    token_path = os.path.join(CUR_DIR, "token.json")
+    mgr = KiwoomTokenManager(config_file=config_path, token_file=token_path)
     token = mgr.get_token()
     print("ACCESS TOKEN:", token)
-

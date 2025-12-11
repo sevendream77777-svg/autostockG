@@ -20,15 +20,15 @@ if project_root not in sys.path:
 if ui_dir not in sys.path:
     sys.path.append(ui_dir)
 
-from pages.p0_index import P0_Index
-from pages.p1_data_pipeline import P1_DataPipeline
-from pages.p2_training import P2_Training
-from pages.p3_analysis import P3_Analysis
-from pages.p4_prediction import PredictionPage as P4_Prediction
-from pages.p5_send import P5SendPage
-from pages.p6_trading import TradingPage as P6_Trading
-from pages.p7_portfolio import PortfolioPage as P7_Portfolio
-from pages.p_setup import SettingsPage as P_Setup
+from ui.pages.p0_index import P0_Index
+from ui.pages.p1_data_pipeline import P1_DataPipeline
+from ui.pages.p2_training import P2_Training
+from ui.pages.p3_analysis import P3_Analysis
+from ui.pages.p4_prediction import PredictionPage as P4_Prediction
+from ui.pages.p5_send import P5SendPage
+from ui.pages.p6_trading import TradingPage as P6_Trading
+from ui.pages.p7_portfolio import PortfolioPage as P7_Portfolio
+from ui.pages.p_setup import SettingsPage as P_Setup
 
 from common.styles import build_qss
 

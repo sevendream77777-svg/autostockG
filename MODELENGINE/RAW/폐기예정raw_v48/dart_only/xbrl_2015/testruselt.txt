@@ -1,0 +1,115 @@
+PS F:\autostockG\MODELENGINE\RAW\raw_v48\dart_only> python dart_2015_full_tester.py
+
+===============================================
+     DART 2015 FULL TESTER START
+===============================================
+[fnlttSinglAcntAll] reprt=11011 fs_div=CFS -> status=000, msg=정상, list_len=184
+[fnlttSinglAcnt] reprt=11011 fs_div=CFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11011 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11011 fs_div=OFS -> status=000, msg=정상, list_len=135
+[fnlttSinglAcnt] reprt=11011 fs_div=OFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11011 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11011 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11011 fs_div=None -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11011 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11012 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11012 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11012 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11012 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11012 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11012 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11012 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11012 fs_div=None -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11012 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11013 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11013 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11013 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11013 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11013 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11013 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11013 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11013 fs_div=None -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11013 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11014 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11014 fs_div=CFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11014 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11014 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[fnlttSinglAcnt] reprt=11014 fs_div=OFS -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11014 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11014 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11014 fs_div=None -> status=013, msg=조회된 데이타가 없습니다., list_len=0
+[UNDOCUMENTED] reprt=11014 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11015 fs_div=CFS -> status=000, msg=정상, list_len=184
+[fnlttSinglAcnt] reprt=11015 fs_div=CFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11015 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11015 fs_div=OFS -> status=000, msg=정상, list_len=135
+[fnlttSinglAcnt] reprt=11015 fs_div=OFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11015 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11015 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11015 fs_div=None -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11015 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11016 fs_div=CFS -> status=000, msg=정상, list_len=184
+[fnlttSinglAcnt] reprt=11016 fs_div=CFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11016 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11016 fs_div=OFS -> status=000, msg=정상, list_len=135
+[fnlttSinglAcnt] reprt=11016 fs_div=OFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11016 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11016 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11016 fs_div=None -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11016 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11010 fs_div=CFS -> status=000, msg=정상, list_len=184
+[fnlttSinglAcnt] reprt=11010 fs_div=CFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11010 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11010 fs_div=OFS -> status=000, msg=정상, list_len=135
+[fnlttSinglAcnt] reprt=11010 fs_div=OFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11010 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11010 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11010 fs_div=None -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11010 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11017 fs_div=CFS -> status=000, msg=정상, list_len=184
+[fnlttSinglAcnt] reprt=11017 fs_div=CFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11017 fs_div=CFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11017 fs_div=OFS -> status=000, msg=정상, list_len=135
+[fnlttSinglAcnt] reprt=11017 fs_div=OFS -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11017 fs_div=OFS -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+[fnlttSinglAcntAll] reprt=11017 fs_div=None -> status=100, msg=필수값(fs_div)이 누락되었습니다., list_len=0
+[fnlttSinglAcnt] reprt=11017 fs_div=None -> status=000, msg=정상, list_len=24
+[UNDOCUMENTED] reprt=11017 fs_div=None -> status=100, msg=필수값(corp_code,bsns_year,reprt_code)이 누락되었습니다., list_len=0
+
+===============================================
+    SUMMARY: SUCCESS / FAIL 정리
+===============================================
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11011 fs_div=CFS -> status=000, msg=정상, list_len=184
+[SUCCESS]  [fnlttSinglAcnt] reprt=11011 fs_div=CFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11011 fs_div=OFS -> status=000, msg=정상, list_len=135
+[SUCCESS]  [fnlttSinglAcnt] reprt=11011 fs_div=OFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcnt] reprt=11011 fs_div=None -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11015 fs_div=CFS -> status=000, msg=정상, list_len=184
+[SUCCESS]  [fnlttSinglAcnt] reprt=11015 fs_div=CFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11015 fs_div=OFS -> status=000, msg=정상, list_len=135
+[SUCCESS]  [fnlttSinglAcnt] reprt=11015 fs_div=OFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcnt] reprt=11015 fs_div=None -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11016 fs_div=CFS -> status=000, msg=정상, list_len=184
+[SUCCESS]  [fnlttSinglAcnt] reprt=11016 fs_div=CFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11016 fs_div=OFS -> status=000, msg=정상, list_len=135
+[SUCCESS]  [fnlttSinglAcnt] reprt=11016 fs_div=OFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcnt] reprt=11016 fs_div=None -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11010 fs_div=CFS -> status=000, msg=정상, list_len=184
+[SUCCESS]  [fnlttSinglAcnt] reprt=11010 fs_div=CFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11010 fs_div=OFS -> status=000, msg=정상, list_len=135
+[SUCCESS]  [fnlttSinglAcnt] reprt=11010 fs_div=OFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcnt] reprt=11010 fs_div=None -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11017 fs_div=CFS -> status=000, msg=정상, list_len=184
+[SUCCESS]  [fnlttSinglAcnt] reprt=11017 fs_div=CFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcntAll] reprt=11017 fs_div=OFS -> status=000, msg=정상, list_len=135
+[SUCCESS]  [fnlttSinglAcnt] reprt=11017 fs_div=OFS -> status=000, msg=정상, list_len=24
+[SUCCESS]  [fnlttSinglAcnt] reprt=11017 fs_div=None -> status=000, msg=정상, list_len=24
+
+===============================================
+이제 XBRL 테스트 시작 (선택)
+===============================================
+
+===============================================
+    XBRL DOWNLOAD TEST
+===============================================
+[XBRL OK] 다운로드 완료 → xbrl_2015\20150515001379_ifrs\00126380_2011-04-30.xbrl

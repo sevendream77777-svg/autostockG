@@ -313,6 +313,16 @@ def run_prediction_core(
 
     df, db_path = load_latest_db(version)
 
+    # [추가] 엔진/DB 정합성 검증
+    engine_version = meta.get("version", "V31")
+    if engine_version != version:
+        print(f"[경고] 엔진 버전({engine_version}) != 요청 버전({version}), 엔진 버전 사용")
+    
+    engine_horizon = meta.get("horizon", None)
+    engine_window = meta.get("input_window", None)
+    if engine_horizon is not None:
+        print(f"[INFO] 엔진 설정: horizon={engine_horizon}, input_window={engine_window}")
+
     if target_date:
         td = pd.to_datetime(target_date)
     else:
@@ -324,49 +334,111 @@ def run_prediction_core(
 
     missing = [f for f in features if f not in daily.columns]
     if missing:
-        raise KeyError(f"필수 피처 누락: {missing[:5]} ...")
+        raise KeyError(f"필수 피처 누락: {missing[:5]} ... (엔진과 DB 버전 불일치 가능)")
 
     # 종가 컬럼찾기
     close_col = pick_close_col(daily)
+    
+    # [추가] 필터 전 초기 종목 수
+    initial_count = len(daily)
+    print(f"[FILTER] 초기 종목 수: {initial_count:,}개")
 
     # ======================================================
     # >>>>>>>>>>>>>>> [ADD FILTER: STEP 1] <<<<<<<<<<<<<<<<<
     # ======================================================
     # 1) 종가 0 제거 (상폐·정지)
+    before = len(daily)
     daily = daily[daily[close_col] > 0]
+    removed = before - len(daily)
+    if removed > 0:
+        print(f"[FILTER] 종가 <= 0 제거: {removed:,}개 (남음: {len(daily):,}개)")
 
     # 2) 거래량 0·초저유동성 제거
     if "Volume" in daily.columns:
+        before = len(daily)
         daily = daily[daily["Volume"] > 0]
+        removed1 = before - len(daily)
+        if removed1 > 0:
+            print(f"[FILTER] 거래량 = 0 제거: {removed1:,}개 (남음: {len(daily):,}개)")
+        
+        before = len(daily)
         daily = daily[daily["Volume"] > 5000]   # 최소 기준
+        removed2 = before - len(daily)
+        if removed2 > 0:
+            print(f"[FILTER] 거래량 <= 5,000 제거: {removed2:,}개 (남음: {len(daily):,}개)")
 
     # 3) 20일 변동성 최소 기준 (정지·flat 차단)
     if "volatility_20" in daily.columns:
+        before = len(daily)
         daily = daily[daily["volatility_20"] > 0.5]
+        removed = before - len(daily)
+        if removed > 0:
+            print(f"[FILTER] 변동성(20일) <= 0.5 제거: {removed:,}개 (남음: {len(daily):,}개)")
 
     # 4) MA20 = MA60 동일(flat) 제거
     if "MA20" in daily.columns and "MA60" in daily.columns:
+        before = len(daily)
         daily = daily[daily["MA20"] != daily["MA60"]]
+        removed = before - len(daily)
+        if removed > 0:
+            print(f"[FILTER] MA20 = MA60 (flat) 제거: {removed:,}개 (남음: {len(daily):,}개)")
 
     # 5) 시가총액 최소 기준 (초소형주 제거)
+    # [참고] 200억원 기준 (필요시 조정 가능)
     if "MarketCap" in daily.columns:
+        before = len(daily)
         daily = daily[daily["MarketCap"] > 200_000_00000]
+        removed = before - len(daily)
+        if removed > 0:
+            print(f"[FILTER] 시가총액 <= 200억 제거: {removed:,}개 (남음: {len(daily):,}개)")
 
     # ======================================================
     # >>>>>>>>>>>>>>> [FILTER END] <<<<<<<<<<<<<<<<<<<<<<<<<<
     # ======================================================
+    
+    print(f"[FILTER] 필터 적용 후 종목 수: {len(daily):,}개 (제거: {initial_count - len(daily):,}개)")
 
+    # [추가] 필터 후 빈 데이터 체크
+    if daily.empty:
+        raise ValueError(f"필터 적용 후 데이터가 없습니다. (날짜: {td.date()})")
+
+    # 결측 제거 (20% 이상 결측일 때만 제거)
+    before = len(daily)
     X = daily[features].copy()
-    mask = X.notnull().all(axis=1)
+    
+    # 결측 비율 계산 (20% 이상 결측이면 제거)
+    missing_count = X.isnull().sum(axis=1)
+    missing_ratio = missing_count / len(features)
+    mask = missing_ratio < 0.20  # 20% 미만 결측만 통과
+    
     daily = daily[mask]
     X = X[mask]
+    removed = before - len(daily)
+    if removed > 0:
+        print(f"[FILTER] 피처 결측 제거 (20% 이상 결측): {removed:,}개 (남음: {len(daily):,}개)")
+        # 결측 통계 출력
+        if len(daily) > 0:
+            avg_missing = (missing_count[mask] / len(features) * 100).mean()
+            print(f"[FILTER] 통과한 종목의 평균 결측 비율: {avg_missing:.1f}%")
+    
+    # [추가] 결측 제거 후 빈 데이터 체크
+    if daily.empty or len(X) == 0:
+        raise ValueError(f"결측 제거 후 데이터가 없습니다. (날짜: {td.date()}, 필터 후: {len(daily)}개)")
+    
+    print(f"[FILTER] 최종 예측 대상 종목 수: {len(daily):,}개")
 
     name_col = "Name" if "Name" in daily.columns else ("name" if "name" in daily.columns else None)
     code_col = "Code" if "Code" in daily.columns else ("code" if "code" in daily.columns else None)
+    
+    if name_col is None or code_col is None:
+        raise ValueError(f"종목명/코드 컬럼을 찾을 수 없습니다. (Name/name, Code/code)")
 
     prob = model_cls.predict_proba(X)[:,1] if model_cls else np.zeros(len(X))
     ret  = model_reg.predict(X) if model_reg else np.zeros(len(X))
-    ret_clip = np.clip(ret, -0.10, None)
+    
+    # [개선] combo 계산 안정화 (상하한 모두 적용 또는 winsorize)
+    # 하방만 클리핑하면 극단값이 combo에 과도하게 반영될 수 있음
+    ret_clip = np.clip(ret, -0.10, 0.20)  # 상방도 제한 (20% 상한)
     combo = prob * ret_clip
 
     df_out = pd.DataFrame({

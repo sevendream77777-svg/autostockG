@@ -1,0 +1,58 @@
+============================================================
+ V52 Final Check: 005930
+------------------------------------------------------------
+ date                 | 20251205        | ✅
+ code                 | 005930          | ✅
+ name                 | Unknown         | ✅
+ market               |                 | ❌
+ listing_status       | Listed          | ✅
+ sector_code          |                 | ❌
+ sector_name          |                 | ❌
+ open                 | 105300.0        | ✅
+ high                 | 108400.0        | ✅
+ low                  | 104600.0        | ✅
+ close                | 108400.0        | ✅
+ volume               | 19739076.0      | ✅
+ amount               | 2139715838400.0 | ✅
+ adj_factor           |                 | ❌
+ vwap                 | 108400.0        | ✅
+ market_cap           |                 | ❌
+ shares_out           |                 | ❌
+ frgn_net_amt         | 0.0             | ✅
+ inst_net_amt         | 0.0             | ✅
+ nps_net_amt          | 0.0             | ✅
+ tust_net_amt         | 0.0             | ✅
+ dealer_net_amt       | 0.0             | ✅
+ frgn_net_qty         | 0.0             | ✅
+ inst_net_qty         | 0.0             | ✅
+ nps_net_qty          | 0.0             | ✅
+ short_sell_amt       | 0.0             | ✅
+ short_sell_qty       | 0.0             | ✅
+ loan_balance_amt     | 0.0             | ✅
+ loan_balance_qty     | 0.0             | ✅
+ announce_date        | 20250331        | ✅
+ revenue              |                 | ❌
+ op_income            |                 | ❌
+ net_income           |                 | ❌
+ total_equity         |                 | ❌
+ total_assets         |                 | ❌
+ cash_flow_op         |                 | ❌
+ cash_flow_inv        |                 | ❌
+ cash_flow_fin        |                 | ❌
+ div_amount           |                 | ❌
+ eps                  |                 | ❌
+ roe                  |                 | ❌
+ usdkrw               | 1472.3800048... | ✅
+ us10y_yield          | 4.1389999389... | ✅
+ kr10y_yield          |                 | ❌
+ wti                  | 60.139999389... | ✅
+ dxy                  | 98.986000061... | ✅
+ cnykrw               | 192.5           | ✅
+ gold                 | 4227.7001953125 | ✅
+ ex_div_date          | 20241229        | ✅
+ earnings_date        | 20250331        | ✅
+ bps                  |                 | ❌
+ debt_ratio           |                 | ❌
+------------------------------------------------------------
+ Score: 32 / 52
+============================================================

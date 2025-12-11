@@ -1,0 +1,16 @@
+🚀 학습 프로세스 시작 (모드: REAL)...
+=== 🚀 Unified HOJ Trainer V31 (REAL) ===
+[CFG] mode=real  horizon=5  input_window=60  valid_days=0  n_estimators=1000
+[DATA] DB max(Date) = 2025-12-05 | rows=6,099,326
+[FEAT] 후보 피처 수 = 21
+[MASK] MaxPeriod=60d | After rows=5,910,027 | Date: 2015-04-01~2025-11-29
+[경고] 일부 종목의 샘플 수가 매우 적습니다 (최소: 4개)
+[HASH] df_m = 6143657654156517345
+[SPLIT] REAL: 전체 5,910,027 학습
+[TRAIN] 모델 학습 완료
+
+💾 엔진 저장 완료: F:\autostockG\MODELENGINE\HOJ_ENGINE\REAL\HOJ_ENGINE_REAL_V31_h5_w60_n1000_251205.pkl
+📄 JSON 저장/업데이트 완료: F:\autostockG\MODELENGINE\INFO\hoj_engine_info\HOJ_ENGINE_REAL_V31_h5_w60_n1000_251205.json
+=== 🏁 Done. ===
+------------------------------------------------------------
+[SUCCESS] Process Finished

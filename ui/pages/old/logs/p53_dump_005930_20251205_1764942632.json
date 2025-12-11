@@ -1,0 +1,234 @@
+{
+  "code": "005930",
+  "date": "20251205",
+  "v53_count": 32,
+  "have": [
+    "amount",
+    "cash_flow_fin",
+    "cash_flow_inv",
+    "cash_flow_op",
+    "close",
+    "cnykrw",
+    "code",
+    "date",
+    "dxy",
+    "eps",
+    "frgn_net_amt",
+    "frgn_net_qty",
+    "gold",
+    "high",
+    "inst_net_amt",
+    "inst_net_qty",
+    "low",
+    "market",
+    "name",
+    "net_income",
+    "op_income",
+    "open",
+    "revenue",
+    "rights_issue_announce_date",
+    "sector_code",
+    "sector_name",
+    "us10y_yield",
+    "usdkrw",
+    "vix",
+    "volume",
+    "vwap",
+    "wti"
+  ],
+  "missing": [
+    "adj_factor",
+    "nps_net_qty",
+    "nps_net_amt",
+    "dealer_net_qty",
+    "dealer_net_amt",
+    "short_sell_qty",
+    "short_sell_amt",
+    "loan_balance_qty",
+    "loan_balance_amt",
+    "theme_code",
+    "theme_name",
+    "sector_index_close",
+    "kr10y_yield",
+    "earnings_announce_date",
+    "earnings_effective_date",
+    "ex_div_date",
+    "div_amount",
+    "split_announce_date",
+    "split_effective_date",
+    "rights_issue_effective_date",
+    "mna_announce_date"
+  ],
+  "result": {
+    "close": 108400.0,
+    "name": "삼성전자",
+    "code": "005930",
+    "date": "20251205",
+    "open": 105300.0,
+    "high": 108400.0,
+    "low": 104600.0,
+    "volume": 19739076.0,
+    "amount": 2110938031640.0,
+    "inst_net_qty": 1838285,
+    "inst_net_amt": 196150053800,
+    "frgn_net_qty": 4058756,
+    "frgn_net_amt": 435663672950,
+    "sector_name": "FICS  반도체 및 관련장비",
+    "sector_code": "278",
+    "usdkrw": 1465.030029296875,
+    "cnykrw": 208.39,
+    "dxy": 98.98999786376953,
+    "us10y_yield": 4.107999801635742,
+    "wti": 59.66999816894531,
+    "gold": 4211.7998046875,
+    "vix": 15.779999732971191,
+    "op_income": 4676057000000.0,
+    "eps": 737.0,
+    "net_income": 5756129000000.0,
+    "revenue": 74566317000000.0,
+    "cash_flow_fin": -14748410000000.0,
+    "cash_flow_inv": -24173503000000.0,
+    "cash_flow_op": 33941002000000.0,
+    "rights_issue_announce_date": "20251204",
+    "market": "KOSPI",
+    "vwap": 106942.0894696388
+  },
+  "source": {
+    "Kiwoom": {
+      "close": "+108400",
+      "name": "삼성전자",
+      "code": "005930",
+      "date": "20251205"
+    },
+    "PyKRX": {
+      "open": 105300.0,
+      "high": 108400.0,
+      "low": 104600.0,
+      "close": 108400.0,
+      "volume": 19739076.0,
+      "amount": 2110938031640.0,
+      "inst_net_qty": 1838285,
+      "inst_net_amt": 196150053800,
+      "frgn_net_qty": 4058756,
+      "frgn_net_amt": 435663672950,
+      "name": "삼성전자",
+      "code": "005930",
+      "date": "20251205"
+    },
+    "NaverSectorTheme": {
+      "sector_name": "반도체와반도체장비",
+      "sector_code": "278"
+    },
+    "FnGuide": {
+      "sector_name": "FICS  반도체 및 관련장비"
+    },
+    "NaverMacro": {
+      "usdkrw": 1473.3,
+      "cnykrw": 208.39
+    },
+    "FDR": {
+      "usdkrw": 1465.030029296875,
+      "dxy": 98.98999786376953,
+      "us10y_yield": 4.107999801635742,
+      "wti": 59.66999816894531,
+      "gold": 4211.7998046875,
+      "vix": 15.779999732971191
+    },
+    "BOK": {},
+    "DART": {
+      "assets": 504875185000000.0,
+      "equity": 504875185000000.0,
+      "liabilities": 105313218000000.0,
+      "op_income": 4676057000000.0,
+      "eps": 737.0,
+      "net_income": 5756129000000.0,
+      "revenue": 74566317000000.0,
+      "cash_flow_fin": -14748410000000.0,
+      "cash_flow_inv": -24173503000000.0,
+      "cash_flow_op": 33941002000000.0,
+      "_dart_year": 2025,
+      "_dart_fs": "CFS",
+      "_dart_rc": "11012"
+    },
+    "DART_EVT": {
+      "rights_issue_announce_date": "20251204"
+    }
+  },
+  "raw": {
+    "Kiwoom": {
+      "close": "+108400",
+      "name": "삼성전자",
+      "code": "005930",
+      "date": "20251205"
+    },
+    "PyKRX": {
+      "open": 105300.0,
+      "high": 108400.0,
+      "low": 104600.0,
+      "close": 108400.0,
+      "volume": 19739076.0,
+      "amount": 2110938031640.0,
+      "inst_net_qty": 1838285,
+      "inst_net_amt": 196150053800,
+      "frgn_net_qty": 4058756,
+      "frgn_net_amt": 435663672950,
+      "name": "삼성전자",
+      "code": "005930",
+      "date": "20251205"
+    },
+    "NaverSectorTheme": {
+      "sector_name": "반도체와반도체장비",
+      "sector_code": "278"
+    },
+    "FnGuide": {
+      "sector_name": "FICS  반도체 및 관련장비"
+    },
+    "NaverMacro": {
+      "usdkrw": 1473.3,
+      "cnykrw": 208.39
+    },
+    "FDR": {
+      "usdkrw": 1465.030029296875,
+      "dxy": 98.98999786376953,
+      "us10y_yield": 4.107999801635742,
+      "wti": 59.66999816894531,
+      "gold": 4211.7998046875,
+      "vix": 15.779999732971191
+    },
+    "BOK": {},
+    "DART": {
+      "assets": 504875185000000.0,
+      "equity": 504875185000000.0,
+      "liabilities": 105313218000000.0,
+      "op_income": 4676057000000.0,
+      "eps": 737.0,
+      "net_income": 5756129000000.0,
+      "revenue": 74566317000000.0,
+      "cash_flow_fin": -14748410000000.0,
+      "cash_flow_inv": -24173503000000.0,
+      "cash_flow_op": 33941002000000.0,
+      "_dart_year": 2025,
+      "_dart_fs": "CFS",
+      "_dart_rc": "11012"
+    },
+    "DART_EVT": {
+      "rights_issue_announce_date": "20251204"
+    }
+  },
+  "notes": {
+    "Kiwoom": [],
+    "PyKRX": [],
+    "NaverSectorTheme": [],
+    "FnGuide": [],
+    "NaverMacro": [],
+    "FDR": [
+      "cnykrw:CNY/KRW err 'timestamp'",
+      "kr10y_yield:KR10YT err 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/KR10YT?period1=1763996400&period2=1764860400&interval=1d&includeAdjustedClose=true",
+      "kr10y_yield:KR10YT=RR alt err 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/KR10YT=RR?period1=1763996400&period2=1764860400&interval=1d&includeAdjustedClose=true",
+      "kr10y_yield:^KTB10Y alt err 404 Client Error: Not Found for url: https://query2.finance.yahoo.com/v8/finance/chart/%5EKTB10Y?period1=1763996400&period2=1764860400&interval=1d&includeAdjustedClose=true"
+    ],
+    "BOK": [],
+    "DART": [],
+    "DART_EVT": []
+  }
+}

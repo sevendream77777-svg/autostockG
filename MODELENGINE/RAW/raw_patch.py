@@ -21,24 +21,27 @@ import os as _os
 import yfinance as yf
 import os.path as _path
 
-# ============================================================
-#  KIWOOM REST API 경로/모듈 설정
-# ============================================================
-KIWOOM_REST_DIR = r"F:\autostockG"
-if KIWOOM_REST_DIR not in sys.path:
-    sys.path.append(KIWOOM_REST_DIR)
-
-# REST API 전용 모듈 가져오기
-try:
-    from kiwoom_rest.token_manager import KiwoomTokenManager
-    from kiwoom_rest.kiwoom_api import KiwoomRestApi
-except ImportError:
-    print("Warning: kiwoom_rest 모듈을 찾을 수 없습니다. 경로를 확인해주세요.")
-
 # ======================
 # 경로 설정
 # ======================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODELENGINE_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
+
+for p in (MODELENGINE_ROOT, PROJECT_ROOT):
+    if p not in sys.path:
+        sys.path.append(p)
+
+KIWOOM_API_DIR = os.path.join(PROJECT_ROOT, "api", "kiwoom_rest")
+KIWOOM_CONFIG_PATH = os.path.join(PROJECT_ROOT, "api", "config.ini")
+KIWOOM_TOKEN_PATH = os.path.join(KIWOOM_API_DIR, "token.json")
+
+# REST API 전용 모듈 가져오기
+try:
+    from api.kiwoom_rest.token_manager import KiwoomTokenManager
+    from api.kiwoom_rest.kiwoom_api import KiwoomRestApi
+except ImportError:
+    print("Warning: api.kiwoom_rest 모듈을 찾을 수 없습니다. 경로를 확인해주세요.")
 STOCKS_DIR = os.path.join(BASE_DIR, "stocks")
 RAW_MAIN = os.path.join(STOCKS_DIR, "all_stocks_cumulative.parquet")
 DAILY_DIR = os.path.join(STOCKS_DIR, "DAILY")
@@ -47,11 +50,6 @@ OHLCV_COLS = ["Open", "High", "Low", "Close", "Volume"]
 
 os.makedirs(DAILY_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
-
-# MODELENGINE 루트 경로를 sys.path에 추가하여 UTIL 모듈 사용
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
 
 from UTIL.config_paths import versioned_filename
 from UTIL.version_utils import save_dataframe_with_date, find_latest_file
@@ -149,15 +147,12 @@ def build_daily_from_kiwoom(date: dt.date, tickers: Optional[List[str]] = None) 
 
     import configparser
     cfg = configparser.ConfigParser()
-    cfg.read(r"F:\autostockG\kiwoom_rest\config.ini")
+    cfg.read(KIWOOM_CONFIG_PATH)
 
     MODE = cfg["SETTINGS"]["MODE"].strip().lower()
     BASE_URL = cfg["SETTINGS"]["BASE_URL_PAPER"] if MODE == "paper" else cfg["SETTINGS"]["BASE_URL"]
 
-    token_mgr = KiwoomTokenManager(
-        config_file=r"F:\autostockG\kiwoom_rest\config.ini",
-        token_file=r"F:\autostockG\kiwoom_rest\token.json"
-    )
+    token_mgr = KiwoomTokenManager(config_file=KIWOOM_CONFIG_PATH, token_file=KIWOOM_TOKEN_PATH)
     token = token_mgr.get_access_token()
 
     if tickers is None:
@@ -432,14 +427,15 @@ if __name__ == "__main__":
                 break
 
         # 시간대 룰 적용
+        # [수정] 오전 시간대에도 오늘 영업일까지 수집하도록 변경
         if not is_trading_day(today):
             target_date = today_biz
         elif dt.time(16,0) <= now_t < dt.time(18,0):
+            # 16-18시: 장 마감 후 데이터 정리 시간대 (전날 영업일만)
             log("[WARN] 16~18시는 전날 영업일 기준으로 업데이트합니다.")
             target_date = prev_biz
-        elif now_t < dt.time(18,0):
-            target_date = prev_biz
         else:
+            # 그 외 시간대(오전/저녁): 오늘 영업일까지 수집
             target_date = today_biz
 
     except Exception as e:

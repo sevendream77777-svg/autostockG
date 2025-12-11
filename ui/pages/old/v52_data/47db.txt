@@ -1,0 +1,61 @@
+PS F:\autostockG\ui\pages\v52_data> python 47db.py
+[2025-12-06 13:01:38.114789] Hybrid Collecting: 005930
+============================================================
+ V52 Hybrid Result: 005930
+------------------------------------------------------------
+ date                   | 20251205           | ✅
+ code                   | 005930             | ✅
+ name                   |   쇱 깆              | ✅
+ market                 | KOSPI              | ✅
+ listing_status         | Listed             | ✅
+ sector_code            |                    | ❌
+ sector_name            | 홈페이지               | ✅
+ open                   | 105300.0           | ✅
+ high                   | 108400.0           | ✅
+ low                    | 104600.0           | ✅
+ close                  | 108400.0           | ✅
+ volume                 | 19739076.0         | ✅
+ amount                 | 2139715838400.0    | ✅
+ adj_factor             | 1.0                | ✅
+ vwap                   | 108400.0           | ✅
+ market_cap             |                    | ❌
+ shares_out             |                    | ❌
+ frgn_net_amt           | 0.0                | ✅
+ inst_net_amt           | 0.0                | ✅
+ nps_net_amt            | 0.0                | ✅
+ tust_net_amt           | 0.0                | ✅
+ dealer_net_amt         | 0.0                | ✅
+ frgn_net_qty           | 0.0                | ✅
+ inst_net_qty           | 0.0                | ✅
+ nps_net_qty            | 0.0                | ✅
+ short_sell_amt         | 0.0                | ✅
+ short_sell_qty         | 0.0                | ✅
+ loan_balance_amt       | 0.0                | ✅
+ loan_balance_qty       | 0.0                | ✅
+ announce_date          | 20250331           | ✅
+ revenue                | 79140503000000.0   | ✅
+ op_income              | 14922900000000.0   | ✅
+ net_income             | 8028407000000.0    | ✅
+ total_equity           | 4403893000000.0    | ✅
+ total_assets           | 516376748000000.0  | ✅
+ cash_flow_op           | 16580866000000.0   | ✅
+ cash_flow_inv          | -6431187000000.0   | ✅
+ cash_flow_fin          | -11341720000000.0  | ✅
+ div_amount             |                    | ❌
+ eps                    | 2098.0             | ✅
+ roe                    |                    | ❌
+ usdkrw                 | 1472.3800048828125 | ✅
+ us10y_yield            | 4.138999938964844  | ✅
+ kr10y_yield            |                    | ❌
+ wti                    | 60.13999938964844  | ✅
+ dxy                    |                    | ❌
+ cnykrw                 | 192.5              | ✅
+ gold                   | 4197.60009765625   | ✅
+ ex_div_date            | 20241229           | ✅
+ earnings_date          | 20250331           | ✅
+ bps                    | 62864.0            | ✅
+ debt_ratio             |                    | ❌
+------------------------------------------------------------
+ Score: 44 / 52
+============================================================
+PS F:\autostockG\ui\pages\v52_data>

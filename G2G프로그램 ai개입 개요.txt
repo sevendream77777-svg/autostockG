@@ -1,0 +1,182 @@
+아래는 위 흐름을 HOJ(일반)·SLE(재무)·LGBM·AI 결합 기준으로, 어디에 AI가 개입하면 좋은지를 전 단계에 꽉 채워 설계한 “실전형 전체 구조도”다.
+(각 블록: 입력 ▶ 처리 ▶ 출력, 굵은 글씨 = AI 개입 포인트)
+
+0. 공통 규칙(누수·오염 방지)
+
+시간축: 과거→미래 단방향, announce_date 이후만 재무 반영(FFill)
+
+스냅샷 버전: YYYYMMDD_HHMMSS(원천/파생/모델/포트 전부 동일 버저닝)
+
+스키마 잠금: 컬럼 추가/삭제 시 AI 사전 검사 통과 후 배포
+
+1. 데이터 수집 (RAW Ingestion)
+
+입력: KRX/네이버/pykrx(일반, HOJ), DART(재무, SLE), 거시·환율·원자재
+처리:
+
+크롤·API 병렬 수집, 키 로테이션, 리트라이/백오프
+
+압축 저장(Parquet), 무결성 해시
+AI 개입:
+
+이상치 감지: 거래량·가격·환율 급변 시 경보/격리
+
+스키마 드리프트 감시: 컬럼/단위 변동 자동 차단
+
+누락 채움 제안: 휴장/결측 패턴 학습 후 보정 가이드
+출력: /RAW/HOJ_YYYYMMDD.parquet, /RAW/SLE_YYYYMMDD.parquet
+
+2. 모든 데이터 업데이트 (정제·동기화)
+
+입력: RAW 스냅샷
+처리:
+
+중복/결측/단위 통일, 심볼 변경 매핑(상폐/합병), 분할/배당락 조정
+
+SLE는 announce_date 기준 정렬, HOJ에 붙일 준비
+AI 개입:
+
+정합성 검사: 총주식수/시총/액면병합 전후 불연속 탐지
+
+정책 엔진: 드문 이벤트(합병/코드변경) 자동 룰 업데이트
+출력: /CURATED/HOJ_*.parquet, /CURATED/SLE_*.parquet
+
+3. 피처 생성 (Feature Engineering)
+
+입력: CURATED(HOJ/SLE)
+처리:
+
+HOJ: 일별 가격/수급/거시 파생(수익률·모멘텀·변동성·회전율 등)
+
+SLE: 분기 재무 → TTM/YoY/마진/레버리지/FCF 등 파생
+
+병합: announce_date 이후 HOJ에 SLE FFill 부착
+AI 개입:
+
+자동 파생 제너레이터: 수십~수백 개 후보 파생 생성, 유효성/누수 스크리닝
+
+중복·공선성 제거: VIF·상관·MI 기반 컬럼 축소
+
+스케일링/표준화 정책 추천: 분포별 최적 변환(Box-Cox/RankGauss 등)
+출력: /FEATURE/FEAT_YYYYMMDD.parquet (+ 컬럼사전 JSON)
+
+4. Train (학습·검증)
+
+입력: FEATURE 스냅샷, 타겟 정의(y: 5일 수익률 등)
+처리:
+
+시계열 분할(예: Expanding/Walk-forward), K-Fold(TimeSeriesSplit)
+
+LightGBM/XGBoost/Linear/NN 후보 학습
+AI 개입:
+
+하이퍼튜닝 오케스트레이터: LGBM 파라미터 Bayesian/Optuna로 자동 탐색
+
+데이터누수 탐지: 시계열 위반/미래 컬럼/정렬 오류 자동 차단
+
+메트릭 패널: Sharpe, Turnover, HitRate, Calib(예측-실현) 자동 리포트
+출력: /MODEL_CAND/…/lgbm_v###.pkl, 검증 리포트(.html/.md)
+
+5. 엔진 생성 (선정·앙상블·캘리브레이션)
+
+입력: MODEL_CAND + 검증 리포트
+처리:
+
+상위 후보 앙상블(가중 평균/스태킹), 예측 확률 교정(Platt/Isotonic)
+
+위험제약(섹터/종목 한도), 거래비용·슬리피지 반영
+AI 개입:
+
+모델 선택사관: 드리프트·일자별 안정도 고려해 “실전형”만 채택
+
+리스크 엔진: 변동성·상관 기반 비중 규제안 제시
+
+캘리브레이션 튜너: 과대확신 억제, 예측-실현 갭 최소화
+출력: /ENGINE/engine_YYYYMMDD.pkg (모델+전처리+스케일러+규칙 포함)
+
+6. 최신데이터에 엔진 적용 (Inference)
+
+입력: 당일 FEATURE (D-0 08:30 등) + ENGINE
+처리:
+
+실시간 스코어링, TopN 랭킹, 비중 산출
+
+거래제약(유동성/가격대/상폐경보) 필터
+AI 개입:
+
+상황별 보정: 공포/탐욕, FOMC 주간, 실적시즌 등 가중치 동적 조정
+
+거래비용 시뮬: 예상 체결가/체결확률 추정으로 실현수익 보정
+출력: /SIGNAL/signal_YYYYMMDD.csv (종목·점수·비중·진입가·손절·익절)
+
+7. 예측결과 생성 (포트 구성·시뮬레이션)
+
+입력: SIGNAL
+처리:
+
+포트폴리오 최적화(단순 규칙→HRP/리스크패리티), 체결 로직
+
+체결 로그/미체결 사유 기록
+AI 개입:
+
+포트 전략 선택기: 변동성 국면에 맞춰 “공격/중립/수비” 전환
+
+시뮬·백테 자동화: D-1 대비 개선폭·MDD 제어안 산출
+출력: /PORT/port_YYYYMMDD.csv, 체결 리포트
+
+8. AI 종목 해설 (설명·감사 가능성)
+
+입력: SIGNAL/PORT + 모형 내 중요도/SHAP
+처리:
+
+종목별 “왜 선택/제외” 서술, 리스크 포인트, 대안 종목
+AI 개입:
+
+설명가능성(XAI): SHAP/Permutation 기반 요약
+
+페어 비교: 같은 섹터 내 대체 후보 제시
+출력: /REPORT/explain_YYYYMMDD.md(pdf)
+
+9. 자료 출력·배포 (Dashboard/MLOps)
+
+입력: 위 전 결과물
+처리:
+
+대시보드(성능·드리프트·거래로그), 알림(슬랙/텔레그램)
+
+모델/데이터 아카이브, 롤백 스위치
+AI 개입:
+
+모니터링 봇: 성능 급변/드리프트·오류 즉시 알림 + 자동 완화 시나리오
+
+릴리즈 매니저: Canary(소액) → Full 전개 자동 전환
+
+운영 체크리스트(핵심 KPI/Guardrail)
+
+누수지수(LeakIndex)=0 유지, 스플릿 규칙 위반=즉시 배포 차단
+
+실전 HitRate, 슬리피지 보정 수익률, Turnover, MDD, Calib Error
+
+드리프트(특징 분포/성능) 임계 초과 시 AI가 자동 재튜닝/롤백
+
+파일/버전 네이밍(예)
+
+RAW: RAW_HOJ_20251211.parquet, RAW_SLE_20251211.parquet
+
+FEATURE: FEAT_20251211_v36_11.parquet
+
+MODEL: lgbm_5d_v027_20251211.pkl
+
+ENGINE: engine_lgbm5d_v027_20251211.pkg
+
+SIGNAL/PORT/REPORT 동일 날짜 버전으로 동기화
+
+바로 적용할 “AI 모듈” 우선순위
+
+누수/오염 탐지 + 스키마 드리프트 가드(가성비 최상)
+
+자동 파생 생성/선별 + 하이퍼튜닝 오케스트레이터
+
+상황별 가중치 보정 + 리스크 제약 엔진
+
+XAI 해설 + 경보/자동 롤백 봇

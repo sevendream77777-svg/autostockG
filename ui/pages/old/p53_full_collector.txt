@@ -1,0 +1,19 @@
+PS F:\autostockg\ui\pages> python p53_full_collector.py
+[22:14:57] === p53 Collector Start: code=005930, date=20251205 ===
+[22:14:57] >>> Kiwoom
+[22:14:57]     raw/norm keys: 0 | sample:
+[22:14:57] >>> PyKRX
+[22:15:06]     raw/norm keys: 8 | sample: amount=None; close=108400.0; high=108400.0; inst_net_amt=196150053800; inst_net_qty=1838285; low=104600.0; open=105300.0; volume=19739076.0
+[22:15:06] >>> Naver Macro
+[22:15:08]     raw/norm keys: 2 | sample: cnykrw=208.37; usdkrw=1473.1
+[22:15:08] >>> FDR Macro
+[22:15:25]     raw/norm keys: 6 | sample: dxy=98.98999786376953; gold=4211.7998046875; us10y_yield=4.107999801635742; usdkrw=1465.030029296875; vix=15.779999732971191; wti=59.66999816894531
+[22:15:25] >>> FnGuide
+[22:15:26]     raw/norm keys: 1 | sample: sector_name=FICS  반도체 및 관련장비
+[22:15:26] >>> DART Finance
+[22:15:30]     raw/norm keys: 13 | sample: _dart_fs=CFS; _dart_rc=11012; _dart_year=2025; assets=504875185000000.0; cash_flow_fin=-14748410000000.0; cash_flow_inv=-24173503000000.0; cash_flow_op=33941002000000.0; eps=737.0; equity=504875185000000.0; liabilities=105313218000000.0
+[22:15:30]
+[22:15:30] [RESULT] V53 확보: 23/53 (43.4%)
+[22:15:30] [HAVE]   cash_flow_fin, cash_flow_inv, cash_flow_op, close, cnykrw, dxy, eps, gold, high, inst_net_amt, inst_net_qty, low, market, net_income, op_income, open, revenue, sector_name, us10y_yield, usdkrw, vix, volume, wti
+[22:15:30] [MISS]   date, code, name, amount, adj_factor, vwap, frgn_net_qty, frgn_net_amt, nps_net_qty, nps_net_amt, dealer_net_qty, dealer_net_amt, short_sell_qty, short_sell_amt, loan_balance_qty, loan_balance_amt, sector_code, theme_code, theme_name, sector_index_close, kr10y_yield, earnings_announce_date, earnings_effective_date, ex_div_date, div_amount, split_announce_date, split_effective_date, rights_issue_announce_date, rights_issue_effective_date, mna_announce_date
+[22:15:30] [ERROR] save failed: Object of type int64 is not JSON serializable

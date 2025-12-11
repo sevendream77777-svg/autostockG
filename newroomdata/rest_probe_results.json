@@ -1,0 +1,2246 @@
+[
+  {
+    "api_id": "au10001",
+    "sheet": "접근토큰 발급(au10001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:42.004+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "au10002",
+    "sheet": "접근토큰폐기(au10002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:43.787+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka00198",
+    "sheet": "실시간종목조회순위(ka00198)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:45.455+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka01690",
+    "sheet": "일별잔고수익률(ka01690)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:47.331+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10001",
+    "sheet": "주식기본정보요청(ka10001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:48.990+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10002",
+    "sheet": "주식거래원요청(ka10002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:50.573+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10003",
+    "sheet": "체결정보요청(ka10003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:52.491+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10004",
+    "sheet": "주식호가요청(ka10004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:54.319+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10005",
+    "sheet": "주식일주월시분요청(ka10005)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:56.147+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10006",
+    "sheet": "주식시분요청(ka10006)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:57.808+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10007",
+    "sheet": "시세표성정보요청(ka10007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:14:59.841+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10008",
+    "sheet": "주식외국인종목별매매동향(ka10008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:01.481+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10009",
+    "sheet": "주식기관요청(ka10009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:03.830+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10010",
+    "sheet": "업종프로그램요청(ka10010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:05.902+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10011",
+    "sheet": "신주인수권전체시세요청(ka10011)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:07.552+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10013",
+    "sheet": "신용매매동향요청(ka10013)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:10.271+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10014",
+    "sheet": "공매도추이요청(ka10014)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:11.931+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10015",
+    "sheet": "일별거래상세요청(ka10015)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:13.575+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10016",
+    "sheet": "신고저가요청(ka10016)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:15.172+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10017",
+    "sheet": "상하한가요청(ka10017)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:16.787+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10018",
+    "sheet": "고저가근접요청(ka10018)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:18.476+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10019",
+    "sheet": "가격급등락요청(ka10019)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:20.147+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10020",
+    "sheet": "호가잔량상위요청(ka10020)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:21.787+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10021",
+    "sheet": "호가잔량급증요청(ka10021)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:23.440+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10022",
+    "sheet": "잔량율급증요청(ka10022)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:25.138+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10023",
+    "sheet": "거래량급증요청(ka10023)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:26.767+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10024",
+    "sheet": "거래량갱신요청(ka10024)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:29.331+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10025",
+    "sheet": "매물대집중요청(ka10025)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:31.951+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10026",
+    "sheet": "고저PER요청(ka10026)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -999,
+    "return_msg": "Network Error: HTTPSConnectionPool(host='api.kiwoom.com', port=443): Read timed out. (read timeout=5)",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10027",
+    "sheet": "전일대비등락률상위요청(ka10027)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:40.136+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10028",
+    "sheet": "시가대비등락률요청(ka10028)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:41.869+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10029",
+    "sheet": "예상체결등락률상위요청(ka10029)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:44.031+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10030",
+    "sheet": "당일거래량상위요청(ka10030)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:45.691+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10031",
+    "sheet": "전일거래량상위요청(ka10031)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:47.540+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10032",
+    "sheet": "거래대금상위요청(ka10032)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:49.379+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10033",
+    "sheet": "신용비율상위요청(ka10033)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:52.491+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10034",
+    "sheet": "외인기간별매매상위요청(ka10034)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:54.128+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10035",
+    "sheet": "외인연속순매매상위요청(ka10035)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:56.026+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10036",
+    "sheet": "외인한도소진율증가상위(ka10036)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:57.762+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10037",
+    "sheet": "외국계창구매매상위요청(ka10037)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:15:59.525+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10038",
+    "sheet": "종목별증권사순위요청(ka10038)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:01.286+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10039",
+    "sheet": "증권사별매매상위요청(ka10039)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:03.410+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10040",
+    "sheet": "당일주요거래원요청(ka10040)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:05.027+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10042",
+    "sheet": "순매수거래원순위요청(ka10042)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:06.670+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10043",
+    "sheet": "거래원매물대분석요청(ka10043)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:08.238+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10044",
+    "sheet": "일별기관매매종목요청(ka10044)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:09.829+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10045",
+    "sheet": "종목별기관매매추이요청(ka10045)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:11.760+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10046",
+    "sheet": "체결강도추이시간별요청(ka10046)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:13.662+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10047",
+    "sheet": "체결강도추이일별요청(ka10047)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:15.285+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10048",
+    "sheet": "ELW일별민감도지표요청(ka10048)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:17.202+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10050",
+    "sheet": "ELW민감도지표요청(ka10050)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:18.795+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10051",
+    "sheet": "업종별투자자순매수요청(ka10051)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:20.390+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10052",
+    "sheet": "거래원순간거래량요청(ka10052)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:22.209+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10053",
+    "sheet": "당일상위이탈원요청(ka10053)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:24.056+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10054",
+    "sheet": "변동성완화장치발동종목요청(ka10054)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:25.678+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10055",
+    "sheet": "당일전일체결량요청(ka10055)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:27.327+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10058",
+    "sheet": "투자자별일별매매종목요청(ka10058)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:28.969+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10059",
+    "sheet": "종목별투자자기관별요청(ka10059)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:30.500+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10060",
+    "sheet": "종목별투자자기관별차트요청(ka10060)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:32.122+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10061",
+    "sheet": "종목별투자자기관별합계요청(ka10061)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:34.788+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10062",
+    "sheet": "동일순매매순위요청(ka10062)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:36.650+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10063",
+    "sheet": "장중투자자별매매요청(ka10063)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:38.260+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10064",
+    "sheet": "장중투자자별매매차트요청(ka10064)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:40.590+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10065",
+    "sheet": "장중투자자별매매상위요청(ka10065)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:42.299+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10066",
+    "sheet": "장마감후투자자별매매요청(ka10066)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:43.994+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10068",
+    "sheet": "대차거래추이요청(ka10068)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:45.657+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10069",
+    "sheet": "대차거래상위10종목요청(ka10069)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:47.287+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10072",
+    "sheet": "일자별종목별실현손익요청_일자(ka10072)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:49.930+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10073",
+    "sheet": "일자별종목별실현손익요청_기간(ka10073)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:51.759+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10074",
+    "sheet": "일자별실현손익요청(ka10074)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:53.337+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10075",
+    "sheet": "미체결요청(ka10075)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:54.956+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10076",
+    "sheet": "체결요청(ka10076)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:56.483+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10077",
+    "sheet": "당일실현손익상세요청(ka10077)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:58.080+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10078",
+    "sheet": "증권사별종목매매동향요청(ka10078)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:16:59.842+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10079",
+    "sheet": "주식틱차트조회요청(ka10079)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:01.580+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10080",
+    "sheet": "주식분봉차트조회요청(ka10080)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:04.275+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10081",
+    "sheet": "주식일봉차트조회요청(ka10081)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:06.080+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10082",
+    "sheet": "주식주봉차트조회요청(ka10082)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:07.741+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10083",
+    "sheet": "주식월봉차트조회요청(ka10083)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:09.426+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10084",
+    "sheet": "당일전일체결요청(ka10084)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:11.133+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10085",
+    "sheet": "계좌수익률요청(ka10085)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:12.790+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10086",
+    "sheet": "일별주가요청(ka10086)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:14.647+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10087",
+    "sheet": "시간외단일가요청(ka10087)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:16.305+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10088",
+    "sheet": "미체결 분할주문 상세(ka10088)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:18.060+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10094",
+    "sheet": "주식년봉차트조회요청(ka10094)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:19.740+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10095",
+    "sheet": "관심종목정보요청(ka10095)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:21.579+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10098",
+    "sheet": "시간외단일가등락율순위요청(ka10098)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:23.269+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10099",
+    "sheet": "종목정보 리스트(ka10099)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:25.079+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10100",
+    "sheet": "종목정보 조회(ka10100)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:26.986+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10101",
+    "sheet": "업종코드 리스트(ka10101)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:28.992+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10102",
+    "sheet": "회원사 리스트(ka10102)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:33.715+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10131",
+    "sheet": "기관외국인연속매매현황요청(ka10131)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:36.353+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10170",
+    "sheet": "당일매매일지요청(ka10170)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:40.999+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10171",
+    "sheet": "조건검색 목록조회(ka10171)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:43.179+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10172",
+    "sheet": "조건검색 요청 일반(ka10172)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:44.764+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10173",
+    "sheet": "조건검색 요청 실시간(ka10173)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:46.485+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka10174",
+    "sheet": "조건검색 실시간 해제(ka10174)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:48.602+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20001",
+    "sheet": "업종현재가요청(ka20001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:50.751+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20002",
+    "sheet": "업종별주가요청(ka20002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:52.789+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20003",
+    "sheet": "전업종지수요청(ka20003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:54.899+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20004",
+    "sheet": "업종틱차트조회요청(ka20004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:17:58.130+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20005",
+    "sheet": "업종분봉조회요청(ka20005)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:01.341+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20006",
+    "sheet": "업종일봉조회요청(ka20006)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:03.482+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20007",
+    "sheet": "업종주봉조회요청(ka20007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:06.886+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20008",
+    "sheet": "업종월봉조회요청(ka20008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:09.040+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20009",
+    "sheet": "업종현재가일별요청(ka20009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:10.830+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20019",
+    "sheet": "업종년봉조회요청(ka20019)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:12.928+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka20068",
+    "sheet": "대차거래추이요청(종목별)(ka20068)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:15.446+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30001",
+    "sheet": "ELW가격급등락요청(ka30001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:17.661+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30002",
+    "sheet": "거래원별ELW순매매상위요청(ka30002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:19.699+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30003",
+    "sheet": "ELWLP보유일별추이요청(ka30003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:21.858+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30004",
+    "sheet": "ELW괴리율요청(ka30004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:23.973+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30005",
+    "sheet": "ELW조건검색요청(ka30005)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:26.038+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30009",
+    "sheet": "ELW등락율순위요청(ka30009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:28.260+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30010",
+    "sheet": "ELW잔량순위요청(ka30010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:30.149+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30011",
+    "sheet": "ELW근접율요청(ka30011)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:32.311+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka30012",
+    "sheet": "ELW종목상세정보요청(ka30012)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:34.688+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40001",
+    "sheet": "ETF수익율요청(ka40001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:37.126+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40002",
+    "sheet": "ETF종목정보요청(ka40002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:39.358+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40003",
+    "sheet": "ETF일별추이요청(ka40003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:41.534+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40004",
+    "sheet": "ETF전체시세요청(ka40004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:43.698+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40006",
+    "sheet": "ETF시간대별추이요청(ka40006)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:45.851+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40007",
+    "sheet": "ETF시간대별체결요청(ka40007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:47.895+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40008",
+    "sheet": "ETF일자별체결요청(ka40008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:50.411+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40009",
+    "sheet": "ETF시간대별체결요청(ka40009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:52.162+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka40010",
+    "sheet": "ETF시간대별추이요청(ka40010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:54.399+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50010",
+    "sheet": "금현물체결추이(ka50010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:56.390+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50012",
+    "sheet": "금현물일별추이(ka50012)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:18:58.439+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50079",
+    "sheet": "금현물틱차트조회요청(ka50079)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:00.703+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50080",
+    "sheet": "금현물분봉차트조회요청(ka50080)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:05.853+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50081",
+    "sheet": "금현물일봉차트조회요청(ka50081)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:08.241+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50082",
+    "sheet": "금현물주봉차트조회요청(ka50082)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:10.270+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50083",
+    "sheet": "금현물월봉차트조회요청(ka50083)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:11.903+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50087",
+    "sheet": "금현물예상체결(ka50087)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:13.753+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50091",
+    "sheet": "금현물당일틱차트조회요청(ka50091)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:15.344+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50092",
+    "sheet": "금현물당일분봉차트조회요청(ka50092)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:16.990+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50100",
+    "sheet": "금현물 시세정보(ka50100)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:18.628+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka50101",
+    "sheet": "금현물 호가(ka50101)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:20.460+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka52301",
+    "sheet": "금현물투자자현황(ka52301)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:22.372+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90001",
+    "sheet": "테마그룹별요청(ka90001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:24.030+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90002",
+    "sheet": "테마구성종목요청(ka90002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:25.602+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90003",
+    "sheet": "프로그램순매수상위50요청(ka90003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:27.166+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90004",
+    "sheet": "종목별프로그램매매현황요청(ka90004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:28.760+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90005",
+    "sheet": "프로그램매매추이요청 시간대별(ka90005)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:30.354+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90006",
+    "sheet": "프로그램매매차익잔고추이요청(ka90006)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:31.952+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90007",
+    "sheet": "프로그램매매누적추이요청(ka90007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:33.613+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90008",
+    "sheet": "종목시간별프로그램매매추이요청(ka90008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:35.221+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90009",
+    "sheet": "외국인기관매매상위요청(ka90009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:37.090+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90010",
+    "sheet": "프로그램매매추이요청 일자별(ka90010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:38.731+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90012",
+    "sheet": "대차거래내역요청(ka90012)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:40.352+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "ka90013",
+    "sheet": "종목일별프로그램매매추이요청(ka90013)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:41.949+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00001",
+    "sheet": "예수금상세현황요청(kt00001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:43.486+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00002",
+    "sheet": "일별추정예탁자산현황요청(kt00002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:46.034+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00003",
+    "sheet": "추정자산조회요청(kt00003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:47.627+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00004",
+    "sheet": "계좌평가현황요청(kt00004)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:49.243+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00005",
+    "sheet": "체결잔고요청(kt00005)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:51.875+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00007",
+    "sheet": "계좌별주문체결내역상세요청(kt00007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:53.415+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00008",
+    "sheet": "계좌별익일결제예정내역요청(kt00008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:54.973+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00009",
+    "sheet": "계좌별주문체결현황요청(kt00009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:56.766+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00010",
+    "sheet": "주문인출가능금액요청(kt00010)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:19:58.389+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00011",
+    "sheet": "증거금율별주문가능수량조회요청(kt00011)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:00.092+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00012",
+    "sheet": "신용보증금율별주문가능수량조회요청(kt00012)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:01.632+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00013",
+    "sheet": "증거금세부내역조회요청(kt00013)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:04.210+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00015",
+    "sheet": "위탁종합거래내역요청(kt00015)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:07.035+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00016",
+    "sheet": "일별계좌수익률상세현황요청(kt00016)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:08.687+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00017",
+    "sheet": "계좌별당일현황요청(kt00017)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:10.477+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt00018",
+    "sheet": "계좌평가잔고내역요청(kt00018)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:12.170+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10000",
+    "sheet": "주식 매수주문(kt10000)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:13.789+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10001",
+    "sheet": "주식 매도주문(kt10001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:15.446+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10002",
+    "sheet": "주식 정정주문(kt10002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:17.013+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10003",
+    "sheet": "주식 취소주문(kt10003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:18.307+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10006",
+    "sheet": "신용 매수주문(kt10006)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:19.652+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10007",
+    "sheet": "신용 매도주문(kt10007)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:21.651+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10008",
+    "sheet": "신용 정정주문(kt10008)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:26.739+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt10009",
+    "sheet": "신용 취소주문(kt10009)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:28.877+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt20016",
+    "sheet": "신용융자 가능종목요청(kt20016)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:30.986+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt20017",
+    "sheet": "신용융자 가능문의(kt20017)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:32.829+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50000",
+    "sheet": "금현물 매수주문(kt50000)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:35.258+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50001",
+    "sheet": "금현물 매도주문(kt50001)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:37.649+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50002",
+    "sheet": "금현물 정정주문(kt50002)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:39.685+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50003",
+    "sheet": "금현물 취소주문(kt50003)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:41.837+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50020",
+    "sheet": "금현물 잔고확인(kt50020)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:44.019+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50021",
+    "sheet": "금현물 예수금(kt50021)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:46.171+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50030",
+    "sheet": "금현물 주문체결전체조회(kt50030)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:48.497+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50031",
+    "sheet": "금현물 주문체결조회(kt50031)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:50.584+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50032",
+    "sheet": "금현물 거래내역조회(kt50032)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:52.586+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  },
+  {
+    "api_id": "kt50075",
+    "sheet": "금현물 미체결조회(kt50075)",
+    "url": "/api/dostk/stkinfo",
+    "method": "POST",
+    "return_code": -400,
+    "return_msg": "HTTP Error: {\"date\":\"2025-12-04T13:20:54.765+0000\",\"error\":\"BAD_REQUEST\",\"status\":400,\"message\":\"Required request body is missing\"}",
+    "keys": [
+      "return_code",
+      "return_msg"
+    ]
+  }
+]
