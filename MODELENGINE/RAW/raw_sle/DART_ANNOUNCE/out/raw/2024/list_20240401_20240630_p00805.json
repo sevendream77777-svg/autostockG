@@ -1,0 +1,186 @@
+{
+  "status": "000",
+  "message": "정상",
+  "page_no": 805,
+  "page_count": 100,
+  "total_count": 80416,
+  "total_page": 805,
+  "list": [
+    {
+      "corp_code": "00154842",
+      "corp_name": "파라다이스호텔부산",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003650",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01551228",
+      "corp_name": "포운",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003624",
+      "flr_nm": "회계법인길인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01360486",
+      "corp_name": "피피이씨글로벌김치",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003662",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00444578",
+      "corp_name": "피피이씨음성나물",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003661",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00444675",
+      "corp_name": "피피이씨음성생면",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003653",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00444505",
+      "corp_name": "피피이씨의령",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003655",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00918347",
+      "corp_name": "한국웰드텍",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003647",
+      "flr_nm": "대원공인회계사감사반(제239호)",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01617764",
+      "corp_name": "한국초저온",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003677",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01719804",
+      "corp_name": "한국초저온인천",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003680",
+      "flr_nm": "삼일회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01675494",
+      "corp_name": "한성알루미늄",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003652",
+      "flr_nm": "회계법인하나로",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "01637421",
+      "corp_name": "한영아이앤피",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003617",
+      "flr_nm": "회계법인길인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00891925",
+      "corp_name": "항진축산제2공장",
+      "stock_code": "",
+      "corp_cls": "E",
+      "report_nm": "감사보고서 (2023.12)",
+      "rcept_no": "20240329003625",
+      "flr_nm": "성현회계법인",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00164618",
+      "corp_name": "현대사료",
+      "stock_code": "016790",
+      "corp_cls": "K",
+      "report_nm": "사외이사의선임ㆍ해임또는중도퇴임에관한신고",
+      "rcept_no": "20240329003636",
+      "flr_nm": "현대사료",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00246620",
+      "corp_name": "케이엘넷",
+      "stock_code": "039420",
+      "corp_cls": "K",
+      "report_nm": "주요사항보고서(자기주식처분결정)",
+      "rcept_no": "20240329003660",
+      "flr_nm": "케이엘넷",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00976615",
+      "corp_name": "틸론",
+      "stock_code": "217880",
+      "corp_cls": "N",
+      "report_nm": "주요사항보고서(자기주식취득결정)",
+      "rcept_no": "20240329003638",
+      "flr_nm": "틸론",
+      "rcept_dt": "20240401",
+      "rm": ""
+    },
+    {
+      "corp_code": "00409681",
+      "corp_name": "아스트",
+      "stock_code": "067390",
+      "corp_cls": "K",
+      "report_nm": "[기재정정]주요사항보고서(유상증자결정)",
+      "rcept_no": "20240329003614",
+      "flr_nm": "아스트",
+      "rcept_dt": "20240401",
+      "rm": ""
+    }
+  ]
+}

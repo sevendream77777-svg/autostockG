@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Set
 from multiprocessing import Pool, cpu_count
 from datetime import datetime, timedelta
+import re
 import threading
 import random
 import ast
@@ -35,6 +36,12 @@ try:
     import yfinance as yf
 except ImportError:
     yf = None
+
+# 실시간 로그 출력(tee 사용 시 버퍼링 완화)
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
 
 # --------------------------------------------------------------------------- #
 # 경로 및 공용 설정
@@ -63,6 +70,7 @@ _RATE_LOCK = threading.Lock()
 _LAST_CALL: Dict[str, float] = {}
 _MIN_INTERVAL = {"naver": float(os.environ.get("RATE_LIMIT_NAVER", "0.3"))}
 _RATE_FILES = {"naver": CACHE_DIR / ".rate_naver"}
+SKIP_FRGN_RATIO = False
 
 def _throttle(domain: str):
     interval = _MIN_INTERVAL.get(domain)
@@ -136,7 +144,7 @@ def safe_request(method: str, url: str, **kwargs) -> requests.Response:
     if proxy:
         kwargs.setdefault("proxies", proxy)
     headers = kwargs.pop("headers", {}) or {}
-    headers.setdefault("User-Agent", "Mozilla/5.0 (raw_v48 nodart safe)")
+    headers.setdefault("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     headers.setdefault("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
     kwargs["headers"] = headers
     kwargs.setdefault("timeout", 10)
@@ -157,6 +165,13 @@ def safe_request(method: str, url: str, **kwargs) -> requests.Response:
             if attempt == tries - 1:
                 raise
             time.sleep(0.5 * (2 ** attempt) + random.uniform(0, 0.3))
+
+def _has_coverage(df: pd.DataFrame, start: str, end: str) -> bool:
+    if df is None or df.empty or "date" not in df.columns:
+        return False
+    dmin = df["date"].astype(str).min()
+    dmax = df["date"].astype(str).max()
+    return (dmin <= str(start)) and (dmax >= str(end))
 
 # --------------------------------------------------------------------------- #
 # [NEW] 원자적 저장 및 이어받기 유틸리티
@@ -240,6 +255,10 @@ YFINANCE_TICKERS = {
     "gold": "GC=F",
     "dxy": "DX-Y.NYB",
     "vix": "^VIX",
+    # 추가 매크로 우회
+    "usdkrw": "KRW=X",   # USD/KRW 환율
+    "cnykrw": "CNYKRW=X",# CNY/KRW 환율 (존재 안 하면 빈 DF)
+    "usdcny": "CNY=X",   # USD/CNY 환율
 }
 
 _MACRO_CACHE: Dict[str, pd.DataFrame] = {}
@@ -262,17 +281,21 @@ def load_macro_yfinance(key: str, start_date: str, end_date: str) -> pd.DataFram
 
     cache_path = CACHE_DIR / f"yf_{key}.parquet"
     df = _cache_read_df(cache_path)
-    if df is not None:
-        mask = (df["Date"] >= start_date) & (df["Date"] <= end_date)
-        out = df[mask].copy()
-        if key == "us10y_yield":
-            out[key] = out[key] / 10.0
-        _MACRO_CACHE[cache_key] = out
-        return out
+    if df is not None and not df.empty:
+        min_d, max_d = df["Date"].min(), df["Date"].max()
+        need_refresh = (start_date < min_d) or (end_date > max_d)
+        if not need_refresh:
+            mask = (df["Date"] >= start_date) & (df["Date"] <= end_date)
+            out = df[mask].copy()
+            if key == "us10y_yield":
+                out[key] = out[key] / 10.0
+            _MACRO_CACHE[cache_key] = out
+            return out
 
     try:
         data = yf.Ticker(YFINANCE_TICKERS[key])
-        hist = data.history(period="11y")
+        # 오래된 구간까지 커버하기 위해 최대 기간 조회
+        hist = data.history(period="max")
         if hist.empty:
             return pd.DataFrame()
         df = hist[["Close"]].reset_index()
@@ -288,7 +311,9 @@ def load_macro_yfinance(key: str, start_date: str, end_date: str) -> pd.DataFram
         out = df[mask].copy()
         _MACRO_CACHE[cache_key] = out
         return out
-    except Exception:
+    except Exception as e:
+        if isinstance(e, ValueError):
+            raise
         return pd.DataFrame()
 
 def read_ecos_key() -> str:
@@ -411,8 +436,8 @@ def safe_pykrx_call(func, *args, **kwargs):
     """
     max_retries = 3
     
-    # [Jitter] 호출 전 랜덤 대기 (동시 접속 분산)
-    time.sleep(random.uniform(0.5, 2.0))
+    # [Jitter] 호출 전 랜덤 대기 (동시 접속 분산) - 단축
+    time.sleep(random.uniform(0.2, 0.5))
     
     for i in range(max_retries):
         try:
@@ -438,7 +463,32 @@ def _collect_price_pykrx(code: str, start: str, end: str) -> pd.DataFrame:
     if df is None or df.empty:
         raise ValueError("pykrx_empty")
     df = df.reset_index()
-    df.columns = ["date", "open", "high", "low", "close", "volume", "amount"]
+    # pykrx가 거래대금 없이 등락률만 줄 수도 있어 안전 매핑 적용
+    col_map = {
+        "날짜": "date",
+        "시가": "open",
+        "고가": "high",
+        "저가": "low",
+        "종가": "close",
+        "거래량": "volume",
+        "거래대금": "amount",
+    }
+    df = df.rename(columns=col_map)
+    required = ["date", "open", "high", "low", "close", "volume"]
+    for c in required:
+        if c not in df.columns:
+            raise ValueError(f"pykrx_missing_col:{c}")
+    # 거래대금 누락 시 종가*거래량으로 근사 (데이터 오염 방어)
+    close_val = pd.to_numeric(df["close"], errors="coerce").astype("float64")
+    volume_val = pd.to_numeric(df["volume"], errors="coerce").astype("float64")
+    if "amount" not in df.columns:
+        df["amount"] = close_val * volume_val
+    else:
+        df["amount"] = pd.to_numeric(df["amount"], errors="coerce").astype("float64")
+        miss_amt = df["amount"].isna()
+        if miss_amt.any():
+            df.loc[miss_amt, "amount"] = (close_val * volume_val)
+    df = df[["date", "open", "high", "low", "close", "volume", "amount"]]
     df["date"] = df["date"].astype(str).str.replace("-", "")
     df["code"] = code
     df["adj_factor"] = 1.0
@@ -466,7 +516,8 @@ def _collect_price_pykrx(code: str, start: str, end: str) -> pd.DataFrame:
     # 상태 기본값
     df["is_trading_suspended"] = False
     df["is_limit_reached"] = 0  # -1/0/1
-    return df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap"]]
+    df = df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap", "is_trading_suspended"]]
+    return df
 
 def _collect_price_fallback(code: str, start: str, end: str) -> pd.DataFrame:
     # [FIX] count=3000 -> 30000 (약 100년치로 증대하여 2014년 이전 데이터 확보)
@@ -503,7 +554,7 @@ def _collect_price_fallback(code: str, start: str, end: str) -> pd.DataFrame:
     df["adjust_close"] = df["close"]
     df["is_trading_suspended"] = False
     df["is_limit_reached"] = 0
-    return df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap"]]
+    return df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap", "is_trading_suspended"]]
 
 def _detect_market(code: str) -> Optional[str]:
     try:
@@ -517,47 +568,85 @@ def _detect_market(code: str) -> Optional[str]:
         pass
     return None
 
+# --------------------------------------------------------------------------- #
+# 업종 정보 (네이버 파싱)
+# --------------------------------------------------------------------------- #
+def fetch_sector_from_naver(code: str) -> Tuple[Optional[str], Optional[str]]:
+    """
+    네이버 종목 메인 페이지에서 업종 코드/명을 파싱.
+    실패 시 (None, None) 반환.
+    """
+    try:
+        url = f"https://finance.naver.com/item/main.nhn?code={code}"
+        r = safe_request("get", url, timeout=8)
+        if r.status_code != 200:
+            return None, None
+        m = re.search(r"/sise/sise_group_detail\.naver\?type=upjong&no=(\d+)[^>]*>\s*([^<]+)\s*<", r.text)
+        if not m:
+            return None, None
+        return m.group(1).strip(), m.group(2).strip()
+    except Exception:
+        return None, None
+
 def collect_price(code: str, start: str, end: str) -> pd.DataFrame:
     try:
-        return _collect_price_pykrx(code, start, end)
+        df_py = _collect_price_pykrx(code, start, end)
+        if _has_coverage(df_py, start, end):
+            return df_py
     except Exception:
-        # yfinance fallback with market detection
-        if yf is not None:
-            suffixes = []
-            mkt = _detect_market(code)
-            if mkt:
-                suffixes = [mkt]
-            else:
-                suffixes = ["KS", "KQ"]
-            for suf in suffixes:
-                try:
-                    ticker = f"{code}.{suf}"
-                    hist = yf.Ticker(ticker).history(period="max") # period="11y" -> "max" 권장
-                    if not hist.empty:
-                        df = hist.reset_index()
-                        df["date"] = df["Date"].dt.strftime("%Y%m%d")
-                        # [FIX] 날짜 필터
-                        df = df[(df["date"] >= start) & (df["date"] <= end)]
-                        if df.empty: continue
+        pass
 
-                        df = df.rename(columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"})
-                        df["amount"] = df["close"] * df["volume"] # 근사치
-                        df["adj_factor"] = 1.0
-                        df["code"] = code
-                        df["vwap"] = df["close"]
-                        df["adjust_close"] = df["close"]
-                        df["is_trading_suspended"] = False
-                        df["is_limit_reached"] = 0
-                        return df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap"]]
-                except Exception:
-                    continue
-        return _collect_price_fallback(code, start, end)
+    # yfinance fallback with market detection
+    if yf is not None:
+        suffixes = []
+        mkt = _detect_market(code)
+        if mkt:
+            suffixes = [mkt]
+        else:
+            suffixes = ["KS", "KQ"]
+        for suf in suffixes:
+            try:
+                ticker = f"{code}.{suf}"
+                hist = yf.Ticker(ticker).history(period="max") # period="11y" -> "max" 권장
+                if not hist.empty:
+                    df = hist.reset_index()
+                    df["date"] = df["Date"].dt.strftime("%Y%m%d")
+                    # [FIX] 날짜 필터
+                    df = df[(df["date"] >= start) & (df["date"] <= end)]
+                    if df.empty:
+                        continue
+
+                    df = df.rename(columns={"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"})
+                    df["amount"] = df["close"] * df["volume"] # 근사치
+                    df["adj_factor"] = 1.0
+                    df["code"] = code
+                    df["vwap"] = df["close"]
+                    df["adjust_close"] = df["close"]
+                    df["is_trading_suspended"] = False
+                    df["is_limit_reached"] = 0
+                    df = df[["date", "code", "open", "high", "low", "close", "adjust_close", "volume", "amount", "adj_factor", "vwap", "is_trading_suspended"]]
+                    if _has_coverage(df, start, end):
+                        return df
+                    # coverage 부족이면 일단 후보로 저장
+                    df_yf_partial = df
+            except Exception:
+                continue
+
+    fb = _collect_price_fallback(code, start, end)
+    if fb is not None and not fb.empty and _has_coverage(fb, start, end):
+        return fb
+
+    # 커버리지 안되더라도 yfinance 부분 결과가 있으면 반환
+    if 'df_yf_partial' in locals():
+        return df_yf_partial
+    # 마지막으로 fallback 부분 결과라도 반환
+    return fb
 
 def collect_flow(code: str, start: str, end: str) -> pd.DataFrame:
     try:
         # [FIX] Use safe_pykrx_call & Sleep
         df_val = safe_pykrx_call(stock.get_market_trading_value_by_date, start, end, code, detail=True)
-        time.sleep(0.3)
+        time.sleep(0.05)
         df_vol = safe_pykrx_call(stock.get_market_trading_volume_by_date, start, end, code, detail=True)
         
         if (df_val is None or df_val.empty) and (df_vol is None or df_vol.empty):
@@ -595,11 +684,106 @@ def collect_flow(code: str, start: str, end: str) -> pd.DataFrame:
                              ("기관합계", "inst_net_qty"), ("연기금", "nps_net_qty")]:
                 if src in df_vol.columns:
                     result[dst] = pd.to_numeric(df_vol[src], errors="coerce")
+            # 기관합계가 없으면 세부 합으로 계산 (수량)
+            if "inst_net_qty" not in result.columns:
+                inst_cols_qty = ["금융투자", "보험", "투신", "사모", "은행", "기타금융", "연기금", "기타법인"]
+                avail_qty = [c for c in inst_cols_qty if c in df_vol.columns]
+                if avail_qty:
+                    result["inst_net_qty"] = pd.to_numeric(df_vol[avail_qty].sum(axis=1), errors="coerce")
 
         result = result.sort_values("date").drop_duplicates(subset=["date"], keep="last")
+        # inst_net_qty 실제 값만 변환 (더미 채우기 없음)
+        if "inst_net_qty" in result.columns:
+            result["inst_net_qty"] = pd.to_numeric(result["inst_net_qty"], errors="coerce")
+
         return result
+    except Exception as e:
+        if isinstance(e, ValueError):
+            return pd.DataFrame()
+        return pd.DataFrame()
+
+# --------------------------------------------------------------------------- #
+# 외국인 보유비중 수집 (일자별)
+# --------------------------------------------------------------------------- #
+def fetch_frgn_hold_ratio_range(codes: List[str], start: str, end: str) -> pd.DataFrame:
+    """
+    get_exhaustion_rates_of_foreign_investment_by_ticker를 날짜별 호출해
+    요청한 code subset에 대한 frgn_hold_ratio를 수집.
+    """
+    codes_set = set(str(c).zfill(6) for c in codes)
+    rows = []
+    try:
+        dates = pd.bdate_range(start=pd.to_datetime(start), end=pd.to_datetime(end), freq="C")
     except Exception:
         return pd.DataFrame()
+    for dt in dates:
+        dstr = dt.strftime("%Y%m%d")
+        try:
+            df_ratio = stock.get_exhaustion_rates_of_foreign_investment_by_ticker(dstr)
+            if df_ratio is None or df_ratio.empty:
+                continue
+            df_ratio = df_ratio.reset_index()
+            code_col = df_ratio.columns[0]
+            # 가능한 컬럼: 한도소진율, 보유비중 등 -> 숫자 변환
+            val_col = df_ratio.columns[3] if len(df_ratio.columns) >= 4 else None
+            if not val_col:
+                # fallback by name
+                for cand in ["보유비중", "한도소진율", "한도소진율(%)", "지분율"]:
+                    if cand in df_ratio.columns:
+                        val_col = cand
+                        break
+            if not val_col:
+                continue
+            df_ratio["code"] = df_ratio[code_col].astype(str).str.zfill(6)
+            df_ratio["frgn_hold_ratio"] = pd.to_numeric(df_ratio[val_col], errors="coerce")
+            df_ratio = df_ratio[df_ratio["code"].isin(codes_set)]
+            df_ratio = df_ratio.dropna(subset=["frgn_hold_ratio"])
+            if df_ratio.empty:
+                continue
+            df_ratio["date"] = dstr
+            rows.append(df_ratio[["date", "code", "frgn_hold_ratio"]])
+        except Exception:
+            continue
+    if not rows:
+        return pd.DataFrame()
+    out = pd.concat(rows, ignore_index=True)
+    return out
+
+# --------------------------------------------------------------------------- #
+# earnings_date (yfinance)
+# --------------------------------------------------------------------------- #
+def fetch_earnings_date_yf(code: str) -> Optional[str]:
+    if yf is None:
+        return None
+    suffixes = []
+    mkt = _detect_market(code)
+    if mkt:
+        suffixes = [mkt]
+    else:
+        suffixes = ["KS", "KQ"]
+    for suf in suffixes:
+        try:
+            ticker = yf.Ticker(f"{code}.{suf}")
+            if not hasattr(ticker, "earnings_dates"):
+                continue
+            ed = ticker.earnings_dates
+            if ed is None or ed.empty:
+                continue
+            # 가장 최근/근접한 발표 예정일을 하나 선택
+            ed = ed.reset_index()
+            if "Earnings Date" in ed.columns:
+                dt_col = "Earnings Date"
+            else:
+                dt_col = ed.columns[0]
+            ed[dt_col] = pd.to_datetime(ed[dt_col], errors="coerce")
+            ed = ed.dropna(subset=[dt_col])
+            if ed.empty:
+                continue
+            nearest = ed.sort_values(dt_col).iloc[0][dt_col]
+            return nearest.strftime("%Y%m%d")
+        except Exception:
+            continue
+    return None
 
 def collect_meta_and_cap(code: str, start: str, end: str) -> pd.DataFrame:
     df = pd.DataFrame({"date": [start], "code": [code]})
@@ -611,17 +795,12 @@ def collect_meta_and_cap(code: str, start: str, end: str) -> pd.DataFrame:
     except Exception:
         df["name"] = None
     # 시장 구분
-    mk = None
-    try:
-        # 이 부분은 부하가 크므로 생략하거나, 단일 호출만 시도
-        # if code in stock.get_market_ticker_list... 
-        pass 
-    except Exception:
-        mk = None
+    mk = _detect_market(code)
     df["market"] = mk
     df["listing_status"] = "Listed"
-    df["sector_code"] = None
-    df["sector_name"] = None
+    sec_code, sec_name = fetch_sector_from_naver(code)
+    df["sector_code"] = sec_code
+    df["sector_name"] = sec_name
     # 상장주식수
     try:
         # [FIX] Use safe_pykrx_call
@@ -649,17 +828,22 @@ def collect_meta_and_cap(code: str, start: str, end: str) -> pd.DataFrame:
 def merge_macro(df: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
     if df is None or df.empty:
         return df
-    keys = ["usdkrw", "us10y_yield", "kr10y_yield", "wti", "dxy", "cnykrw", "gold", "vix"]
+    keys = ["usdkrw", "usdcny", "us10y_yield", "kr10y_yield", "wti", "dxy", "cnykrw", "gold", "vix"]
     macro = pd.DataFrame({"date": df["date"].astype(str).copy()}).drop_duplicates(subset=["date"])
 
     def _merge_one(key: str) -> Optional[pd.DataFrame]:
         d = pd.DataFrame()
         if key in ("usdkrw", "cnykrw", "kr10y_yield"):
             d = load_macro_ecos(key, start, end)
+            # ECOS 실패 시 yfinance 우회
+            if (d is None or d.empty) and key in YFINANCE_TICKERS:
+                d = load_macro_yfinance(key, start, end)
         elif key in ("us10y_yield", "dxy", "wti", "gold", "vix"):
             d = load_macro_fred(key, start, end)
             if d is None or d.empty:
                 d = load_macro_yfinance(key, start, end)
+        elif key in YFINANCE_TICKERS:
+            d = load_macro_yfinance(key, start, end)
         if d is None or d.empty:
             return None
         out = d.copy()
@@ -671,8 +855,16 @@ def merge_macro(df: pd.DataFrame, start: str, end: str) -> pd.DataFrame:
         d = _merge_one(k)
         if d is not None and not d.empty:
             macro = macro.merge(d, on="date", how="left")
+    # USD/CNY와 USD/KRW가 있으면 CNY/KRW를 계산 (오염 없이 파생)
+    if "usdkrw" in macro.columns and "usdcny" in macro.columns:
+        try:
+            macro["cnykrw"] = pd.to_numeric(macro["usdkrw"], errors="coerce") / pd.to_numeric(macro["usdcny"], errors="coerce")
+        except Exception:
+            pass
+    macro = macro.drop(columns=["usdcny"], errors="ignore")
     macro["earnings_date"] = None
     merged = df.merge(macro, on="date", how="left")
+    merged["earnings_date"] = merged["earnings_date"].fillna("")
     return merged
 
 # --------------------------------------------------------------------------- #
@@ -698,12 +890,13 @@ def flag_limit_reached(df: pd.DataFrame) -> pd.Series:
 # [MODIFIED] 단일 종목 수집 엔진 (Resume Logic 적용)
 # --------------------------------------------------------------------------- #
 class VectorizedCollector:
-    def __init__(self, code: str, start_date: str, end_date: str, out_dir: Optional[Path] = None):
+    def __init__(self, code: str, start_date: str, end_date: str, out_dir: Optional[Path] = None, run_suffix: str = ""):
         self.code = str(code).zfill(6)
         self.global_start = start_date
         self.global_end = end_date
         self.out_dir = out_dir
-        self.file_path = (out_dir / f"{self.code}.csv") if out_dir else None
+        fname = f"{self.code}{run_suffix}.csv" if run_suffix else f"{self.code}.csv"
+        self.file_path = (out_dir / fname) if out_dir else None
 
     def collect(self) -> pd.DataFrame:
         # 1. Resume Logic (이어받기 체크)
@@ -771,6 +964,7 @@ class VectorizedCollector:
             
         # 날짜 정렬
         final_df = final_df.sort_values("date")
+        final_df["code"] = final_df["code"].astype(str).str.zfill(6)
         
         # 6. 매크로 및 상/하한선 (전체 데이터 대상 재계산)
         # 상/하한 추정은 전일 종가가 필요하므로 합친 후에 계산하는 것이 정확함
@@ -779,15 +973,48 @@ class VectorizedCollector:
         except Exception:
             pass
         
+        # 외국인 보유비중 수집/병합 (옵션)
+        if not SKIP_FRGN_RATIO:
+            try:
+                ratio_df = fetch_frgn_hold_ratio_range([self.code], self.global_start, self.global_end)
+                if ratio_df is not None and not ratio_df.empty:
+                    ratio_df["code"] = ratio_df["code"].astype(str).str.zfill(6)
+                    ratio_map = {(r["date"], r["code"]): r["frgn_hold_ratio"] for _, r in ratio_df.iterrows()}
+                    final_df["frgn_hold_ratio"] = final_df.apply(
+                        lambda row: ratio_map.get((str(row["date"]), str(row["code"]).zfill(6))), axis=1
+                    )
+            except Exception:
+                pass
+
         # 매크로 병합 (이미 있는 구간은 중복 병합되겠지만, merge_macro 내부 로직에 맡김)
         # 성능 최적화를 위해 신규 구간만 할 수도 있으나, 안전성을 위해 전체 수행
         final_df = merge_macro(final_df, self.global_start, self.global_end)
+
+        # 숫자형 변환만 수행 (오염 방지)
+        if "inst_net_qty" in final_df.columns:
+            final_df["inst_net_qty"] = pd.to_numeric(final_df["inst_net_qty"], errors="coerce")
+        if "frgn_hold_ratio" in final_df.columns:
+            final_df["frgn_hold_ratio"] = pd.to_numeric(final_df["frgn_hold_ratio"], errors="coerce")
+
+        # earnings_date: yfinance 이벤트(가능한 경우) 하나를 채워 넣음
+        if "earnings_date" in final_df.columns:
+            if final_df["earnings_date"].isna().all():
+                ed = fetch_earnings_date_yf(self.code)
+                if ed:
+                    final_df["earnings_date"] = ed
         
         # 스키마 강제
         for col in V36_COLS:
             if col not in final_df.columns:
                 final_df[col] = pd.NA
         final_df = final_df[[c for c in V36_COLS if c in final_df.columns]]
+        final_df["code"] = final_df["code"].astype(str).str.zfill(6)
+
+        # 최종: 더미 채우기 없이 변환만 수행
+        final_df["inst_net_qty"] = pd.to_numeric(final_df.get("inst_net_qty"), errors="coerce")
+        final_df["frgn_hold_ratio"] = pd.to_numeric(final_df.get("frgn_hold_ratio"), errors="coerce")
+        if not _has_coverage(final_df, self.global_start, self.global_end):
+            raise ValueError("coverage_fail_final")
         
         # 7. [NEW] 개별 파일 원자적 저장 (Atomic Save)
         if self.file_path:
@@ -803,6 +1030,17 @@ QUALITY_LOG = "quality_report.jsonl"
 STREAM_FILE = "raw_v48_nodart_all.csv"
 METRIC_LOG = "run_metrics.jsonl"
 STATUS_FILE = "status_summary.json"
+
+def apply_run_suffix(suffix: str):
+    """run-id 접미사를 적용해 로그/스트림 파일 이름을 분리."""
+    global QUALITY_LOG, STREAM_FILE, METRIC_LOG, STATUS_FILE
+    if not suffix:
+        return
+    # 접미사는 앞에 '_' 포함해서 전달
+    QUALITY_LOG = f"quality_report{suffix}.jsonl"
+    STREAM_FILE = f"raw_v48_nodart_all{suffix}.csv"
+    METRIC_LOG = f"run_metrics{suffix}.jsonl"
+    STATUS_FILE = f"status_summary{suffix}.json"
 
 # 품질 가드 범위
 GUARD_RANGES = {
@@ -1009,9 +1247,9 @@ class SmartCollector:
 # --------------------------------------------------------------------------- #
 # 병렬 수집
 # --------------------------------------------------------------------------- #
-def collect_one_stock(args: Tuple[str, str, str, Optional[str], bool, Optional[Path]]) -> Tuple[str, Optional[pd.DataFrame]]:
+def collect_one_stock(args: Tuple[str, str, str, Optional[str], bool, Optional[Path], str]) -> Tuple[str, Optional[pd.DataFrame], Optional[str]]:
     # [MODIFIED] 인자 변경: 마지막 인자로 out_dir 추가됨
-    code, start_date, end_date, proxy, calc_limit_flag, out_dir = args
+    code, start_date, end_date, proxy, calc_limit_flag, out_dir, run_suffix = args
     if proxy:
         try:
             set_proxy(proxy)
@@ -1019,16 +1257,16 @@ def collect_one_stock(args: Tuple[str, str, str, Optional[str], bool, Optional[P
             pass
     try:
         # [MODIFIED] VectorizedCollector 생성 시 out_dir 전달
-        collector_obj = VectorizedCollector(code, start_date, end_date, out_dir=out_dir)
+        collector_obj = VectorizedCollector(code, start_date, end_date, out_dir=out_dir, run_suffix=run_suffix)
         df = collector_obj.collect()
         
         # limit flag는 이미 collect 내부에서 전체 데이터 대상으로 수행됨.
         # 필요시 여기서 재확인 가능하나, resume 로직 상 collect() 내부 처리가 더 안전함.
         
-        return code, df
+        return code, df, None
     except Exception as e:
         print(f"  [오류] {code}: {e}")
-        return code, None
+        return code, None, str(e)
 
 def collect_parallel(
     codes: List[str],
@@ -1042,12 +1280,13 @@ def collect_parallel(
     failed_only: bool = False,
     max_tasks: Optional[int] = None,
     log_interval: int = 30,
-    calc_limit_flag: bool = True
+    calc_limit_flag: bool = True,
+    run_suffix: str = "",
 ) -> Tuple[Dict[str, pd.DataFrame], int]:
     target_codes = collector.failed if failed_only else codes
     
     # [MODIFIED] tasks 생성 시 out_dir 포함 전달
-    tasks = [(code, start_date, end_date, proxy, calc_limit_flag, out_dir) for code in target_codes if not collector.is_completed(code)]
+    tasks = [(code, start_date, end_date, proxy, calc_limit_flag, out_dir, run_suffix) for code in target_codes if not collector.is_completed(code)]
     if max_tasks is not None:
         tasks = tasks[:max_tasks]
 
@@ -1072,13 +1311,20 @@ def collect_parallel(
             for result in pool.imap(collect_one_stock, tasks, chunksize=1):
                 if result is None:
                     continue
-                code, df = result
+                # result may include error message
+                if len(result) == 3:
+                    code, df, err_msg = result
+                else:
+                    code, df = result
+                    err_msg = None
 
                 if df is None or df.empty:
                     reason = {"issues": ["no_data_returned"], "warnings": []}
+                    if err_msg:
+                        reason["error"] = err_msg
                     collector.mark_failed(code, reason=reason)
                     processed = completed + len(collector.failed)
-                    print(f"[FAIL] code={code} progress={processed}/{total_tasks} fail={len(collector.failed)} elapsed={time.time()-start_time:.0f}s")
+                    print(f"[FAIL] code={code} progress={processed}/{total_tasks} fail={len(collector.failed)} elapsed={time.time()-start_time:.0f}s reason={reason}")
                     if out_dir:
                         fail_rec = {
                             "code": code, "ok": False, "status": "fail",
@@ -1192,12 +1438,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--failed-only", action="store_true", help="실패 종목만 재시도")
     p.add_argument("--max-tasks", type=int, default=None, help="최대 처리 종목 수 제한")
     p.add_argument("--no-limit-flag", action="store_true", help="상/하한 추정 플래그 계산 비활성화")
+    p.add_argument("--run-id", type=str, default=None, help="출력/로그/체크포인트 파일에 접미사를 붙여 중복 실행 지원")
+    p.add_argument("--no-frgn-ratio", action="store_true", help="외국인 보유비중 수집 비활성화(속도 개선)")
     return p.parse_args()
 
 def main():
     args = parse_args()
     if not args.end_date:
         args.end_date = datetime.now().strftime("%Y%m%d")
+
+    run_suffix = f"_{args.run_id}" if args.run_id else ""
+    apply_run_suffix(run_suffix)
+
+    global SKIP_FRGN_RATIO
+    SKIP_FRGN_RATIO = bool(args.no_frgn_ratio)
 
     codes = load_codes(args.codes)
 
@@ -1227,7 +1481,7 @@ def main():
     workers = args.workers or max(2, min(cpu_count() * 2, 32))
 
     # Collector 준비
-    sc = SmartCollector(out_dir)
+    sc = SmartCollector(out_dir, checkpoint_file=f"checkpoint{run_suffix}.pkl" if run_suffix else "checkpoint.pkl")
 
     # 실행
     results, completed = collect_parallel(
@@ -1242,6 +1496,7 @@ def main():
         failed_only=bool(args.failed_only),
         max_tasks=args.max_tasks,
         calc_limit_flag=not args.no_limit_flag,
+        run_suffix=run_suffix,
     )
 
     # 통합 저장(옵션) — 스트리밍 미사용 시
@@ -1249,7 +1504,7 @@ def main():
         dfs = [df for df in results.values() if df is not None and not df.empty]
         if dfs:
             df_all = pd.concat(dfs, ignore_index=True).sort_values(["date", "code"])
-            output_file = out_dir / "raw_v50_final_all.csv"
+            output_file = out_dir / f"raw_v50_final_all{run_suffix}.csv"
             df_all.to_csv(output_file, index=False, encoding="utf-8-sig")
             print(f"[저장] {output_file} ({len(df_all):,}행, {len(results):,}종목)")
 

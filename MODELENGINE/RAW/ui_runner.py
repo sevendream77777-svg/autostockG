@@ -27,17 +27,13 @@ from tkinter import filedialog, messagebox, scrolledtext
 
 
 BASE_DIR = Path(__file__).resolve().parent
-HOJ_DIR = BASE_DIR / "raw_hoj"
-SLE_DIR = BASE_DIR / "raw_sle"
 SNAPSHOT_FILE = BASE_DIR / "ui_snapshot.txt"
 
 
-def find_python_scripts(base: Path) -> List[Path]:
-    """지정 폴더 내 실행 가능한 파이썬 스크립트 목록 반환."""
+def find_python_scripts() -> List[Path]:
+    """폴더 내 실행 가능한 파이썬 스크립트 목록 반환."""
     scripts: List[Path] = []
-    if not base.exists():
-        return scripts
-    for path in base.rglob("*.py"):
+    for path in BASE_DIR.rglob("*.py"):
         if path.name.startswith("__"):
             continue
         if path.name == Path(__file__).name:
@@ -80,7 +76,7 @@ def read_preview_lines(path: Path, n: int = 20, max_bytes: int = 200_000) -> Tup
 class RunnerUI:
     def __init__(self, master: tk.Tk):
         self.master = master
-        master.title("raw 데이터 실행 UI (hoj/sle 테스트)")
+        master.title("raw_v48 실행 UI")
         master.geometry("900x720")
 
         self.scripts: List[Path] = []
@@ -90,32 +86,27 @@ class RunnerUI:
         self.current_proc: subprocess.Popen | None = None
 
         # 입력 변수
-        self.start_date = tk.StringVar(value="20100102")
-        self.end_date = tk.StringVar(value="20251205")
+        self.start_date = tk.StringVar(value="20150102")
+        self.end_date = tk.StringVar(value="20150108")
         self.code1 = tk.StringVar(value="005930")  # 삼성전자
         self.code2 = tk.StringVar(value="000660")  # SK하이닉스
         self.code3 = tk.StringVar()
         self.codes_file = tk.StringVar(value="")
-        self.output_dir = tk.StringVar()
-        self.result_file = tk.StringVar()
-        self.log_path = tk.StringVar()
+        self.output_dir = tk.StringVar(value=str(BASE_DIR / "out"))
+        self.result_file = tk.StringVar(value=str(BASE_DIR / "out" / "raw_v48_all.csv"))
+        self.log_path = tk.StringVar(value=str(BASE_DIR / "ui_run.log"))
         self.dart_mode = tk.StringVar(value="annual")
         self.extra_args = tk.StringVar()
         self.workers = tk.StringVar(value="1")
-        self.announce_mode = tk.StringVar(value="none")  # run_raw_sle 전용
-        self.list_cache_dir = tk.StringVar()
-        self.dataset = tk.StringVar(value="hoj")  # hoj | sle
 
-        self.current_base = HOJ_DIR
         self._build_layout()
-        self._apply_dataset_defaults()
         self.refresh_scripts()
         self.master.after(200, self._poll_log_queue)
 
     # ------------------------------------------------------------------ UI 구성
     def _build_layout(self):
         # 스크립트 영역
-        frame_scripts = tk.LabelFrame(self.master, text="실행 파일 목록")
+        frame_scripts = tk.LabelFrame(self.master, text="실행 파일 목록 (raw_v48 하위)")
         frame_scripts.pack(fill="x", padx=10, pady=6)
 
         self.listbox = tk.Listbox(frame_scripts, height=6)
@@ -125,13 +116,6 @@ class RunnerUI:
         btn_frame.pack(side="right", padx=10, pady=6)
         tk.Button(btn_frame, text="새로고침", command=self.refresh_scripts, width=12).pack(pady=2)
         tk.Button(btn_frame, text="경로 복사", command=self.copy_selected_path, width=12).pack(pady=2)
-
-        # 데이터셋 선택
-        frame_dataset = tk.Frame(frame_scripts)
-        frame_dataset.pack(side="bottom", fill="x", padx=10, pady=4)
-        tk.Label(frame_dataset, text="데이터셋").pack(side="left")
-        tk.Radiobutton(frame_dataset, text="HOJ(36)", variable=self.dataset, value="hoj", command=self.on_dataset_change).pack(side="left", padx=4)
-        tk.Radiobutton(frame_dataset, text="SLE(11)", variable=self.dataset, value="sle", command=self.on_dataset_change).pack(side="left", padx=4)
 
         # 기본 입력
         frame_inputs = tk.LabelFrame(self.master, text="실행 옵션")
@@ -144,19 +128,10 @@ class RunnerUI:
         tk.Entry(row_dates, textvariable=self.start_date, width=12).pack(side="left", padx=4)
         tk.Label(row_dates, text="종료일").pack(side="left")
         tk.Entry(row_dates, textvariable=self.end_date, width=12).pack(side="left", padx=4)
-        tk.Label(row_dates, text="DART 모드").pack(side="left", padx=(10, 2))
+        tk.Label(row_dates, text="DART 모드(raw_v48)").pack(side="left", padx=(10, 2))
         tk.OptionMenu(row_dates, self.dart_mode, "off", "annual", "full").pack(side="left")
         tk.Label(row_dates, text="워커").pack(side="left", padx=(10, 2))
         tk.Entry(row_dates, textvariable=self.workers, width=6).pack(side="left")
-
-        # announce 옵션 (SLE)
-        row_ann = tk.Frame(frame_inputs)
-        row_ann.pack(fill="x", padx=6, pady=2)
-        tk.Label(row_ann, text="announce_mode").pack(side="left")
-        tk.OptionMenu(row_ann, self.announce_mode, "none", "cache", "hybrid", "live").pack(side="left", padx=4)
-        tk.Label(row_ann, text="list cache").pack(side="left", padx=(10, 2))
-        tk.Entry(row_ann, textvariable=self.list_cache_dir, width=45).pack(side="left", padx=4, fill="x", expand=True)
-        tk.Button(row_ann, text="선택", command=self.pick_list_cache_dir, width=8).pack(side="left", padx=4)
 
         # 종목 코드
         row_codes = tk.Frame(frame_inputs)
@@ -232,17 +207,14 @@ class RunnerUI:
 
     # ------------------------------------------------------------------ 유틸
     def refresh_scripts(self):
-        self.scripts = find_python_scripts(self.current_base)
+        self.scripts = find_python_scripts()
         self.listbox.delete(0, tk.END)
         for p in self.scripts:
-            try:
-                rel = p.relative_to(self.current_base)
-            except ValueError:
-                rel = p.name
+            rel = p.relative_to(BASE_DIR)
             self.listbox.insert(tk.END, str(rel))
         if self.scripts:
             self.listbox.selection_set(0)
-        self._log(f"[INFO] 스크립트 {len(self.scripts)}개 로드 완료. (base={self.current_base})")
+        self._log(f"[INFO] 스크립트 {len(self.scripts)}개 로드 완료.")
 
     def copy_selected_path(self):
         path = self._get_selected_path()
@@ -261,11 +233,6 @@ class RunnerUI:
         chosen = filedialog.askopenfilename(initialdir=self.output_dir.get() or str(BASE_DIR))
         if chosen:
             self.codes_file.set(chosen)
-
-    def pick_list_cache_dir(self):
-        chosen = filedialog.askdirectory(initialdir=self.list_cache_dir.get() or str(self.output_dir.get() or BASE_DIR))
-        if chosen:
-            self.list_cache_dir.set(chosen)
 
     def pick_result_file(self):
         chosen = filedialog.askopenfilename(initialdir=self.output_dir.get() or str(BASE_DIR))
@@ -344,7 +311,7 @@ class RunnerUI:
                 cmd += ["--workers", workers]
             # 결과 파일 기본값 추정
             self._set_default_result_path(script_name, codes_list, out_dir)
-        elif script_name in {"dart.py", "dart_v49.py", "run_raw_sle.py"}:
+        elif script_name in {"dart.py", "dart_v49.py"}:
             if codes_file:
                 cmd += ["--codes", codes_file]
             elif codes_arg:
@@ -364,13 +331,6 @@ class RunnerUI:
             else:
                 if mode in {"annual", "full"}:
                     cmd += ["--mode", mode]
-            if script_name == "run_raw_sle.py":
-                ann_mode = self.announce_mode.get().strip()
-                if ann_mode:
-                    cmd += ["--announce-mode", ann_mode]
-                cache_dir = self.list_cache_dir.get().strip()
-                if cache_dir:
-                    cmd += ["--list-cache", cache_dir]
             self._set_default_result_path(script_name, codes_list, out_dir)
         else:
             # 기타 스크립트는 추가 인자만 붙여서 실행
@@ -453,36 +413,6 @@ class RunnerUI:
 
         self.running_thread = threading.Thread(target=runner, daemon=True)
         self.running_thread.start()
-
-    def on_dataset_change(self):
-        """데이터셋(HOJ/SLE) 전환 시 기본 경로/날짜를 재설정."""
-        self._apply_dataset_defaults()
-        self.refresh_scripts()
-
-    def _apply_dataset_defaults(self):
-        ds = self.dataset.get()
-        if ds == "sle":
-            self.current_base = SLE_DIR
-            self.start_date.set("20160101")
-        else:
-            self.current_base = HOJ_DIR
-            self.start_date.set("20100102")
-        # 종료일 고정
-        self.end_date.set("20251205")
-        # 출력/로그 기본 경로
-        out_base = self.current_base / "out"
-        self.output_dir.set(str(out_base))
-        self.log_path.set(str(self.current_base / "ui_run.log"))
-        # announce 기본값: SLE는 캐시 사용 준비
-        if ds == "sle":
-            self.announce_mode.set("none")
-            self.list_cache_dir.set(str(SLE_DIR / "out" / "list" / "by_corp"))
-        else:
-            self.announce_mode.set("live")
-            self.list_cache_dir.set("")
-        # 결과 파일 기본
-        default_name = "raw_sle_all.csv" if ds == "sle" else "raw_hoj_all.csv"
-        self.result_file.set(str(out_base / default_name))
 
     def on_stop(self):
         if not self.current_proc:
@@ -654,7 +584,7 @@ class RunnerUI:
 
     def _set_default_result_path(self, script_name: str, codes: List[str], out_dir: str):
         out_base = Path(out_dir) if out_dir else BASE_DIR / "out"
-        if script_name in {"dart.py", "dart_v49.py", "run_raw_sle.py"} and codes:
+        if script_name == "dart.py" and codes:
             path = out_base / "csv" / f"{codes[0]}.csv"
             self.result_file.set(str(path))
         elif script_name == "run_raw_v48.py":
@@ -670,8 +600,6 @@ class RunnerUI:
             f"result={result_path}",
             f"out_dir={self.output_dir.get()}",
             f"dart_mode={self.dart_mode.get()}",
-            f"announce_mode={self.announce_mode.get()}",
-            f"list_cache={self.list_cache_dir.get()}",
         ]
         try:
             info_path.write_text("\n".join(payload), encoding="utf-8")

@@ -1,0 +1,4 @@
+
+[2025-12-12T16:00:19.702248] START CMD: C:\Users\slk\AppData\Local\Programs\Python\Python313\python.exe -u F:\autostockG\MODELENGINE\RAW\raw_hoj\run_raw_hoj.py --codes 005930 --start-date 20100102 --end-date 20161231 --out-dir F:\autostockG\MODELENGINE\RAW\raw_hoj\out --workers 1 --run-id run20251212_160019
+
+[END] return_code=3221225786
