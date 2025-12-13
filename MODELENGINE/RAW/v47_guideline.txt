@@ -1,0 +1,462 @@
+V47 이후 버전업의 근본 데이터 운영 규칙 (정리본)
+
+0. 목적 / 개요
+
+이 문서는 **v47 이후 버전업의 “근본 데이터 운영 규칙”**을 정의한다.
+
+대상:
+
+HOJ_DATA: 일반 시계열 원천 데이터 (일별, 약 34개 원천컬럼 + 조합컬럼 별도)
+
+SLE_DATA: 재무제표 기반 원천 데이터 (분기별 11개 원천컬럼 + 파생/조합컬럼 별도)
+
+원칙:
+
+HOJ와 SLE는 완전히 독립 데이터셋/엔진으로 운영한다.
+
+각자 원천컬럼(Base Layer) 과 조합/파생컬럼(Feature Layer) 를 분리 관리한다.
+
+최종적으로는 HOJ 엔진 + SLE 엔진을 병합 또는 필터로 사용하는 통합 예측 구조를 사용한다.
+
+1. 전체 아키텍처 (레이어 구조)
+1-1. 공통 레이어 정의
+
+모든 데이터는 아래 3단계 레이어로 관리한다.
+
+RAW_SOURCE 레이어 (원본 저장소)
+
+외부 기관/사이트에서 받은 가공 전 원본 파일.
+
+예:
+
+KRX, Naver, 환율/금리/지수 등 원천 CSV/JSON
+
+DART 일괄 다운로드 엑셀/CSV, list.json
+
+금융위 DPS(getDiviInfo) 전체 덤프 CSV
+
+원칙:
+
+절대 수정/덮어쓰기 금지 (오류 확인용, 재처리용 백업).
+
+BASE 레이어 (정규화된 원천컬럼)
+
+HOJ: HOJ_BASE_34
+
+SLE: SLE_BASE_11
+
+목적:
+
+컬럼 정의·타입·키 기준을 모두 통일한 “정제된 원천 테이블”.
+
+이 레이어까지는 “원천”만 포함.
+파생 및 조합 컬럼은 포함하지 않는다.
+
+FEATURE 레이어 (파생/조합 컬럼 포함 학습 테이블)
+
+HOJ_FEATURE: HOJ_BASE_34 + 각종 파생·기술적 지표 (change_rate, turnover 등).
+
+v47_36_11컬럼목록
+
+SLE_FEATURE: SLE_BASE_11 + 재무 비율/성장률/마진 등 파생 컬럼.
+
+MASTER_FEATURE: HOJ_FEATURE + SLE_FEATURE를 날짜/종목 기준으로 조인한 최종 학습용 테이블.
+
+1-2. 엔진 구조
+
+HOJ_ENGINE
+
+입력: HOJ_FEATURE (일별 시계열 중심).
+
+역할: 단기 수급·가격 기반 예측(다음날/다음주 수익률 등).
+
+SLE_ENGINE
+
+입력: SLE_FEATURE (분기 재무 → 일별로 확장된 펀더멘털 피처).
+
+역할: 중·장기 펀더멘털/실적 품질 평가, 이벤트 리스크 반영.
+
+COMBINED_ENGINE (또는 Filter)
+
+입력:
+
+HOJ_ENGINE 산출값 (점수/랭크/신호)
+
+SLE_ENGINE 산출값 (점수/랭크/펀더멘털 등급)
+
+사용 방식 예:
+
+병합(Ensemble): score_total = a*score_hoj + b*score_sle
+
+필터(Filter):
+
+HOJ 상위 N% 중에서 SLE 점수 상위 M%만 최종 종목으로 선택
+
+혹은 SLE가 비정상/부실(negative score)이면 아무리 HOJ가 좋아도 제외.
+
+2. HOJ_DATA 운영 지침
+2-1. HOJ_BASE_34 (일반 원천컬럼)
+
+기준 스펙: v47_36_11컬럼목록.txt의 [HOJ_DATA] 36개 컬럼 정의를 사용하되,
+실질적인 원천 컬럼은 34개로 관리한다 (세부 제외/분류는 내부 표에 명시).
+
+키:
+
+date (YYYY-MM-DD)
+
+code (6자리)
+
+주요 그룹:
+
+메타: date, code, name, market, listing_status, sector_code, sector_name
+
+가격/거래: open, high, low, close, adjust_close, volume, amount, adj_factor
+
+수급: frgn_net_amt, inst_net_amt, nps_net_amt, tust_net_amt, dealer_net_amt, frgn_net_qty, inst_net_qty, nps_net_qty, frgn_hold_ratio
+
+거시/이벤트: usdkrw, us10y_yield, kr10y_yield, wti, dxy, cnykrw, gold, vix, earnings_date
+
+수집 주기:
+
+매일 (Daily) – 모든 거래일 기준.
+
+파일 관리:
+
+기본 단위: 일자별 전체 종목 or 연도별 전체 종목 (Parquet)
+
+예: HOJ_BASE_2015.parquet, …, HOJ_BASE_2025.parquet
+
+RAW_SOURCE(각 사이트별 파일) → ETL → HOJ_BASE_34로 통일.
+
+2-2. HOJ_FEATURE (조합/파생 컬럼)
+
+BASE에서만 가져와서 런타임(or ETL)에 계산한다.
+
+대표 파생(예시는 이미 명세서에 정의):
+
+change_rate = close / prev_close - 1
+
+vol_change_rate = volume / prev_volume - 1
+
+high_low_spread = (high - low) / close
+
+close_loc = (close - low) / (high - low)
+
+turnover_ratio = volume / shares_out
+
+market_cap = close * shares_out
+
+원칙:
+
+BASE 레이어에 파생컬럼을 저장하지 않는다.
+
+Feature Layer에서만 계산/사용.
+
+특정 파생이 잘못되면 Feature 레이어만 다시 생성하면 되도록 설계.
+
+3. SLE_DATA 운영 지침
+3-1. SLE_BASE_11 (재무 원천컬럼)
+
+컬럼 정의 (v47 명세 기준):
+
+v47_36_11컬럼목록
+
+메인 키:
+
+date : 분기말 기준일 (YYYYMMDD, 0331/0630/0930/1231)
+
+run_raw_sle
+
+code : 종목 코드(6자리)
+
+period : "Q1", "Q2", "Q3", "Q4"
+
+corp_code : DART 법인 코드
+
+bsns_year : 사업연도
+
+reprt_code : DART 보고서 코드(11013, 11012, 11014, 11011 등)
+
+재무 컬럼 (FINANCE_COLS):
+
+revenue
+
+op_income
+
+net_income
+
+eps
+
+total_assets
+
+total_equity
+
+cash_flow_op
+
+cash_flow_inv
+
+cash_flow_fin
+
+announce_date
+
+div_amount
+
+수집 주기:
+
+분기(Quarterly), 2016년 1Q 이후 권장.
+
+v47_36_11컬럼목록
+
+특징:
+
+revenue, op_income, net_income, eps, cash_flow_* 등 누적 표기를
+run_raw_sle.py에서 자동으로 분기 데이터로 Diff 변환해 저장.
+
+announce_date는 DART list.json + _select_announce_date_from_rows 로 후처리하여 채움.
+
+div_amount는 금융위 getDiviInfo 전체 수집 + 2015~2025 필터 + 보통주만 사용 후, 연도/법인 기준으로 매핑.
+
+파일 관리:
+
+권장: 연도별 전체 종목 Parquet
+
+예: SLE_BASE_11_2015.parquet … SLE_BASE_11_2025.parquet
+
+혹은 2015~2025 전체를 하나로 모은 SLE_BASE_11_2015_2025.parquet 마스터.
+
+3-2. SLE_RAW 수집 파이프라인 (v47 기준)
+
+Announce용 DART 리스트 캐시
+
+DART list API 호출 또는 웹 일괄 다운로드로 list.json 생성.
+
+위치 예: out/list/by_corp/{stock}_{corp}.json
+
+fill_announce_date
+
+재무제표 수집 (run_raw_sle.py 또는 DART 일괄 다운로드)
+
+META_COLS + FINANCE_COLS를 대상으로 수집.
+
+run_raw_sle
+
+모드:
+
+reprt_codes = ["11013","11012","11014","11011"] (기본: 분기 + 연간)
+
+run_raw_sle
+
+Diff 로직:
+
+FLOW_COLS_TO_DIFF = ["revenue","op_income","net_income","eps","cash_flow_op","cash_flow_inv","cash_flow_fin"]에 대해
+누적 → 분기 실적으로 변환.
+
+DPS 수집 (div_amount_stable.py)
+
+금융위 GetStocDiviInfoService.getDiviInfo 호출.
+
+2015~2025 전체, 보통주만 사용, stckGenrDvdnAmt 필드로 DPS 산출.
+
+SLE_BASE_11 생성
+
+매핑 키: (corp_code, bsns_year, reprt_code, code) + baseline_date/announce_date.
+
+DART 재무 + DART list(announce_date) + DPS CSV를 조인.
+
+결과를 연도별 또는 전체 Parquet로 저장.
+
+3-3. SLE_FEATURE (재무 파생/조합 컬럼)
+
+SLE_BASE_11를 입력으로, 분기 단위에서 파생컬럼을 계산.
+
+예시:
+
+마진류:
+
+op_margin = op_income / revenue
+
+net_margin = net_income / revenue
+
+cfo_margin = cash_flow_op / revenue
+
+레버리지:
+
+debt_ratio = (total_assets - total_equity) / total_equity
+
+v47_36_11컬럼목록
+
+성장률:
+
+revenue_qoq, revenue_yoy
+
+op_income_qoq, net_income_yoy 등
+
+필요 시:
+
+SLE_BASE_11 + 위 파생들을 합쳐 SLE_FEATURE_Q (분기 기준) 파일로 관리.
+
+일별 학습 테이블을 만들 때는, 해당 분기 값을 announce_date 이후 일정 기간 동안 forward-fill 해서 HOJ 날짜와 맞춘다.
+
+4. HOJ vs SLE 데이터 구조 및 역할 분리
+4-1. 운영 단위
+
+HOJ_DATA
+
+단위: 일별
+
+초점: 단기 가격/수급/거시 이벤트
+
+원천: 34개 일반 컬럼 (필수 시계열) + 조합 컬럼은 별도 Feature 레이어.
+
+SLE_DATA
+
+단위: 분기 (재무제표 기준)
+
+초점: 실적(매출/이익/현금흐름), 재무구조, 배당
+
+원천: 11개 재무 컬럼 (announce_date · div_amount 포함)
+
+4-2. 합쳐서 쓰는 방식
+
+데이터 조인 규칙
+
+기본 키: date, code.
+
+조인 방법:
+
+HOJ 일자 = D
+
+SLE 레코드 중:
+
+announce_date <= D 인 것만 후보.
+
+그 중 가장 최근 분기 하나만 선택해 붙인다.
+
+이렇게 하면:
+
+미래 분기 실적이나 발표 전 정보가 HOJ 쪽 일자에 섞이지 않음 (정보 누수 방지).
+
+엔진 사용 규칙
+
+HOJ_ENGINE:
+
+HOJ_FEATURE만으로 훈련 (기술·수급 중심).
+
+SLE_ENGINE:
+
+SLE_FEATURE만으로 훈련 (재무·펀더멘털 중심).
+
+COMBINED_ENGINE:
+
+두 엔진의 출력(score, rank, label 등)을 다시 입력 피처로 사용.
+
+예:
+
+score_hoj, score_sle, rank_hoj, rank_sle, flag_fundamental_ok 등을 조합.
+
+5. 버전업 & 업데이트 운영 규칙
+5-1. 히스토리 확정 (2015~2025 기준)
+
+현재 확보 상태
+
+HOJ_DATA: 2010~2025 일별 원천 36컬럼 스펙 중, 실제 원천 34컬럼 확정.
+
+SLE_DATA: 2015~2025, 재무제표 9컬럼 + announce + div_amount = 11컬럼 모두 확보.
+
+v47 기준 마스터
+
+HOJ:
+
+HOJ_BASE_2010_2025.parquet (또는 연도별 파일)
+
+SLE:
+
+SLE_BASE_11_2015_2025.parquet (또는 연도별 파일)
+
+이 두 파일 세트가 v47 “근본 데이터” 마스터가 된다.
+
+5-2. 이후 증분 업데이트 (2016+ / 2015+ 공통)
+
+새로운 데이터가 나올 때마다:
+
+HOJ 쪽
+
+RAW_SOURCE로 새 일자 데이터 수집.
+
+HOJ_ETL로 HOJ_BASE_YYYY.parquet에 append.
+
+필요하면 해당 연도 파일만 재생성 가능.
+
+SLE 쪽
+
+(1) 새 분기 / 연도 배당 정보 등장
+
+div_amount:
+
+금융위 API에서 새 연도 기준일(dvdnBasDt) 구간만 추가 수집 후, 기존 DPS CSV에 append.
+
+(2) 새 분기 재무제표 등장
+
+DART:
+
+해당 연도+분기만 API 또는 일괄 다운로드로 RAW_SOURCE에 저장.
+
+run_raw_sle 로직 또는 별도 ETL 스크립트로 SLE_RAW → SLE_BASE_11_delta 생성.
+
+(3) announce 리스트 갱신
+
+DART list.json을 새 해/분기만 업데이트 후,
+fill_announce_date.py로 SLE_BASE_11_delta의 announce_date 보정.
+
+(4) 마스터 병합
+
+기존 SLE_BASE_11 마스터에서 (code, bsns_year, reprt_code) 동일 키 행 삭제.
+
+SLE_BASE_11_delta를 append하고 새 파일을 SLE_BASE_11_2015_20XX.parquet 으로 저장.
+
+5-3. Feature / Engine 재생성
+
+데이터가 업데이트되면, 해당 범위에 대해:
+
+HOJ_FEATURE 재생성
+
+SLE_FEATURE 재생성
+
+MASTER_FEATURE 재생성
+
+필요 시 엔진 재학습(HOJ_ENGINE / SLE_ENGINE / COMBINED_ENGINE)
+
+원칙:
+
+RAW_SOURCE는 절대 건드리지 않음.
+
+BASE 레이어는 “교체(Replace)” 방식으로 관리.
+
+Feature/Engine 레이어는 “버전 업(v47, v48, …)” 방식으로 관리.
+
+6. 기타 필수 규칙 정리
+
+파일 포맷
+
+RAW_SOURCE: 원본 형식 그대로 (CSV, JSON, XLS, XML 등).
+
+BASE / FEATURE / MASTER:
+
+가능하면 모두 Parquet로 통일.
+
+컬럼 관리
+
+컬럼 목록과 설명은 항상 v47_36_11컬럼목록.txt를 기준으로 삼고,
+컬럼 추가/변경 시 이 파일부터 업데이트.
+
+미래 정보 누수 방지
+
+재무 반영 기준일: announce_date 고정.
+
+earnings_date는 Feature 레이어에서 “이벤트 리스크용 변수”로만 사용.
+
+에러 / 정정 공시 발생 시
+
+문제 구간 연도/분기만 다시 RAW_SOURCE → SLE_BASE_11_delta 생성 후 마스터 교체.
+
+HOJ 쪽은 동일 일자 구간만 다시 ETL/Feature 생성.
