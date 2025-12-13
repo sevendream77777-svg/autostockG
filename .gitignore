@@ -13,6 +13,8 @@ MODELENGINE/old"
 
 MODELENGINE/RAW/raw_sle/raw_sle_date
 
+MODELENGINE\RAW\raw_sle\DART_ANNOUNCE
+
 ====================[파이썬/에디터 자동 생성 파일] 지저분함 방지================
 
 pycache/*.pyc.vscode/.idea/.DS_Store
