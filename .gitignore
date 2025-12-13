@@ -1,20 +1,27 @@
-===========[데이터 파일 무시] 용량 문제 및 보안=========
+# ====================[ 데이터 파일 무시 ] 용량 문제 및 보안=========
 
+*.json
+*.zip
+*.csv
+*.parquet
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.db
+*.sqlite
 
-*.parquet*
+====================[특정 폴더 및 파일 무시]====================
 
-====================[특정 데이터 폴더 무시]역슬래시()는 슬래시(/)로 변경해야 인식됩니다.=============
-
+old/  # 'old' 이름의 모든 폴더 무시
 new_Hoj_DB_V25.csv
 new_Hoj_DB_V25_FULL.csv
-
 MODELENGINE/HOJ_ENGINE/RESEARCH/MODELENGINE/RAW/stocks/kospi_data/
-MODELENGINE/old"
 
-MODELENGINE/RAW/raw_sle/raw_sle_date
+# ====================[ 파이썬/에디터 자동 생성 파일 ]====================
 
-MODELENGINE\RAW\raw_sle\DART_ANNOUNCE
-
-====================[파이썬/에디터 자동 생성 파일] 지저분함 방지================
-
-pycache/*.pyc.vscode/.idea/.DS_Store
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.DS_Store
