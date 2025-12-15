@@ -1,0 +1,126 @@
+아래는 **126cul.txt의 항목(괄호의 영문/의미)** 과 **261cul.txt의 IFRS 개념(ifrs_코드)** 을 **같은 회계 개념(동일 데이터가 나오는 단위)** 기준으로 매핑해서 만든 **교집합(abstract/헤더 성격 항목은 제외)** 목록이다.
+(예: 126의 “관리비(Administrative Expenses)”는 261의 `ifrs_AdministrativeExpense`로, 126의 “리스부채(Lease Liabilities / Noncurrent …)”는 261에 존재하는 유일한 리스부채 개념인 `ifrs_NoncurrentLeaseLiabilities`로 매핑)
+근거: 126cul의 해당 항목들 및 261cul의 동일 ifrs_코드 항목들 확인 fileciteturn15file0 fileciteturn15file8 fileciteturn19file1 fileciteturn18file5 fileciteturn17file0
+
+---
+
+## 교집합 컬럼(동일 개념/동일 데이터) 목록 — 총 52개
+
+### A) 재무상태표(자산/부채/자본)
+
+1. `ifrs_CurrentAssets` — 261: 유동자산 — 126: 유동자산 fileciteturn19file1
+
+2. `ifrs_CashAndCashEquivalents` — 261: 현금및현금성자산 — 126: 현금및현금성자산 fileciteturn17file3
+
+3. `ifrs_TradeAndOtherCurrentReceivables` — 261: 매출채권 및 기타유동채권 — 126: 매출채권 및 기타채권 fileciteturn17file0
+
+4. `ifrs_Inventories` — 261: 재고자산 — 126: 재고자산 fileciteturn11file0 fileciteturn19file3
+
+5. `ifrs_OtherCurrentNonfinancialAssets` — 261: 기타유동자산 — 126: 기타유동자산 fileciteturn11file1 fileciteturn18file5
+
+6. `ifrs_CurrentTaxAssets` — 261: 당기법인세자산 — 126: 당기법인세자산 fileciteturn19file1 fileciteturn19file3
+
+7. `ifrs_NoncurrentAssets` — 261: 비유동자산 — 126: 비유동자산 fileciteturn17file1 fileciteturn19file3
+
+8. `ifrs_NoncurrentFinancialAssetsAtFairValueThroughProfitOrLossDesignatedUponInitialRecognition` — 261: (표기: 기타포괄-공정가치…) — 126: 당기손익공정가치금융자산 fileciteturn17file1 fileciteturn19file3
+
+9. `ifrs_InvestmentsInAssociates` — 261: 관계기업투자자산 — 126: 관계기업투자자산 fileciteturn16file2 fileciteturn19file3
+
+10. `ifrs_PropertyPlantAndEquipment` — 261: 유형자산 — 126: 유형자산 fileciteturn18file3 fileciteturn19file3
+
+11. `ifrs_RightofuseAssets` — 261: 사용권자산 — 126: 사용권자산 fileciteturn17file0 fileciteturn19file3
+
+12. `ifrs_InvestmentProperty` — 261: 투자부동산 — 126: 투자부동산 fileciteturn14file0 fileciteturn19file3
+
+13. `ifrs_IntangibleAssetsOtherThanGoodwill` — 261: 영업권 이외의 무형자산 — 126: 무형자산 fileciteturn14file0 fileciteturn19file3
+
+14. `ifrs_OtherNoncurrentNonfinancialAssets` — 261: 기타비유동자산 — 126: 기타비유동자산 fileciteturn17file4 fileciteturn19file3
+
+15. `ifrs_Assets` — 261: 자산총계 — 126: 자산총계 fileciteturn16file2 fileciteturn19file3
+
+16. `ifrs_CurrentLiabilities` — 261: 유동부채 — 126: 유동부채 fileciteturn19file1 fileciteturn18file5
+
+17. `ifrs_TradeAndOtherCurrentPayables` — 261: 매입채무 및 기타유동채무 — 126: 매입채무 및 기타채무 fileciteturn17file0 fileciteturn18file5
+
+18. `ifrs_OtherCurrentNonfinancialLiabilities` — 261: 기타유동부채 — 126: 기타유동부채 fileciteturn11file1 fileciteturn18file5
+
+19. `ifrs_CurrentTaxLiabilities` — 261: 당기법인세부채 — 126: 당기법인세부채 fileciteturn19file1 fileciteturn18file5
+
+20. `ifrs_ShorttermBorrowings` — 261: 단기차입금 — 126: 단기차입금 fileciteturn17file0 fileciteturn18file5
+
+21. `ifrs_CurrentPortionOfLongtermBorrowings` — 261: 유동성장기차입금 — 126: 유동성장기부채 fileciteturn19file1 fileciteturn18file5
+
+22. `ifrs_CurrentProvisions` — 261: 하자보수충당부채 — 126: 하자보수충당부채 fileciteturn19file1 fileciteturn18file5
+
+23. `ifrs_NoncurrentLiabilities` — 261: 비유동부채 — 126: 비유동부채 fileciteturn17file1 fileciteturn18file5
+
+24. `ifrs_OtherNoncurrentFinancialLiabilities` — 261: 기타비유동금융부채 — 126: 기타금융부채 fileciteturn14file0 fileciteturn18file5
+
+25. `ifrs_NoncurrentLeaseLiabilities` — 261: 비유동리스부채 — 126: 리스부채 fileciteturn17file1 fileciteturn18file5
+
+26. `ifrs_Liabilities` — 261: 부채총계 — 126: 부채총계 fileciteturn17file1 fileciteturn18file5
+
+27. `ifrs_EquityAttributableToOwnersOfParent` — 261: 지배기업의 소유지분 — 126: 지배기업의 소유주에게 귀속되는 자본 fileciteturn19file1 fileciteturn18file5
+
+28. `ifrs_IssuedCapital` — 261: 자본금 — 126: 자본금 fileciteturn11file3 fileciteturn18file5
+
+29. `ifrs_RetainedEarnings` — 261: 이익잉여금(결손금) — 126: 이익잉여금(결손금) fileciteturn18file0 fileciteturn18file5
+
+30. `ifrs_NoncontrollingInterests` — 261: II. 비지배지분 — 126: 비지배지분 fileciteturn17file1 fileciteturn18file5
+
+31. `ifrs_Equity` — 261: 자본총계 — 126: 자본총계 fileciteturn19file1 fileciteturn18file5
+
+32. `ifrs_EquityAndLiabilities` — 261: 자본과부채총계 — 126: 부채 및 자본 총계 fileciteturn19file1 fileciteturn18file5
+
+---
+
+### B) 손익/포괄손익/EPS
+
+33. `ifrs_Revenue` — 261: 영업수익 — 126: 매출액, 수익(매출액) fileciteturn18file3 fileciteturn18file6
+
+34. `ifrs_RevenueFromInterest` — 261: 이자수익 — 126: 이자수익 fileciteturn18file0 fileciteturn18file7
+
+35. `ifrs_RevenueFromSaleOfGoods` — 261: 공사매출 — 126: 재화의 판매로 인한 수익(매출액) fileciteturn18file0 fileciteturn18file7
+
+36. `ifrs_RevenueFromRenderingOfServices` — 261: 분양매출 — 126: 용역의 제공으로 인한 수익(매출액) fileciteturn18file0 fileciteturn18file7
+
+37. `ifrs_CostOfSales` — 261: 매출원가 — 126: 매출원가 fileciteturn19file1 fileciteturn18file6
+
+38. `ifrs_GrossProfit` — 261: 매출총이익 — 126: 매출총이익 fileciteturn16file2 fileciteturn18file6
+
+39. `ifrs_AdministrativeExpense` — 261: 관리비 — 126: 관리비 fileciteturn14file0 fileciteturn18file6
+
+40. `ifrs_FinanceIncome` — 261: 금융수익(표기 다양) — 126: 금융수익 fileciteturn16file3 fileciteturn18file6
+
+41. `ifrs_FinanceCosts` — 261: 금융원가 — 126: 금융비용 fileciteturn19file1 fileciteturn18file6
+
+42. `ifrs_ProfitLossBeforeTax` — 261: 법인세비용차감전순이익(손실) — 126: 법인세비용차감전순이익(손실) fileciteturn19file6 fileciteturn18file6
+
+43. `ifrs_IncomeTaxExpenseContinuingOperations` — 261: 법인세비용(수익) — 126: 법인세수익(비용), 법인세비용 fileciteturn14file0 fileciteturn18file6
+
+44. `ifrs_ProfitLoss` — 261: 당기순이익(손실) — 126: 당기순이익(손실) fileciteturn17file4 fileciteturn18file6
+
+45. `ifrs_ProfitLossFromContinuingOperations` — 261: 계속영업이익(손실) — 126: 계속영업이익(손실) fileciteturn19file6 fileciteturn18file7
+
+46. `ifrs_OtherComprehensiveIncome` — 261: 기타포괄손익 — 126: 기타포괄손익 fileciteturn18file2 fileciteturn18file8
+
+47. `ifrs_GainsLossesOnRemeasuringAvailableforsaleFinancialAssetsBeforeTax` — 261: 매도가능금융자산평가손익 — 126: 매도가능금융자산평가손익(세전기타포괄손익) fileciteturn14file0 fileciteturn18file7
+
+48. `ifrs_GainsLossesOnRemeasuringAvailableforsaleFinancialAssetsNetOfTax` — 261: 매도가능금융자산평가이익 — 126: 매도가능금융자산평가이익 fileciteturn14file0 fileciteturn18file8
+
+49. `ifrs_ComprehensiveIncome` — 261: 총포괄손익 — 126: 총포괄손익 fileciteturn19file2 fileciteturn18file8
+
+50. `ifrs_BasicEarningsLossPerShare` — 261: 기본주당이익(손실) — 126: 기본주당이익(손실) fileciteturn14file0 fileciteturn18file8
+
+51. `ifrs_DilutedEarningsLossPerShare` — 261: 희석주당이익(손실) — 126: 희석주당이익(손실) fileciteturn19file1 fileciteturn18file7
+
+52. `ifrs_DilutedEarningsLossPerShareFromContinuingOperations` — 261: 계속영업희석주당이익(손실) — 126: 계속영업희석주당이익(손실) fileciteturn19file1 fileciteturn18file7
+
+---
+
+### 확인 포인트(애매함 제거를 위해 명시)
+
+* 126의 **“리스부채”** 는 261에서 대응 가능한 리스부채 개념이 **`ifrs_NoncurrentLeaseLiabilities`(비유동리스부채)** 하나뿐이어서 그쪽으로 매핑했다. fileciteturn17file1 fileciteturn18file5
+* 261의 일부 항목은 **한글 표기와 ifrs_코드가 직관적으로 어긋나 보이는 줄이 존재**하지만(예: 특정 “금융수익” 표기 줄), **교집합은 ifrs_코드 기준**으로 동일 개념만 채택했다. fileciteturn19file1 fileciteturn16file3
+
+원하면 위 52개를 **(126컬럼명 ↔ 261 ifrs_code) 매핑표(CSV)** 형태로도 정리해줄 수 있다.

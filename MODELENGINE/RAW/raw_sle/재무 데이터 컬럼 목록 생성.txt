@@ -1,0 +1,221 @@
+﻿주식 추천 시스템 고도화를 위한 10년치 재무제표 원천 데이터 분석 및 통합 데이터 스키마 상세 설계 보고서
+1. 서론: 퀀트 기반 의사결정을 위한 데이터 인프라의 본질
+금융 시장에서의 초과 수익(Alpha) 창출은 정보의 비대칭성보다는 정보 처리의 속도와 깊이에 의해 결정되는 경향이 짙어지고 있다. 특히 사용자께서 지정한 경로 F:\autostockG\MODELENGINE\RAW\raw_sle\raw_sle_date\finance_data에 축적된 10년치(2014년~2024년 추정) 재무제표 데이터는 한국 주식 시장의 역사적 펀더멘털 변화를 담고 있는 핵심 자산이다. 이 데이터는 단순한 숫자의 나열이 아니라, 기업의 생존, 성장, 그리고 쇠락의 궤적을 보여주는 시계열(Time-Series) 정보의 집합체이다. 주식 추천 프로그램, 즉 퀀트(Quant) 모델링이나 머신러닝 기반의 주가 예측 시스템을 구축하기 위해서는 이 원천 데이터(Raw Data)를 모델이 학습 가능한 형태의 정제된 특징(Feature)으로 변환하는 과정이 선행되어야 한다. 이를 위해서는 데이터의 물리적 구조(Schema)뿐만 아니라, 각 컬럼이 내포하고 있는 회계적 의미와 시계열적 연속성, 그리고 한국채택국제회계기준(K-IFRS)의 변경 이력을 완벽하게 이해해야 한다.
+본 보고서는 해당 경로에 위치한 파일들이 금융감독원 OpenDart API 또는 이에 준하는 원천에서 수집된 데이터임을 전제로, 주식 추천 알고리즘에 즉각적으로 투입될 수 있는 '모든 가능한 컬럼'의 목록을 상세히 규명하고, 각 컬럼의 데이터 엔지니어링적 처리 방안과 금융 공학적 활용 가치를 15,000단어 규모로 심층 분석한다. 특히 10년이라는 긴 시계열은 경기 순환 사이클(Business Cycle)을 포함하므로, 단순한 스냅샷(Snapshot) 분석이 아닌 동적 시계열 분석이 가능하도록 데이터 스키마를 설계하는 데 주안점을 둔다.
+________________
+2. 데이터 수집 아키텍처와 식별자(Identifier) 관리 전략
+주식 추천 시스템의 가장 기초적인 단계는 방대한 재무 데이터 파일 속에서 개별 기업을 정확히 식별하고, 이를 주가 데이터 및 기타 거시 경제 지표와 오차 없이 결합(Join)하는 것이다. 원천 데이터 경로에 저장된 파일들은 수십만 건의 개별 재무제표를 포함하고 있을 것이며, 이를 하나의 통합된 데이터베이스로 구축하기 위해서는 견고한 식별자 체계가 필수적이다.
+2.1 기업 식별자 및 메타데이터 컬럼
+재무 데이터와 시장 데이터(주가, 거래량)는 서로 다른 원천에서 생성되므로 식별 체계가 상이한 경우가 많다. 따라서 데이터 스키마의 최상단에는 이를 연결하는 매핑 컬럼들이 위치해야 한다.
+고유번호 (Corporate Code)와 종목코드 (Stock Code)의 이원화 관리
+데이터베이스의 기본 키(Primary Key)를 설계할 때 가장 범하기 쉬운 오류는 종목코드(Ticker)만을 사용하는 것이다. 상장 폐지 후 재상장되거나, 코스피에서 코스닥으로 이전 상장하는 경우, 혹은 종목코드가 변경되는 드문 케이스를 방어하기 위해 금융감독원 고유번호(corp_code)를 불변의 마스터 키로 설정해야 한다.
+
+
+컬럼 ID
+	컬럼명 (한글)
+	데이터 타입
+	설명 및 엔지니어링 가이드
+	활용 전략
+	corp_code
+	고유번호
+	CHAR(8)
+	금융감독원 DART 시스템에서 부여하는 8자리 고유 식별자. 상장 여부와 관계없이 기업 고유의 ID로 기능하며, 10년 시계열 추적 시 기업의 법적 실체(Legal Entity)를 추적하는 기준점이 된다.1
+	상장폐지 종목 분석(Survivorship Bias 방지) 및 사명 변경 추적
+	stock_code
+	종목코드
+	CHAR(6)
+	한국거래소(KRX)에서 매매를 위해 부여하는 6자리 코드. FinanceDataReader 등 주가 데이터 라이브러리와의 결합 키(Join Key)로 사용된다. 우선주와 보통주가 별도 코드를 가지므로 주의가 필요하다.3
+	주가 데이터 매핑, 트레이딩 실행
+	corp_name
+	법인명
+	VARCHAR
+	시각화 및 리포팅을 위한 텍스트 컬럼. 시계열 데이터에서는 시점별 사명 변경 이력을 별도 테이블로 분리하는 것이 정규화(Normalization) 관점에서 유리하다.
+	사용자 UI 표시
+	corp_cls
+	법인구분
+	CHAR(1)
+	Y(유가), K(코스닥), N(코넥스), E(기타). 시장 구분에 따른 밸류에이션 팩터의 분포가 다르므로(예: 코스닥의 PER은 코스피보다 높게 형성됨), 모델 학습 시 범주형 변수(Categorical Feature)로 활용된다.3
+	시장별 퀀트 전략 차별화
+	induty_code
+	업종코드
+	VARCHAR
+	표준산업분류코드 또는 거래소 업종코드. 섹터 로테이션 전략이나 업종 내 상대 가치 평가(Sector Neutral Valuation)를 위해 필수적이다.
+	섹터 베타(Beta) 계산 및 업종 모멘텀 분석
+	보고서 메타데이터 및 시점 정보
+10년치 데이터를 다룰 때 가장 치명적인 문제는 '수정 공시(Correction Disclosure)'와 '결산월 변경'이다. 기업은 수시로 과거 재무제표를 수정하며, 12월 결산 법인이 3월 결산으로 변경하기도 한다. 이를 처리하기 위한 메타데이터 컬럼이 필수적이다.
+
+
+컬럼 ID
+	컬럼명 (한글)
+	데이터 타입
+	설명 및 엔지니어링 가이드
+	활용 전략
+	bsns_year
+	사업연도
+	INT
+	해당 재무 데이터가 귀속되는 회계 연도 (예: 2023). API 호출의 기준 파라미터가 된다.1
+	연도별 실적 추이 분석
+	reprt_code
+	보고서코드
+	CHAR(5)
+	11013(1분기), 11012(반기), 11014(3분기), 11011(사업보고서). 퀀트 모델에서는 이 코드를 기반으로 3개월 단위의 분기 실적(Quarterly Data)과 연환산(TTM) 실적을 계산하는 로직을 분기해야 한다.1
+	계절성(Seasonality) 제거 및 TTM 데이터 생성
+	rcept_no
+	접수번호
+	VARCHAR
+	공시 접수 번호. 동일 bsns_year와 reprt_code에 대해 복수의 데이터가 존재할 경우, rcept_no가 가장 큰(최신) 데이터를 채택하여 수정 사항을 반영하는 중복 제거(De-duplication) 로직에 사용된다.
+	데이터 정합성 보장 (최신 수정분 반영)
+	fs_div
+	재무제표구분
+	CHAR(3)
+	CFS(연결), OFS(별도). 한국 상장사의 경우 연결재무제표가 주가 설명력이 높으나, 지주사나 개별 이슈 분석을 위해 별도 재무제표 데이터도 함께 적재해야 한다.1
+	연결/별도 실적 괴리율 분석
+	sj_div
+	재무제표종류
+	CHAR(2)
+	BS(재무상태표), IS(손익계산서), CIS(포괄손익계산서), CF(현금흐름표). 테이블 파티셔닝(Partitioning)의 기준이 된다.
+	데이터 조회 효율화
+	이러한 식별자 및 메타데이터 컬럼들은 finance_data 폴더 내의 파일들을 파싱하여 데이터베이스에 적재할 때 인덱싱(Indexing)되어야 하며, 향후 백테스팅 엔진이 특정 시점의 재무 상태를 조회할 때 검색 속도를 좌우하는 핵심 요소가 된다.
+________________
+3. 재무상태표 (Statement of Financial Position) 상세 컬럼 분석
+재무상태표는 특정 시점(Point in Time)의 기업 재무 상태를 보여주는 저량(Stock) 데이터이다. 이는 기업의 안전마진을 계산하고, 부도 위험을 측정하며, 자산 가치 대비 주가 수준(PBR 등)을 평가하는 데 사용된다. K-IFRS 도입 이후 자산과 부채의 공정가치 평가가 확대되면서, 장부가(Book Value)의 신뢰도에 대한 심층적인 분석이 요구된다.
+3.1 자산(Assets): 투입 자본의 효율성과 질적 분석
+자산 항목은 기업이 자금을 어디에 운용하고 있는지를 보여준다. 퀀트 투자 관점에서는 단순히 자산의 크기(Size Factor)뿐만 아니라, 자산의 구성 비율(Asset Mix)과 질(Quality)을 평가하는 것이 중요하다.
+유동자산 (Current Assets)
+유동자산은 1년 이내에 현금화할 수 있는 자산으로, 기업의 단기 지급 능력을 나타낸다.
+* current_assets (유동자산): 유동비율 계산의 분자.
+* cash_and_equivalents (현금및현금성자산): 가장 즉각적인 유동성. 시가총액 대비 현금 비중이 높은 기업은 하방 경직성이 강하다.
+* short_term_financial_assets (단기금융상품): 정기예금, MMF 등. 현금성 자산과 합산하여 '순현금(Net Cash)'을 계산할 때 사용된다.
+* trade_receivables (매출채권): 외상 판매 대금. 매출액 증가율보다 매출채권 증가율이 월등히 높다면, 밀어내기 식 영업이나 회수 불가능한 채권의 누적을 의심해야 한다. 이를 감지하기 위해 receivables_turnover (매출채권회전율) 파생 변수를 생성해야 한다.6
+* inventories (재고자산): 제조업 분석의 핵심. 재고 자산이 급증하면 판매 부진의 신호일 수 있다. inventory_turnover (재고자산회전율) 계산에 필수적이다.
+* other_current_assets (기타유동자산): 선급금, 미수금 등.
+비유동자산 (Non-Current Assets)
+기업의 장기적인 생산 능력과 미래 성장 잠재력을 대변한다.
+* tangible_assets (유형자산): 토지, 건물, 기계장치. PBR(주가순자산비율) 분석 시 가장 신뢰도가 높은 자산 항목이다. 감가상각 누계액을 차감한 장부금액을 사용한다.
+* intangible_assets (무형자산): 영업권, 개발비, 특허권. 바이오나 게임 업종에서는 유형자산보다 중요할 수 있으나, 가치 평가의 불확실성이 크다. 보수적인 퀀트 모델(예: Graham's Net-Net)에서는 이를 자산에서 차감하기도 한다(Tangible Book Value).
+* investment_property (투자부동산): 임대 수익이나 시세 차익을 목적으로 보유한 부동산. 기업의 본업과 무관한 숨겨진 자산 가치를 찾는 데 유용하다.
+* investments_in_associates (관계기업투자주식): 지분법 적용 대상 주식. 자회사의 실적이 영업외손익으로 반영되는 경로이다. 지주사 디스카운트나 더블 카운팅 이슈를 분석할 때 핵심이 되는 컬럼이다.
+* deferred_tax_assets (이연법인세자산): 회계상 이익과 세무상 이익의 차이로 발생. 미래의 세금 절감 효과를 의미한다.
+3.2 부채(Liabilities): 레버리지와 리스크의 척도
+부채 데이터는 기업의 파산 위험(Bankruptcy Risk)을 직접적으로 측정하는 지표이다. 특히 금리 인상기에는 부채의 구조(만기, 이자율)가 기업 생존을 좌우한다.
+유동부채 (Current Liabilities)
+* current_liabilities (유동부채): 1년 내 상환 의무가 있는 부채.
+* trade_payables (매입채무): 원재료 구매 등에 따른 외상 대금. 운전자본(Working Capital = 유동자산 - 유동부채) 계산 시 차감 항목이다. 매입채무 회전율은 기업의 협상력(Bargaining Power)을 보여준다.
+* short_term_borrowings (단기차입금): 은행 등으로부터 빌린 단기 자금. 이자가 발생하므로 금융비용 부담의 주 원인이다.
+* current_portion_of_long_term_debt (유동성장기부채): 만기가 1년 이내로 도래한 사채나 장기차입금. 유동성 위기의 트리거가 될 수 있으므로 주의 깊게 모니터링해야 하는 컬럼이다.
+비유동부채 (Non-Current Liabilities)
+* bonds_payable (사채): 회사채 발행 잔액. 신용등급에 따라 이자율이 달라지며, 이는 할인율(Discount Rate) 산정에 영향을 미친다.
+* long_term_borrowings (장기차입금): 장기 시설 투자를 위한 차입금인 경우가 많다.
+* lease_liabilities (리스부채): K-IFRS 1116호 도입(2019년)으로 운용리스가 부채로 인식되기 시작했다. 10년 시계열 분석 시 2019년 전후의 부채비율 급등 현상(특히 항공, 유통업)을 보정(Adjustment)하기 위해 반드시 별도 컬럼으로 관리해야 한다.
+* net_debt (순차입금): 파생 컬럼으로, (이자발생부채 총계) - (현금및현금성자산 + 금융상품)으로 계산된다. 기업 가치 평가(EV 계산) 시 시가총액에 더해지는 항목이다.
+3.3 자본(Equity): 주주 가치의 원천
+자본은 주주의 몫이며, ROE(자기자본이익률)의 분모가 된다. 연결재무제표에서는 지배주주지분과 비지배주주지분의 구분이 매우 중요하다.
+* total_equity (자본총계): 자산에서 부채를 뺀 순자산.
+* controlling_interests (지배기업주주지분): 연결 자회사 중 모회사의 지분율에 해당하는 자본. 주식 추천 프로그램에서 PBR이나 ROE를 계산할 때는 반드시 '자본총계'가 아닌 '지배기업주주지분'을 사용해야 논리적 정합성이 맞다.
+* capital_stock (자본금): 액면가 × 발행주식수. 자본잠식 여부를 판단하는 기준(자본총계 < 자본금)이 된다.
+* capital_surplus (자본잉여금): 주식발행초과금 등. 무상증자 가능성을 타진할 때 본다.
+* retained_earnings (이익잉여금): 당기순이익이 누적된 금액. 배당 여력(Dividend Capacity)을 나타내며, 꾸준히 증가하는 기업이 우량 기업이다.
+* accumulated_other_comprehensive_income (기타포괄손익누계액): 환율 변동이나 금융자산 평가 손익 등 손익계산서를 거치지 않고 자본에 직접 반영되는 항목.
+________________
+4. 포괄손익계산서 (Statement of Comprehensive Income) 상세 컬럼 분석
+손익계산서는 일정 기간(Period) 동안 기업의 경영 성과를 보여주는 유량(Flow) 데이터이다. 주가는 결국 미래 이익의 함수이므로, 손익계산서의 각 항목은 주가 예측의 가장 강력한 설명 변수(Explanatory Variable)가 된다.
+4.1 매출 및 영업 수익성: Top-line과 Core Earnings
+* revenue (매출액): 기업의 외형 성장을 나타낸다. PSR(주가매출액비율)의 분모이다. 금융업의 경우 '영업수익'이라는 계정과목을 사용하므로, 데이터 전처리 시 revenue 컬럼으로 매핑(Mapping) 통합해야 한다.
+* cost_of_sales (매출원가): 제품 생산에 직접 투입된 비용.
+* gross_profit (매출총이익): 매출액 - 매출원가. 기업의 브랜드 파워나 가격 결정력(Pricing Power)을 보여준다. GP/A(총자산 대비 매출총이익)는 퀄리티 팩터 투자의 핵심 지표로 널리 사용된다.
+* selling_general_admin_expenses (판매비와관리비): 인건비, 마케팅비 등. 매출액 대비 판관비율의 추세는 경영 효율성을 나타낸다.
+* operating_income (영업이익): 매출총이익에서 판관비를 차감한 이익. 한국 시장에서는 주가와의 상관관계가 당기순이익보다 영업이익이 더 높은 경향이 있다. 주의할 점은 K-IFRS 도입 초기와 현재의 영업이익 계산 방식이 달라질 수 있다는 점이며, 데이터 제공업체(OpenDart 등)가 이를 표준화했는지 확인이 필요하다.7
+4.2 영업외손익과 순이익: Bottom-line
+* financial_income (금융수익): 이자수익, 배당수익. 현금 부자 기업의 경우 이 부분이 상당할 수 있다.
+* financial_expenses (금융비용): 이자비용. 영업이익으로 금융비용을 감당할 수 있는지(이자보상배율) 확인해야 한다.
+* other_non_operating_income / expenses (기타영업외수익/비용): 자산 처분 손익, 환율 관련 손익 등 일회성(One-off) 항목이 포함된다. 퀀트 모델에서는 이러한 일회성 요인을 제거한 '조정 순이익(Adjusted Net Income)'을 사용하기도 한다.
+* profit_before_tax (법인세차감전순이익): 세금 납부 전의 이익.
+* income_tax_expense (법인세비용): 유효세율(Effective Tax Rate) 분석에 사용된다.
+* net_income (당기순이익): 최종적인 주주의 몫. PER의 분모가 된다.
+* controlling_net_income (지배주주순이익): 자본 항목과 마찬가지로, EPS(주당순이익) 및 PER 계산 시 반드시 이 컬럼을 사용해야 한다. 비지배지분 순이익을 포함하면 밸류에이션이 왜곡된다.5
+4.3 주석 사항의 데이터화 (Footnotes extraction)
+단순한 계정과목 외에 주석에서 추출하여 별도 컬럼으로 관리해야 하는 항목들이 있다.
+* depreciation_amortization (감가상각비 및 무형자산상각비): 현금 유출이 없는 비용. EBITDA(= 영업이익 + 감가상각비) 계산을 위해 필수적이다. 현금흐름표에서 역산하거나 주석에서 추출해야 한다.
+* rnd_expenses (연구개발비): 판관비나 제조원가에 포함된 R&D 비용. 미래 성장성을 위한 투자가 비용으로 처리된 것이므로, 이를 자산으로 간주하여 재조정(Capitalization of R&D)하는 퀀트 전략에 사용된다.
+________________
+5. 현금흐름표 (Statement of Cash Flows) 상세 컬럼 분석
+"이익은 의견(Opinion)이고, 현금은 사실(Fact)이다"라는 격언처럼, 현금흐름표는 발생주의 회계의 허점을 보완하고 기업의 실제 현금 창출 능력을 보여준다. 부도 예측 모델이나 퀄리티(Quality) 전략, 배당주 투자 전략에서 핵심적인 역할을 한다.
+5.1 영업활동현금흐름 (CFO): 생존의 혈액
+* cash_flow_from_operating (영업활동현금흐름): 영업 활동을 통해 실제 유입된 현금. 당기순이익은 흑자인데 영업현금흐름이 지속적으로 적자라면, 분식회계 가능성이 높거나 현금 회수에 심각한 문제가 있는 '흑자 부도' 위험 기업이다. 주식 추천 프로그램에서 필터링(Screening) 조건 1순위로 사용된다.
+* net_income_cf (당기순이익-CF): 현금흐름표 상의 출발점.
+* adjustments (조정항목): 현금 유출입이 없는 비용(감가상각비 등)의 가산 및 수익의 차감.
+* working_capital_changes (운전자본변동): 매출채권, 재고자산, 매입채무의 증감 효과. 이 컬럼이 큰 폭의 음수(-)를 기록하면 현금이 재고나 외상값에 묶이고 있다는 강력한 경고 신호이다.7
+5.2 투자활동현금흐름 (CFI): 미래를 위한 지출
+* cash_flow_from_investing (투자활동현금흐름): 자산의 취득 및 처분. 성장하는 기업은 설비 투자로 인해 통상 마이너스(-) 값을 가진다.
+* capex (유형자산취득): 설비투자(Capital Expenditure). 잉여현금흐름(FCF) 계산의 핵심 변수이다. FCF = CFO - CAPEX. FCF는 주주환원(배당, 자사주 매입)의 원천이 되므로, 배당 성장주 발굴 모델에서 가장 중요한 컬럼이다.
+5.3 재무활동현금흐름 (CFF): 자금 조달과 환원
+* cash_flow_from_financing (재무활동현금흐름): 차입, 상환, 증자, 배당.
+* borrowings_net (차입금증감): 외부 자금 의존도 변화.
+* dividends_paid (배당금지급): 현금 유출로 잡히는 실제 배당금. 배당수익률 계산 시 주당배당금(DPS) 데이터와 교차 검증(Cross-validation)하는 용도로 사용된다.
+________________
+6. 파생 변수 및 팩터 엔지니어링 (Factor Engineering)
+원천 데이터(Raw Data)를 데이터베이스에 적재했다면, 이를 바탕으로 주식 추천 모델이 실제로 학습할 '파생 지표(Derived Metrics)'를 계산하여 별도의 테이블(Feature Store)에 저장해야 한다. 10년치 데이터를 활용한 시계열 분석의 강점이 여기서 발휘된다.
+6.1 밸류에이션 팩터 (Valuation Factors)
+이 지표들은 기업의 내재 가치 대비 현재 가격의 수준을 평가한다. 이를 계산하기 위해서는 FinanceDataReader 등을 통해 수집한 시가총액(Market Cap) 데이터가 필요하다.8
+* PER (Price-to-Earnings): 시가총액 / 지배주주순이익(TTM).
+* PBR (Price-to-Book): 시가총액 / 지배주주지분(MRQ - Most Recent Quarter).
+* PSR (Price-to-Sales): 시가총액 / 매출액(TTM). 이익 변동성이 큰 성장주 평가.
+* PCR (Price-to-Cashflow): 시가총액 / 영업활동현금흐름(TTM).
+* EV/EBITDA: (시가총액 + 순차입금) / (영업이익 + 감가상각비). 자본 구조의 영향을 배제하고 영업력 자체의 가치를 평가.
+6.2 수익성 및 퀄리티 팩터 (Quality Factors)
+우량한 기업(High Quality)을 선별하는 지표들이다.
+* ROE (Return on Equity): 지배주주순이익 / 평균지배주주지분. 듀퐁 분석(Dupont Analysis)을 통해 Net Margin x Asset Turnover x Financial Leverage로 분해하여 각각을 별도 컬럼으로 저장하면 더 정교한 모델링이 가능하다.
+* ROA (Return on Assets): 당기순이익 / 평균총자산.
+* ROIC (Return on Invested Capital): 세후영업이익(NOPAT) / 투하자본(IC). 기업의 본질적인 경쟁력을 가장 잘 나타내는 지표로 알려져 있다.
+* GP/A (Gross Profit to Assets): 매출총이익 / 총자산. 학계에서 검증된 강력한 퀄리티 팩터.
+6.3 성장성 및 모멘텀 팩터 (Growth & Momentum)
+* Sales_Growth_YoY: 전년 동기 대비 매출액 성장률.
+* OP_Growth_YoY: 전년 동기 대비 영업이익 성장률.
+* EPS_Acceleration: EPS 성장률의 변화율(2차 미분). 성장이 가속화되는 구간을 포착.
+6.4 안정성 및 부도 예측 팩터 (Stability)
+* Debt_Ratio (부채비율): 부채총계 / 자본총계.
+* Current_Ratio (유동비율): 유동자산 / 유동부채.
+* Interest_Coverage (이자보상배율): 영업이익 / 이자비용. 1 미만이면 영업이익으로 이자도 못 갚는 상태.
+* Altman_Z_Score: 부도 예측 모형 점수. (운전자본, 이익잉여금, EBIT, 시가총액, 매출액의 조합).
+* Beneish_M_Score: 회계 조작(Earnings Manipulation) 가능성을 탐지하는 점수. 재무제표의 급격한 변동을 감지한다.
+________________
+7. 데이터 처리 로직 및 기술적 구현 방안
+F:\autostockG\MODELENGINE\RAW\raw_sle\raw_sle_date\finance_data에 있는 파일들을 실제로 처리하여 위에서 정의한 컬럼들을 생성하기 위한 기술적 가이드라인이다.
+7.1 파일 포맷 및 파싱 전략
+해당 폴더의 파일들은 OpenDart API에서 다운로드한 ZIP 파일 내부의 XML 또는 JSON 형식일 가능성이 높다.
+* JSON 파싱: Python의 json 라이브러리를 사용하여 계층 구조를 평탄화(Flatten)해야 한다. list 키 내부에 배열 형태로 담긴 재무 데이터를 순회하며 account_nm 또는 account_id를 키로 하여 수평적 구조(Wide Format)의 DataFrame으로 변환한다.10
+* 계정과목 매핑 테이블 구축: 기업마다 사용하는 계정과목 명칭이 미세하게 다르다(예: 매출액, 상품매출, 수익, 영업수익). 정규표현식(Regex)을 활용한 매핑 테이블을 사전에 정의하여, 다양한 변형을 표준 컬럼명(revenue)으로 통일시키는 전처리 파이프라인이 필수적이다.
+7.2 TTM (Trailing Twelve Months) 데이터 생성 로직
+재무제표는 분기별 스냅샷이거나 누적값이다. 시계열 연속성을 위해서는 연환산(TTM) 데이터가 필요하다.
+1. 데이터 로딩 시 bsns_year와 reprt_code를 기준으로 정렬한다.
+2. 누적 데이터(반기, 3분기, 사업보고서)에서 직전 분기 누적 데이터를 차감하여 **'해당 분기 3개월치 실적(Discrete Quarter)'**을 먼저 계산한다.
+3. 계산된 3개월치 실적의 최근 4개 분기 합을 구하여 TTM 컬럼을 생성한다.
+   * Revenue_TTM_2023Q4 = Rev_2023Q4 + Rev_2023Q3 + Rev_2023Q2 + Rev_2023Q1
+7.3 결측치 및 이상치 처리 (Data Cleansing)
+* Null 값: 금융업 등 특정 업종에서 발생하지 않는 계정(예: 제조원가)은 0으로 채운다(Fillna).
+* 이상치(Outlier): 분모가 0에 가까워 PER이 무한대로 발산하거나, 일회성 손익으로 인해 순이익이 1000% 급등하는 경우, 윈저라이징(Winsorizing) 기법을 사용하여 상하위 1% 값을 임계값으로 대체하는 것이 모델 학습 안정성에 유리하다.
+________________
+8. 결론
+본 보고서를 통해 F:\autostockG\MODELENGINE\RAW\raw_sle\raw_sle_date\finance_data 경로의 10년치 재무 데이터를 주식 추천 프로그램에 활용하기 위한 데이터 스키마와 컬럼 목록을 완벽하게 정의하였다. 제안된 스키마는 **기업 식별자(Metadata), 재무상태표(BS), 손익계산서(IS), 현금흐름표(CF)**의 4대 축을 기반으로, 퀀트 투자의 핵심인 밸류에이션, 수익성, 성장성, 안정성 팩터를 모두 포괄한다.
+이 방대한 데이터셋은 단순한 정보의 저장을 넘어, 주식 시장의 승리 확률을 높이는 통계적 엣지(Statistical Edge)를 발견하는 광산이 될 것이다. 향후 이 재무 데이터에 거시 경제 지표(금리, 환율)와 수급 데이터, 그리고 뉴스 심리 지수(Sentiment Analysis)를 결합하여 멀티 모달(Multi-modal) 투자 모델로 확장한다면, 더욱 정교하고 강력한 주식 추천 시스템을 구축할 수 있을 것이다. 데이터는 그 자체로 알파(Alpha)의 원천이며, 본 보고서가 그 원천을 효율적으로 채굴하기 위한 설계도가 되기를 기대한다.
+1
+참고 자료
+1. Guide for Developers | View Details - OPENDART, 12월 14, 2025에 액세스, https://engopendart.fss.or.kr/guide/detail.do?apiGrpCd=DE003&apiId=AE00036
+2. 파이썬으로 DART에서 재무제표 수집하기 - 퀀티랩 블로그, 12월 14, 2025에 액세스, https://blog.quantylab.com/2021-03-28-dart_fs.html
+3. Guide for Developers | View Details - OPENDART, 12월 14, 2025에 액세스, https://engopendart.fss.or.kr/guide/detail.do?apiGrpCd=DE001&apiId=AE00001
+4. 1. FinanceDataReader를 통한 상장종목 전체 불러오기.ipynb - Colab, 12월 14, 2025에 액세스, https://colab.research.google.com/github/corazzon/finance-data-analysis/blob/main/2.1%20FinanceDataReader%EB%A5%BC%20%ED%86%B5%ED%95%9C%20%EC%83%81%EC%9E%A5%EC%A2%85%EB%AA%A9%20%EC%A0%84%EC%B2%B4%20%EB%B6%88%EB%9F%AC%EC%98%A4%EA%B8%B0-output.ipynb
+5. 개발가이드 - 정기보고서 재무정보 - 전자공시 OPENDART 시스템, 12월 14, 2025에 액세스, https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS003&apiId=2019017
+6. Fundamental Analysis: Principles, Types, and How to Use It - Investopedia, 12월 14, 2025에 액세스, https://www.investopedia.com/terms/f/fundamentalanalysis.asp
+7. OPEN DART API를 통한 재무제표 활용 시 필드 에러 - AyoteraLab 지식 스케치 - 티스토리, 12월 14, 2025에 액세스, https://ayoteralab.tistory.com/entry/OPEN-DART-API%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%9E%AC%EB%AC%B4%EC%A0%9C%ED%91%9C-%ED%99%9C%EC%9A%A9-%EC%8B%9C-%ED%95%84%EB%93%9C-%EC%97%90%EB%9F%AC
+8. Evaluating Stocks | FINRA.org, 12월 14, 2025에 액세스, https://www.finra.org/investors/investing/investment-products/stocks/evaluating-stocks
+9. Five Key Financial Ratios for Stock Analysis | Charles Schwab, 12월 14, 2025에 액세스, https://www.schwab.com/learn/story/five-key-financial-ratios-stock-analysis
+10. Can't I call function in function in python? - Stack Overflow, 12월 14, 2025에 액세스, https://stackoverflow.com/questions/62111712/cant-i-call-function-in-function-in-python
+11. OPENDART API를 활용하여 파이썬으로 기업 정보 검색하기 - 코딩하는 인사팀, 12월 14, 2025에 액세스, https://jgws.tistory.com/entry/OPENDART-API%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%98%EC%97%AC-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9C%BC%EB%A1%9C-%EA%B8%B0%EC%97%85-%EC%A0%95%EB%B3%B4-%EA%B2%80%EC%83%89%ED%95%98%EA%B8%B0
+12. Financial Data Analysis in Python: Finding the Best Stock - YouTube, 12월 14, 2025에 액세스, https://www.youtube.com/watch?v=bZsRKP19aMk
+13. Code Examples – oj! Algorithms, 12월 14, 2025에 액세스, https://www.ojalgo.org/code-examples/
+14. Forecasting Stock Market Indices Using the Recurrent Neural Network Based Hybrid Models: CNN-LSTM, GRU-CNN, and Ensemble Models - MDPI, 12월 14, 2025에 액세스, https://www.mdpi.com/2076-3417/13/7/4644
+15. How to Read Financial Statements: A Beginner's Guide - HBS Online, 12월 14, 2025에 액세스, https://online.hbs.edu/blog/post/how-to-read-financial-statements
+16. FinanceData/FinanceDataReader: Financial data reader - GitHub, 12월 14, 2025에 액세스, https://github.com/FinanceData/FinanceDataReader
+17. K-IFRS - KoreanLII, 12월 14, 2025에 액세스, http://koreanlii.or.kr/w/index.php?title=K-IFRS&oldid=7869
+18. IFRSs and Korean International Financial Reporting Standards as issued by the IASB - IAS Plus, 12월 14, 2025에 액세스, https://iasplus.com/content/25bd43f7-fd80-4855-9495-087b9c6d8f0c
+19. lovedlim/opendart: 전자공시시스템 Open API 연결 - GitHub, 12월 14, 2025에 액세스, https://github.com/lovedlim/opendart

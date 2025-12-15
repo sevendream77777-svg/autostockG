@@ -1,0 +1,63 @@
+0순위: 데이터 식별 및 시계열 정렬 (Essential Keys)
+데이터를 Stock Price(주가) 및 Macro(거시경제) 데이터와 결합하기 위한 기준점입니다.
+
+corp_code (고유번호): 금융감독원 고유 ID. 종목코드 변경이나 상장 폐지 이슈와 무관하게 기업을 식별하는 불변의 키(Key)입니다.
+
+stock_code (종목코드): 거래소 매매 코드. 주가 데이터(Open, Close 등)와 조인(Join)할 때 사용합니다.
+
+bsns_year (사업연도): 재무 데이터의 시간 축(Time-stamp)입니다. 10년치 시계열 학습(LSTM, Transformer 등)의 기준이 됩니다.
+
+reprt_code (보고서코드): 1분기/반기/3분기/사업보고서를 구분합니다. 계절성(Seasonality) 제거와 연환산(TTM) 처리에 필수입니다.
+
+1순위: 핵심 수익성 지표 (Core Profitability)
+주가 상승의 가장 직접적인 동인(Driver)이자, 퀀트 모델에서 가장 높은 가중치를 갖는 항목들입니다.
+
+operating_income (영업이익): 매출에서 원가와 판관비를 뺀 이익. 한국 시장에서는 당기순이익보다 주가 설명력이 높으며, 핵심 팩터인 영업이익률(OPM) 계산의 분자입니다.
+
+revenue / sales (매출액): 기업의 외형 성장(Growth)을 측정하는 척도. PSR(주가매출액비율)의 기준이며, 매출액 성장률은 성장주 발굴의 제1 조건입니다.
+
+net_income (당기순이익): 최종적인 주주의 몫. PER(주가수익비율) 계산 및 배당 여력 측정의 기초가 됩니다.
+
+controlling_net_income (지배주주순이익): 연결재무제표 사용 시 필수. 자회사의 비지배지분을 제외한 '실제 주주 이익'으로, 정확한 EPS(주당순이익) 계산에 사용됩니다.
+
+2순위: 밸류에이션 및 자산 가치 (Valuation & Asset Quality)
+기업이 저평가되었는지(Value Factor) 판단하기 위한 분모 데이터입니다.
+
+total_equity (자본총계): 기업의 순자산(Net Asset). PBR(주가순자산비율) 및 ROE(자기자본이익률) 계산의 핵심입니다.
+
+controlling_equity (지배주주지분): 연결회계에서 PBR과 ROE의 정확도를 높이기 위해 자본총계 대신 사용해야 하는 컬럼입니다.
+
+total_assets (자산총계): 기업의 규모(Size Factor)를 나타내며, ROA(총자산이익률) 및 부채비율 계산에 사용됩니다.
+
+gross_profit (매출총이익): 매출액 - 매출원가. 기업의 브랜드 파워와 가격 결정력을 보여주며, 학계에서 입증된 퀄리티 지표인 GP/A(자산 대비 매출총이익)의 핵심 변수입니다.
+
+3순위: 현금흐름 및 이익의 질 (Cash Flow & Quality)
+"흑자 부도"를 걸러내고 이익의 진실성을 검증하는 컬럼입니다.
+
+cash_flow_from_operating (영업활동현금흐름): 실제 기업에 유입된 현금. 순이익은 흑자인데 이 항목이 적자라면 분식회계나 부실 징후(Red Flag)로 판단하여 추천에서 제외합니다.
+
+capex / tangible_asset_acquisition (유형자산취득): 미래를 위한 설비 투자액. 잉여현금흐름(FCF = 영업현금흐름 - CAPEX)을 계산하여 배당 성장 가능성을 예측하는 데 쓰입니다.
+
+depreciation (감가상각비): 현금 유출이 없는 비용. 영업이익에 더해 현금 창출력 지표인 EBITDA를 계산할 때 사용합니다.
+
+4순위: 재무 안정성 및 리스크 (Stability & Risk)
+부도 위험을 측정하여 종목 필터링(Screening)에 사용됩니다.
+
+total_liabilities (부채총계): 레버리지 비율(부채비율) 산출의 분자입니다. 금리 인상기에 주가 하락 방어를 위한 중요 팩터입니다.
+
+short_term_borrowings (단기차입금): 1년 내 갚아야 할 이자 발생 부채. 유동성 위기 가능성을 점검합니다.
+
+current_assets (유동자산): 1년 내 현금화 가능한 자산. 유동비율(Current Ratio) 계산에 사용됩니다.
+
+current_liabilities (유동부채): 1년 내 상환해야 할 부채. 유동자산보다 이 항목이 크면 관리종목 지정 위험이 있습니다.
+
+5순위: 상세 운전자본 및 기타 (Working Capital & Others)
+정교한 펀더멘털 분석을 위해 추가적으로 필요한 컬럼입니다.
+
+inventories (재고자산): 재고가 급증하면 매출 부진의 신호입니다. 재고자산회전율 계산에 필요합니다.
+
+trade_receivables (매출채권): 외상값. 매출액 대비 매출채권이 과도하게 늘어나면 '허위 매출' 가능성을 의심해야 합니다.
+
+rnd_expenses (연구개발비): 기술주(Tech)나 바이오 기업의 잠재 성장성을 평가할 때 비용이 아닌 자산으로 재조정(Capitalize)하여 분석합니다.
+
+구현 팁: 수집 프로그램(autostockG)을 만들 때, OpenDart API의 fnlttSinglAcnt(단일회사 주요계정) API를 호출하면 위 컬럼들의 대부분을 표준화된 account_nm(계정명)과 thstrm_amount(당기금액) 형태로 한 번에 수집할 수 있습니다.
